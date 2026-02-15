@@ -1,6 +1,6 @@
 # PeraWave
 
-This is a web-based community platform designed for students of the University of Peradeniya, covering all nine faculties. The purpose of the system is to improve communication, knowledge sharing, and community interaction among students by providing a centralized digital space for discussions related to academic, non-academic, and common university matters.
+PeraWave is a web-based community platform developed by ProWave, designed for students of the University of Peradeniya, covering all nine faculties. The purpose of the system is to improve communication, knowledge sharing, and community interaction among students by providing a centralized digital space for discussions related to academic, non-academic, and common university matters.
 
 
 ## Overview
