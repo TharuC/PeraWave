@@ -1,8 +1,7 @@
 # PeraWave
 
-A full-stack web application built with **React**, **Node.js**, **Express**, and **PostgreSQL** featuring secure authentication using **JWT**.
+This is a web-based community platform designed for students of the University of Peradeniya, covering all nine faculties. The purpose of the system is to improve communication, knowledge sharing, and community interaction among students by providing a centralized digital space for discussions related to academic, non-academic, and common university matters.
 
----
 
 ## Overview
 
@@ -43,7 +42,7 @@ This project is a modern full-stack application designed with:
 * Postman (API Testing)
 
 
-## 🔐 Authentication Flow
+## Authentication Flow
 
 1. User registers → password hashed using bcrypt
 2. User logs in → server generates JWT
