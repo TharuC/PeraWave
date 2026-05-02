@@ -12,7 +12,7 @@
     background-size: 700px;
     background-position: center;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 /* Optional overlay if the line art is too prominent */

@@ -16,6 +16,83 @@ model User {
   fullName           String?
   faculty            String?
   registrationNumber String?
+  suspendedUntil     DateTime?
+  suspensionReason   String?
+  isDeleted          Boolean  @default(false)
+  deletionReason     String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  notifications      Notification[]
+}
+
+model Moderator {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  fullName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  actions   ModerationAction[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // e.g., 'WARNING', 'INFO'
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ModerationAction {
+  id           Int      @id @default(autoincrement())
+  moderatorId  Int?
+  moderator    Moderator? @relation(fields: [moderatorId], references: [id])
+  targetUserId Int
+  actionType   String   // 'WARN', 'SUSPEND', 'DELETE'
+  reason       String?
+  durationDays Int?     // For suspensions, in days
+  createdAt    DateTime @default(now())
+}
+
+// ─── Forum Models ──────────────────────────────────────────────────────────────
+
+model ForumPost {
+  id           Int       @id @default(autoincrement())
+  authorId     Int
+  title        String
+  content      String
+  faculty      String?   // Used for FACULTY_ONLY and BATCH_ONLY scoping
+  batch        String?   // e.g. "E23" – only relevant for BATCH_ONLY
+  visibility   String    // 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY'
+  isAnonymous  Boolean   @default(false)
+  upvotes      Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  comments     Comment[]
+  votes        PostVote[]
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  postId      Int
+  post        ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId    Int
+  content     String
+  isAnonymous Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model PostVote {
+  id      Int       @id @default(autoincrement())
+  postId  Int
+  post    ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId  Int
+  value   Int       // 1 for upvote, -1 for downvote
+
+  @@unique([postId, userId])
 }

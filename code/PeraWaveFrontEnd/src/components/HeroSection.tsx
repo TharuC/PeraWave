@@ -30,7 +30,7 @@ const HeroSection: React.FC = () => {
         </p>
       </div>
 
-      <button className="help-btn">Get Help</button>
+      <button className="help-btn">Need Help?</button>
     </div>
   );
 };

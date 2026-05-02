@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
+import modRoutes from './routes/modRoutes';
+import forumRoutes from './routes/forumRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +17,8 @@ app.use(express.json()); // Parses incoming JSON requests
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/mod', modRoutes);
+app.use('/api/forum', forumRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

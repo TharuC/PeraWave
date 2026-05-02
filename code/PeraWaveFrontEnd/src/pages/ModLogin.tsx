@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
 
-const Login: React.FC = () => {
+const ModLogin: React.FC = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -14,17 +14,11 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError("");
 
-        // University Email Validation
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.pdn\.ac\.lk$/;
-        if (!emailRegex.test(email.trim())) {
-            setError("Please enter a valid University Email Address.");
-            return;
-        }
-
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://localhost:5000/api/auth/login", {
+            // Note: This endpoint will be created later on the backend
+            const response = await fetch("http://localhost:5000/api/auth/mod-login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -33,7 +27,7 @@ const Login: React.FC = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || "Login failed. Please try again.");
+                setError(data.error || "Login failed. Please verify your moderator credentials.");
                 return;
             }
 
@@ -41,8 +35,8 @@ const Login: React.FC = () => {
                 localStorage.setItem("token", data.token);
             }
 
-            // Navigate to home, passing the user object
-            navigate("/home", { state: { user: data.user } });
+            // Navigate to mod dashboard, passing the user object
+            navigate("/mod-dashboard", { state: { user: data.user } });
 
         } catch (err) {
             setError("Failed to connect to the server. Please try again later.");
@@ -52,24 +46,24 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="login-page">
+        <div className="login-page mod-login-page">
             <button className="back-btn" onClick={() => navigate("/")}>
                 &larr; Back to Welcome
             </button>
 
-            <div className="login-card">
+            <div className="login-card" style={{ borderTop: "4px solid #ef4444" }}>
                 <div className="login-header">
-                    <h2>Welcome Back</h2>
-                    <p>Please enter your details to sign in.</p>
+                    <h2>Moderator Portal</h2>
+                    <p>Secure access for PeraWave administrators.</p>
                 </div>
 
                 <form onSubmit={handleLogin} className="login-form">
                     <div className="input-group">
-                        <label htmlFor="email">Email</label>
+                        <label htmlFor="email">Admin Email</label>
                         <input
                             type="email"
                             id="email"
-                            placeholder="Enter your university email"
+                            placeholder="Enter your admin email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -115,20 +109,20 @@ const Login: React.FC = () => {
                         <label className="remember-me">
                             <input type="checkbox" /> Remember me
                         </label>
-                        <a href="#" className="forgot-password">Forgot Password?</a>
+                        <a href="#" className="forgot-password" style={{ color: "#ef4444" }}>Forgot Password?</a>
                     </div>
 
-                    <button type="submit" className="login-submit-btn" disabled={isLoading}>
-                        {isLoading ? "Signing in..." : "Log In"}
+                    <button type="submit" className="login-submit-btn" disabled={isLoading} style={{ background: "linear-gradient(90deg, #ef4444, #f87171)", color: "#fff" }}>
+                        {isLoading ? "Authenticating..." : "Login"}
                     </button>
                 </form>
 
                 <p className="signup-link">
-                    Don't have an account? <span onClick={() => navigate("/register")}>Sign up</span>
+                    Need a moderator account? <span onClick={() => navigate("/mods/register")} style={{ color: "#ef4444" }}>Create one</span>
                 </p>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default ModLogin;
