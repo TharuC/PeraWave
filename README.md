@@ -1,6 +1,6 @@
 # PeraWave
 
-PeraWave is a modern university social platform for communicate information among university students, developed at the University of Peradeniya. The platform provides students with a centralized space to connect, share updates, participate in discussions, discover university events and access campus-related information through a modern and responsive web interface.
+PeraWave is a modern university social platform for communicate information among university students, developed by Prowave at the University of Peradeniya. The platform provides students with a centralized space to connect, share updates, participate in discussions, discover university events and access campus-related information through a modern and responsive web interface.
 
 The application follows a full-stack architecture consisting of a React-based frontend and a Node.js backend, communicating through RESTful APIs and powered by a PostgreSQL database.
 
