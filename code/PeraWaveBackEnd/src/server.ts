@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import modRoutes from './routes/modRoutes';
 import forumRoutes from './routes/forumRoutes';
+import reportRoutes from './routes/reportRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(express.json()); // Parses incoming JSON requests
 app.use('/api/auth', authRoutes);
 app.use('/api/mod', modRoutes);
 app.use('/api/forum', forumRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

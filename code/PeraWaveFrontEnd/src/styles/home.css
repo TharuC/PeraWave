@@ -113,8 +113,6 @@
     border-radius: 12px;
     padding: 20px 0;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-    position: sticky;
-    top: 100px;
 }
 
 .sidebar-section {
@@ -278,8 +276,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    position: sticky;
-    top: 100px;
 }
 
 .widget-card {

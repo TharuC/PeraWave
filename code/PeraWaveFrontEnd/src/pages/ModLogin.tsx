@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
+import { API_URL } from "../config";
 
 const ModLogin: React.FC = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ const ModLogin: React.FC = () => {
 
         try {
             // Note: This endpoint will be created later on the backend
-            const response = await fetch("http://localhost:5000/api/auth/mod-login", {
+            const response = await fetch(`${API_URL}/api/auth/mod-login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -32,11 +33,11 @@ const ModLogin: React.FC = () => {
             }
 
             if (data.token) {
-                localStorage.setItem("token", data.token);
+                sessionStorage.setItem("token", data.token);
             }
 
-            // Navigate to mod dashboard, passing the user object
-            navigate("/mod-dashboard", { state: { user: data.user } });
+            // Navigate to mod forum home
+            navigate("/mod-home", { state: { user: data.user } });
 
         } catch (err) {
             setError("Failed to connect to the server. Please try again later.");
@@ -109,7 +110,7 @@ const ModLogin: React.FC = () => {
                         <label className="remember-me">
                             <input type="checkbox" /> Remember me
                         </label>
-                        <a href="#" className="forgot-password" style={{ color: "#ef4444" }}>Forgot Password?</a>
+                        <a href="#" className="forgot-password" style={{ color: "#ef4444" }} onClick={(e) => { e.preventDefault(); navigate("/mod-forgot-password"); }}>Forgot Password?</a>
                     </div>
 
                     <button type="submit" className="login-submit-btn" disabled={isLoading} style={{ background: "linear-gradient(90deg, #ef4444, #f87171)", color: "#fff" }}>

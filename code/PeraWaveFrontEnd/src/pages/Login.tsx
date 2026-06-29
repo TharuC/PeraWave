@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
+import { API_URL } from "../config";
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://localhost:5000/api/auth/login", {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -38,7 +39,7 @@ const Login: React.FC = () => {
             }
 
             if (data.token) {
-                localStorage.setItem("token", data.token);
+                sessionStorage.setItem("token", data.token);
             }
 
             // Navigate to home, passing the user object
@@ -115,7 +116,7 @@ const Login: React.FC = () => {
                         <label className="remember-me">
                             <input type="checkbox" /> Remember me
                         </label>
-                        <a href="#" className="forgot-password">Forgot Password?</a>
+                        <a href="#" className="forgot-password" onClick={(e) => { e.preventDefault(); navigate("/forgot-password"); }}>Forgot Password?</a>
                     </div>
 
                     <button type="submit" className="login-submit-btn" disabled={isLoading}>

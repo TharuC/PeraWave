@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../styles/dashboard.css";
 import userAvatar from "../assets/UserAvatar.png";
+import { API_URL } from "../config";
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -20,14 +21,16 @@ const UserDashboard: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showWarningPopup, setShowWarningPopup] = useState(false);
   const [currentWarning, setCurrentWarning] = useState<any>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Always fetch fresh data from backend on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) { navigate("/login"); return; }
 
     // 1. Fetch user profile
-    fetch("http://localhost:5000/api/auth/me", {
+    fetch(`${API_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -46,14 +49,14 @@ const UserDashboard: React.FC = () => {
       })
       .catch((err) => {
         if (err === 401 || err === 403) {
-          localStorage.removeItem("token");
+          sessionStorage.removeItem("token");
           navigate("/login");
         }
         console.error("Error fetching user", err);
       });
 
     // 2. Fetch notifications independently (always fresh)
-    fetch("http://localhost:5000/api/auth/notifications", {
+    fetch(`${API_URL}/api/auth/notifications`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -75,8 +78,8 @@ const UserDashboard: React.FC = () => {
     setShowWarningPopup(false);
     // Mark only this notification as read
     try {
-      const token = localStorage.getItem("token");
-      await fetch("http://localhost:5000/api/auth/notifications/read", {
+      const token = sessionStorage.getItem("token");
+      await fetch(`${API_URL}/api/auth/notifications/read`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -89,13 +92,39 @@ const UserDashboard: React.FC = () => {
 
   const markAllRead = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await fetch("http://localhost:5000/api/auth/notifications/read", {
+      const token = sessionStorage.getItem("token");
+      await fetch(`${API_URL}/api/auth/notifications/read`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (e) { console.error(e); }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(`${API_URL}/api/auth/me`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        sessionStorage.removeItem("token");
+        navigate("/");
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to delete account");
+        setIsDeleting(false);
+        setShowDeleteConfirm(false);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Network error occurred.");
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const isSuspended = userData.suspendedUntil && new Date(userData.suspendedUntil) > new Date();
@@ -194,6 +223,23 @@ const UserDashboard: React.FC = () => {
 
           </div>
         </div>
+
+        {/* Delete Account Section */}
+        <div className="info-section" style={{ marginTop: '20px' }}>
+          <h3 className="info-section-title" style={{ color: '#ef4444' }}>Danger Zone</h3>
+          <div style={{ background: '#fff', border: '1px solid #fca5a5', borderRadius: '12px', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h4 style={{ margin: '0 0 5px 0', color: '#0f172a', fontSize: '16px' }}>Delete Account</h4>
+              <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Permanently delete your account and all associated data.</p>
+            </div>
+            <button 
+              onClick={() => setShowDeleteConfirm(true)}
+              style={{ padding: '10px 20px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Delete Account
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Warning Pop-up Modal */}
@@ -227,6 +273,34 @@ const UserDashboard: React.FC = () => {
             >
               I Understand & Acknowledge
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 }}>
+          <div style={{ background: '#fff', padding: '32px', borderRadius: '16px', width: '400px', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', animation: 'fadeIn 0.2s ease' }}>
+            <h2 style={{ margin: '0 0 15px 0', color: '#0f172a', fontSize: '20px' }}>Delete Account?</h2>
+            <p style={{ color: '#475569', fontSize: '15px', lineHeight: '1.5', marginBottom: '25px' }}>
+              Are you absolutely sure you want to delete your account? This action <strong>cannot be undone</strong> and you will lose access to all your data immediately.
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                style={{ flex: 1, padding: '12px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '15px' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                style={{ flex: 1, padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '15px' }}
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete My Account"}
+              </button>
+            </div>
           </div>
         </div>
       )}

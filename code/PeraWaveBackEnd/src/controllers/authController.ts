@@ -3,6 +3,177 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../config/db';
 
+// Temporary in-memory store for OTPs (For prototype purposes)
+// In production, this should be stored in a database or Redis with an expiration.
+const otpStore = new Map<string, { otp: string; expiresAt: number }>();
+
+export const sendOtp = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) return res.status(409).json({ error: 'User with this email already exists' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    otpStore.set(email, { otp, expiresAt });
+
+    console.log(`\n=================================================`);
+    console.log(`[DEVELOPMENT ONLY] OTP generated for ${email}: ${otp}`);
+    console.log(`=================================================\n`);
+
+    return res.status(200).json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
+
+    const storedOtpData = otpStore.get(email);
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+
+    if (Date.now() > storedOtpData.expiresAt) {
+      otpStore.delete(email);
+      return res.status(400).json({ error: 'OTP has expired' });
+    }
+
+    if (storedOtpData.otp !== otp) {
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
+
+    otpStore.delete(email); // OTP consumed
+    return res.status(200).json({ message: 'OTP verified successfully' });
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const sendResetPasswordOtp = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (!existingUser || existingUser.isDeleted) {
+      return res.status(404).json({ error: 'User with this email not found' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    otpStore.set(email, { otp, expiresAt });
+
+    console.log(`\n=================================================`);
+    console.log(`[DEVELOPMENT ONLY] Password Reset OTP for ${email}: ${otp}`);
+    console.log(`=================================================\n`);
+
+    return res.status(200).json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('Send Reset OTP error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) return res.status(400).json({ error: 'Email, OTP, and new password are required' });
+
+    const storedOtpData = otpStore.get(email);
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+
+    if (Date.now() > storedOtpData.expiresAt) {
+      otpStore.delete(email);
+      return res.status(400).json({ error: 'OTP has expired' });
+    }
+
+    if (storedOtpData.otp !== otp) {
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    await prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword }
+    });
+
+    otpStore.delete(email);
+    return res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Reset Password error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const sendModResetPasswordOtp = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const existingMod = await prisma.moderator.findUnique({ where: { email } });
+    if (!existingMod) {
+      return res.status(404).json({ error: 'Moderator with this email not found' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+
+    otpStore.set(`mod_${email}`, { otp, expiresAt });
+
+    console.log(`\n=================================================`);
+    console.log(`[DEVELOPMENT ONLY] MOD Password Reset OTP for ${email}: ${otp}`);
+    console.log(`=================================================\n`);
+
+    return res.status(200).json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('Send Mod Reset OTP error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const modResetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) return res.status(400).json({ error: 'Email, OTP, and new password are required' });
+
+    const storedOtpData = otpStore.get(`mod_${email}`);
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+
+    if (Date.now() > storedOtpData.expiresAt) {
+      otpStore.delete(`mod_${email}`);
+      return res.status(400).json({ error: 'OTP has expired' });
+    }
+
+    if (storedOtpData.otp !== otp) {
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    await prisma.moderator.update({
+      where: { email },
+      data: { password: hashedPassword }
+    });
+
+    otpStore.delete(`mod_${email}`);
+    return res.status(200).json({ message: 'Moderator password reset successfully' });
+  } catch (error) {
+    console.error('Mod Reset Password error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const { email, password, fullName, faculty, registrationNumber } = req.body;
@@ -72,6 +243,11 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    // Block deleted accounts from logging in
+    if (user.isDeleted) {
+      return res.status(403).json({ error: 'This account has been permanently deleted.' });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -105,12 +281,48 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
+export const sendModRegisterOtp = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const existingMod = await prisma.moderator.findUnique({ where: { email } });
+    if (existingMod) return res.status(409).json({ error: 'Moderator with this email already exists' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+
+    otpStore.set(`mod_reg_${email}`, { otp, expiresAt });
+
+    console.log(`\n=================================================`);
+    console.log(`[DEVELOPMENT ONLY] MOD Registration OTP for ${email}: ${otp}`);
+    console.log(`=================================================\n`);
+
+    return res.status(200).json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('Send Mod Reg OTP error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const modRegister = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, adminCode } = req.body;
+    const { name, email, password, adminCode, otp } = req.body;
 
-    if (!name || !email || !password || !adminCode) {
+    if (!name || !email || !password || !adminCode || !otp) {
       return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const storedOtpData = otpStore.get(`mod_reg_${email}`);
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+
+    if (Date.now() > storedOtpData.expiresAt) {
+      otpStore.delete(`mod_reg_${email}`);
+      return res.status(400).json({ error: 'OTP has expired' });
+    }
+
+    if (storedOtpData.otp !== otp) {
+      return res.status(400).json({ error: 'Invalid OTP' });
     }
 
     const expectedCode = process.env.ADMIN_REGISTRATION_CODE || 'PeraWaveAdmin2026';
@@ -132,6 +344,8 @@ export const modRegister = async (req: Request, res: Response) => {
         fullName: name,
       },
     });
+
+    otpStore.delete(`mod_reg_${email}`);
 
     return res.status(201).json({
       message: 'Moderator registered successfully',
@@ -218,6 +432,7 @@ export const getCurrentUser = async (req: any, res: Response) => {
         include: { notifications: { where: { isRead: false } } }
       });
       if (!user) return res.status(404).json({ error: 'User not found' });
+      if (user.isDeleted) return res.status(403).json({ error: 'This account has been permanently deleted.' });
       return res.status(200).json({
         id: user.id,
         email: user.email,
@@ -234,6 +449,32 @@ export const getCurrentUser = async (req: any, res: Response) => {
   } catch (error) {
     console.error('Error fetching current user:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteMe = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    // Double check the user exists
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Soft delete the user
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isDeleted: true, deletionReason: 'User deleted their own account' }
+    });
+
+    return res.status(200).json({ message: 'Account successfully deleted' });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    return res.status(500).json({ error: 'Internal server error while deleting account' });
   }
 };
 

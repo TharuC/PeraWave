@@ -1,6 +1,48 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db';
 
+export const getModerationActions = async (req: Request, res: Response) => {
+  try {
+    const actions = await prisma.moderationAction.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: {
+        moderator: { select: { fullName: true, email: true } }
+      }
+    });
+    res.status(200).json(actions);
+  } catch (error) {
+    console.error('Error fetching moderation actions:', error);
+    res.status(500).json({ error: 'Failed to fetch audit logs' });
+  }
+};
+
+export const getPlatformStats = async (req: Request, res: Response) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [totalUsers, newUsersToday, suspendedUsers, totalPosts, totalModerators] = await Promise.all([
+      prisma.user.count({ where: { isDeleted: false } }),
+      prisma.user.count({ where: { isDeleted: false, createdAt: { gte: today } } }),
+      prisma.user.count({ where: { isDeleted: false, suspendedUntil: { gt: new Date() } } }),
+      prisma.forumPost.count(),
+      prisma.moderator.count(),
+    ]);
+
+    res.status(200).json({
+      totalUsers,
+      newUsersToday,
+      suspendedUsers,
+      totalPosts,
+      totalModerators,
+    });
+  } catch (error) {
+    console.error('Error fetching platform stats:', error);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+};
+
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
@@ -20,6 +62,23 @@ export const getUsers = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
+
+export const getModerators = async (req: Request, res: Response) => {
+  try {
+    const moderators = await prisma.moderator.findMany({
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        createdAt: true,
+      }
+    });
+    res.status(200).json(moderators);
+  } catch (error) {
+    console.error('Error fetching moderators:', error);
+    res.status(500).json({ error: 'Failed to fetch moderators' });
   }
 };
 

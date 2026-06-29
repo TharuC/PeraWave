@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/login.css"; // Reuse existing styles
+import { API_URL } from "../config";
 
 const facultyMap: Record<string, string> = {
   sci: "Faculty of Science",
@@ -48,7 +49,13 @@ const RegisterDetails: React.FC = () => {
     const { email, regNumber, faculty } = location.state;
     setEmail(email);
     setComputedReg(formatRegNumber(regNumber));
-    setComputedFaculty(facultyMap[faculty.toLowerCase()] || `Faculty of ${faculty}`);
+    const resolvedFaculty = facultyMap[faculty.toLowerCase()];
+    if (!resolvedFaculty) {
+      // Unknown faculty — send user back to email step
+      navigate('/register');
+      return;
+    }
+    setComputedFaculty(resolvedFaculty);
   }, [location, navigate]);
 
   const validatePassword = (pass: string) => {
@@ -76,7 +83,7 @@ const RegisterDetails: React.FC = () => {
 
     // Send to backend
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +100,9 @@ const RegisterDetails: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setPasswordError(data.error || "Something went wrong during registration.");
+        console.error("Backend returned error:", data);
+        const errorMsg = data.error || data.message || `Server error ${response.status}: ${JSON.stringify(data)}`;
+        setPasswordError(errorMsg);
         return;
       }
 
@@ -101,9 +110,9 @@ const RegisterDetails: React.FC = () => {
       console.log("Registration successful!", data);
       navigate("/login", { state: { message: "Account created successfully! Please log in." } });
 
-    } catch (err) {
-      console.error("Failed to connect to backend:", err);
-      setPasswordError("Failed to connect to the server. Please try again later.");
+    } catch (err: any) {
+      console.error("Failed to connect or parse response:", err);
+      setPasswordError(`Network error: ${err.message}. Please check if the backend is running.`);
     }
   };
 

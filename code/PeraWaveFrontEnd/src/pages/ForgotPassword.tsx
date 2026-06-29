@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
+import { API_URL } from "../config";
 
-const ModForgotPassword: React.FC = () => {
+const ForgotPassword: React.FC = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState<1 | 2>(1);
     const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const ModForgotPassword: React.FC = () => {
 
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:8080/api/auth/mod-reset-password-otp", {
+            const res = await fetch(`${API_URL}/api/auth/reset-password-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
@@ -36,7 +37,7 @@ const ModForgotPassword: React.FC = () => {
 
             const data = await res.json();
             if (res.ok) {
-                setSuccessMsg("Reset OTP sent! Check your backend terminal for the code.");
+                setSuccessMsg("Reset OTP sent!");
                 setStep(2);
             } else {
                 setError(data.error || "Failed to send OTP");
@@ -70,7 +71,7 @@ const ModForgotPassword: React.FC = () => {
 
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:8080/api/auth/mod-reset-password", {
+            const res = await fetch(`${API_URL}/api/auth/reset-password`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp, newPassword })
@@ -78,8 +79,8 @@ const ModForgotPassword: React.FC = () => {
 
             const data = await res.json();
             if (res.ok) {
-                alert("Moderator password reset successfully! You can now log in.");
-                navigate("/mods");
+                alert("Password reset successfully! You can now log in.");
+                navigate("/login");
             } else {
                 setError(data.error || "Failed to reset password");
             }
@@ -92,13 +93,13 @@ const ModForgotPassword: React.FC = () => {
 
     return (
         <div className="login-page">
-            <button className="back-btn" onClick={() => navigate(step === 2 ? "#" : "/mods")} onMouseDown={() => step === 2 && setStep(1)}>
+            <button className="back-btn" onClick={() => navigate(step === 2 ? "#" : "/login")} onMouseDown={() => step === 2 && setStep(1)}>
                 &larr; Back
             </button>
 
             <div className="login-card">
                 <div className="login-header">
-                    <h2>Moderator Reset Password</h2>
+                    <h2>Reset Password</h2>
                     <p>{step === 1 ? "Enter your email to receive a reset code." : "Enter the OTP and your new password."}</p>
                 </div>
 
@@ -107,11 +108,11 @@ const ModForgotPassword: React.FC = () => {
                 {step === 1 ? (
                     <form onSubmit={handleSendOTP} className="login-form">
                         <div className="input-group">
-                            <label htmlFor="email">Email Address</label>
+                            <label htmlFor="email">University Email</label>
                             <input
                                 type="email"
                                 id="email"
-                                placeholder="Moderator email address"
+                                placeholder="UoP email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -121,7 +122,7 @@ const ModForgotPassword: React.FC = () => {
 
                         {error && <p className="error-message fade-in" style={{ color: '#ff6b6b', fontSize: '0.9rem', marginBottom: '1rem' }}>{error}</p>}
 
-                        <button type="submit" className="login-submit-btn" disabled={loading} style={{ background: 'linear-gradient(45deg, #10b981, #059669)' }}>
+                        <button type="submit" className="login-submit-btn" disabled={loading}>
                             {loading ? "Sending OTP..." : "Send Reset Code"}
                         </button>
                     </form>
@@ -203,7 +204,7 @@ const ModForgotPassword: React.FC = () => {
 
                         {error && <p className="error-message fade-in" style={{ color: '#ff6b6b', fontSize: '0.9rem', marginBottom: '1rem' }}>{error}</p>}
 
-                        <button type="submit" className="login-submit-btn" disabled={loading} style={{ background: 'linear-gradient(45deg, #10b981, #059669)' }}>
+                        <button type="submit" className="login-submit-btn" disabled={loading}>
                             {loading ? "Resetting..." : "Reset Password"}
                         </button>
                     </form>
@@ -213,4 +214,4 @@ const ModForgotPassword: React.FC = () => {
     );
 };
 
-export default ModForgotPassword;
+export default ForgotPassword;

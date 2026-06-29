@@ -16,6 +16,10 @@
     flex-direction: column;
     padding: 20px;
     box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+    overflow-y: auto; /* Allows sidebar to scroll if items exceed height */
+    height: 100vh;
+    position: sticky;
+    top: 0;
 }
 
 .mod-sidebar-header {
@@ -126,6 +130,11 @@
     margin-bottom: 20px;
     font-size: 20px;
     color: #0f172a;
+}
+
+.mod-table-container {
+    width: 100%;
+    overflow-x: auto; /* Allows tables to scroll horizontally on small screens */
 }
 
 .mod-table {

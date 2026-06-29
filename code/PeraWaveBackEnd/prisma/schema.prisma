@@ -24,6 +24,7 @@ model User {
   updatedAt          DateTime @updatedAt
 
   notifications      Notification[]
+  reports            Report[]
 }
 
 model Moderator {
@@ -70,6 +71,7 @@ model ForumPost {
   visibility   String    // 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY'
   isAnonymous  Boolean   @default(false)
   upvotes      Int       @default(0)
+  isFlagged    Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -84,6 +86,7 @@ model Comment {
   authorId    Int
   content     String
   isAnonymous Boolean   @default(false)
+  isFlagged   Boolean   @default(false)
   createdAt   DateTime  @default(now())
 }
 
@@ -95,4 +98,22 @@ model PostVote {
   value   Int       // 1 for upvote, -1 for downvote
 
   @@unique([postId, userId])
+}
+
+// ─── Reporting System ───────────────────────────────────────────────────────────
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  reporterId  Int
+  reporter    User     @relation(fields: [reporterId], references: [id])
+  contentType String   // 'POST' | 'COMMENT'
+  contentId   Int
+  reason      String   // 'SPAM' | 'HARASSMENT' | 'MISINFORMATION' | 'INAPPROPRIATE' | 'DUPLICATE' | 'OTHER'
+  description String?  // Optional extra detail from reporter
+  status      String   @default("PENDING")  // 'PENDING' | 'UNDER_REVIEW' | 'RESOLVED' | 'REJECTED'
+  modNote     String?  // Moderator's internal note
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([reporterId, contentType, contentId])  // Prevent duplicate reports
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/forum.css';
 import '../styles/home.css';
-import logo from '../assets/PeraWaveLogo.png';
+// import logo from '../assets/PeraWaveLogo.png';
+import { API_URL } from '../config';
 
 type Visibility = 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY';
 
@@ -24,10 +25,10 @@ const CreatePost: React.FC = () => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) { navigate('/login'); return; }
 
-    fetch('http://localhost:5000/api/auth/me', {
+    fetch(`${API_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.ok ? r.json() : Promise.reject())
@@ -36,11 +37,11 @@ const CreatePost: React.FC = () => {
         if (isSuspended) { navigate('/home'); return; }
         setUser(data);
       })
-      .catch(() => { localStorage.removeItem('token'); navigate('/login'); });
+      .catch(() => { sessionStorage.removeItem('token'); navigate('/login'); });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     navigate('/');
   };
 
@@ -51,12 +52,12 @@ const CreatePost: React.FC = () => {
     if (!title.trim()) { setError('Please enter a title for your post.'); return; }
     if (!content.trim()) { setError('Please enter some content for your post.'); return; }
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) { navigate('/login'); return; }
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/forum/posts', {
+      const res = await fetch(`${API_URL}/api/forum/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title, content, visibility, isAnonymous }),
@@ -81,6 +82,7 @@ const CreatePost: React.FC = () => {
         onLogout={handleLogout}
         userName={user?.fullName}
         userAvatar={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.fullName}`}
+        userRole={user?.role}
       />
 
       <div className="forum-layout">
@@ -161,8 +163,6 @@ const CreatePost: React.FC = () => {
                 <h4>🎭 Post Anonymously</h4>
                 <p>
                   Your name won't be shown to other users.{' '}
-                  {isAnonymous && <strong style={{ color: '#15803d' }}>Moderators can still see your identity.</strong>}
-                  {!isAnonymous && 'Moderators can always see your identity.'}
                 </p>
               </div>
             </div>
@@ -174,7 +174,7 @@ const CreatePost: React.FC = () => {
                 Posting as: <strong style={{ color: '#1e293b' }}>{isAnonymous ? 'Anonymous' : (user?.fullName || '...')}</strong>
                 {isAnonymous && (
                   <span style={{ marginLeft: '8px', fontSize: '11px', background: '#fef9c3', color: '#854d0e', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                    🔑 Mod-visible: {user?.fullName}
+                    {user?.fullName}
                   </span>
                 )}
               </p>
@@ -185,7 +185,7 @@ const CreatePost: React.FC = () => {
 
             {/* Actions */}
             <div className="cp-actions">
-              <button type="button" className="cp-cancel-btn" onClick={() => navigate('/home')}>
+              <button type="button" className="cp-cancel-btn" onClick={() => navigate(user?.role === 'MODERATOR' ? '/mod-home' : '/home')}>
                 Cancel
               </button>
               <button type="submit" className="cp-submit-btn" disabled={loading} id="submit-post-btn">

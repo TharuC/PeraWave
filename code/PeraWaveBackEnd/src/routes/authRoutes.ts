@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser, loginUser, modRegister, modLogin, getCurrentUser, getAllUsers, markNotificationsRead, getNotifications } from '../controllers/authController';
+import { registerUser, loginUser, modRegister, modLogin, getCurrentUser, getAllUsers, markNotificationsRead, getNotifications, sendOtp, verifyOtp, deleteMe, sendResetPasswordOtp, resetPassword, sendModResetPasswordOtp, modResetPassword, sendModRegisterOtp } from '../controllers/authController';
 import { verifyToken, requireModerator } from '../middlewares/authMiddleware';
 
 const router = Router();
@@ -7,8 +7,29 @@ const router = Router();
 // POST /api/auth/register
 router.post('/register', registerUser);
 
+// POST /api/auth/send-otp
+router.post('/send-otp', sendOtp);
+
+// POST /api/auth/verify-otp
+router.post('/verify-otp', verifyOtp);
+
+// POST /api/auth/reset-password-otp
+router.post('/reset-password-otp', sendResetPasswordOtp);
+
+// POST /api/auth/reset-password
+router.post('/reset-password', resetPassword);
+
+// POST /api/auth/mod-reset-password-otp
+router.post('/mod-reset-password-otp', sendModResetPasswordOtp);
+
+// POST /api/auth/mod-reset-password
+router.post('/mod-reset-password', modResetPassword);
+
 // POST /api/auth/login
 router.post('/login', loginUser);
+
+// POST /api/auth/mod-register-otp
+router.post('/mod-register-otp', sendModRegisterOtp);
 
 // POST /api/auth/mod-register
 router.post('/mod-register', modRegister);
@@ -24,6 +45,9 @@ router.post('/notifications/read', verifyToken, markNotificationsRead);
 
 // GET /api/auth/notifications
 router.get('/notifications', verifyToken, getNotifications);
+
+// DELETE /api/auth/me (User self-deletion)
+router.delete('/me', verifyToken, deleteMe);
 
 // GET /api/auth/users (Moderators Only)
 router.get('/users', requireModerator, getAllUsers);

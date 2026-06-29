@@ -78,6 +78,20 @@ export const getPosts = async (req: any, res: Response) => {
     });
     const authorMap = Object.fromEntries(authors.map((a) => [a.id, a]));
 
+    // Fetch report counts for these posts if user is a moderator
+    let reportCountMap: Record<number, number> = {};
+    if (isMod) {
+      const postIds = posts.map(p => p.id);
+      const reports = await prisma.report.groupBy({
+        by: ['contentId'],
+        where: { contentType: 'POST', contentId: { in: postIds }, status: { not: 'REJECTED' } },
+        _count: { _all: true },
+      });
+      reports.forEach(r => {
+        reportCountMap[r.contentId] = r._count._all;
+      });
+    }
+
     const result = posts.map((post) => {
       const author = authorMap[post.authorId] || {};
       const info   = buildAuthorInfo(
@@ -99,6 +113,10 @@ export const getPosts = async (req: any, res: Response) => {
         commentCount: post._count.comments,
         createdAt:    post.createdAt,
         userVote,
+        isAuthor:     post.authorId === userId,
+        // Always expose email to mods; for normal users only if not anonymous
+        authorEmail:  isMod ? (author as any).email : (!post.isAnonymous ? (author as any).email : undefined),
+        reportCount:  isMod ? (reportCountMap[post.id] || 0) : undefined,
         ...info,
       };
     });
@@ -106,6 +124,47 @@ export const getPosts = async (req: any, res: Response) => {
     return res.status(200).json(result);
   } catch (error) {
     console.error('Error fetching posts:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ─── GET /api/forum/posts/my-posts ────────────────────────────────────────────
+export const getMyPosts = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+
+    const posts = await prisma.forumPost.findMany({
+      where: { authorId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { comments: true } },
+        votes: { where: { userId } },
+      },
+    });
+
+    const result = posts.map((post) => {
+      const userVote = (post.votes as any[]).length > 0 ? (post.votes as any[])[0].value : 0;
+      return {
+        id:           post.id,
+        title:        post.title,
+        content:      post.content,
+        faculty:      post.faculty,
+        batch:        post.batch,
+        visibility:   post.visibility,
+        isAnonymous:  post.isAnonymous,
+        upvotes:      post.upvotes,
+        commentCount: post._count.comments,
+        createdAt:    post.createdAt,
+        userVote,
+        isAuthor:     true,
+        displayName:  post.isAnonymous ? 'Anonymous (You)' : 'You',
+      };
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching user posts:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -156,6 +215,7 @@ export const getPostById = async (req: any, res: Response) => {
           ? isMod ? `Anonymous (${(ca as any).fullName || 'Unknown'})` : 'Anonymous'
           : (ca as any).fullName || 'Unknown',
         authorId:    c.isAnonymous && !isMod ? null : c.authorId,
+        isAuthor:    c.authorId === userId,
       };
     });
 
@@ -174,6 +234,7 @@ export const getPostById = async (req: any, res: Response) => {
       upvotes:      post.upvotes,
       createdAt:    post.createdAt,
       userVote,
+      isAuthor:     post.authorId === userId,
       comments:     commentsResult,
       ...authorInfo,
     });
@@ -308,14 +369,54 @@ export const votePost = async (req: any, res: Response) => {
   }
 };
 
-// ─── DELETE /api/forum/posts/:id  (mod only) ──────────────────────────────────
+// ─── DELETE /api/forum/posts/:id  (author or mod) ──────────────────────────────
 export const deletePost = async (req: any, res: Response) => {
   try {
+    const userId = req.user?.userId;
+    const isMod = req.user?.role === 'MODERATOR' || req.user?.role === 'SUPER_ADMIN';
+    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+
     const postId = parseInt(req.params.id);
+    const post = await prisma.forumPost.findUnique({ where: { id: postId } });
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    if (!isMod && post.authorId !== userId) {
+      return res.status(403).json({ error: 'You can only delete your own posts' });
+    }
+
     await prisma.forumPost.delete({ where: { id: postId } });
-    return res.status(200).json({ message: 'Post deleted by moderator' });
+    return res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     console.error('Error deleting post:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ─── DELETE /api/forum/comments/:id  (author or mod) ──────────────────────────
+export const deleteComment = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const isMod = req.user?.role === 'MODERATOR' || req.user?.role === 'SUPER_ADMIN';
+    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+
+    const commentId = parseInt(req.params.id);
+    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    if (!isMod && comment.authorId !== userId) {
+      return res.status(403).json({ error: 'You can only delete your own comments' });
+    }
+
+    await prisma.comment.delete({ where: { id: commentId } });
+    return res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

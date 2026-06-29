@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
+import { API_URL } from "../config";
 
 const ModRegister: React.FC = () => {
     const navigate = useNavigate();
+    const [step, setStep] = useState<1 | 2>(1);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [adminCode, setAdminCode] = useState("");
+    const [otp, setOtp] = useState("");
+    
+    const [successMsg, setSuccessMsg] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -23,6 +28,48 @@ const ModRegister: React.FC = () => {
     const hasNumber = /[0-9]/.test(password);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     const isPasswordValid = hasLength && hasUpper && hasLower && hasNumber && hasSpecial;
+
+    const handleSendOTP = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        setSuccessMsg("");
+
+        if (!isPasswordValid) {
+            setError("Please ensure your password meets all the required standards.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
+        if (!adminCode) {
+            setError("Admin authorization code is required.");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${API_URL}/api/auth/mod-register-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setSuccessMsg("Reset OTP sent!");
+                setStep(2);
+            } else {
+                setError(data.error || "Failed to send OTP.");
+            }
+        } catch (err) {
+            setError("Failed to connect to the server.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,11 +88,10 @@ const ModRegister: React.FC = () => {
         setIsLoading(true);
 
         try {
-            // Note: Endpoint to be created later
-            const response = await fetch("http://localhost:5000/api/auth/mod-register", {
+            const response = await fetch(`${API_URL}/api/auth/mod-register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password, adminCode }),
+                body: JSON.stringify({ name, email, password, adminCode, otp }),
             });
 
             const data = await response.json();
@@ -67,17 +113,20 @@ const ModRegister: React.FC = () => {
 
     return (
         <div className="login-page mod-login-page" style={{ height: "100vh", overflowY: "auto", padding: "40px 0", display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
-            <button className="back-btn" onClick={() => navigate("/mods")} style={{ top: "20px" }}>
-                &larr; Back to Login
+            <button className="back-btn" onClick={() => navigate(step === 2 ? "#" : "/mods")} onMouseDown={() => step === 2 && setStep(1)} style={{ top: "20px" }}>
+                &larr; Back{step === 1 ? " to Login" : ""}
             </button>
 
             <div className="login-card" style={{ borderTop: "4px solid #ef4444", width: "450px", marginTop: "20px" }}>
                 <div className="login-header">
-                    <h2>Create Admin Account</h2>
-                    <p>Register as a new platform moderator.</p>
+                    <h2>{step === 1 ? "Create Admin Account" : "Verify Email"}</h2>
+                    <p>{step === 1 ? "Register as a new platform moderator." : "Enter the OTP to complete registration."}</p>
                 </div>
+                
+                {successMsg && <p className="success-message fade-in" style={{ color: '#10b981', fontSize: '0.9rem', marginBottom: '1rem', background: '#d1fae5', padding: '10px', borderRadius: '8px' }}>{successMsg}</p>}
 
-                <form onSubmit={handleRegister} className="login-form">
+                {step === 1 ? (
+                <form onSubmit={handleSendOTP} className="login-form">
                     <div className="input-group">
                         <label htmlFor="name">Full Name</label>
                         <input
@@ -202,9 +251,33 @@ const ModRegister: React.FC = () => {
                     )}
 
                     <button type="submit" className="login-submit-btn" disabled={isLoading || !isPasswordValid || password !== confirmPassword} style={{ background: "linear-gradient(90deg, #ef4444, #f87171)", color: "#fff", opacity: (!isPasswordValid || isLoading || password !== confirmPassword) ? 0.7 : 1, cursor: (!isPasswordValid || isLoading || password !== confirmPassword) ? "not-allowed" : "pointer" }}>
-                        {isLoading ? "Creating Account..." : "Create Moderator Account"}
+                        {isLoading ? "Sending OTP..." : "Send Verification Code"}
                     </button>
                 </form>
+                ) : (
+                <form onSubmit={handleRegister} className="login-form">
+                    <div className="input-group">
+                        <label htmlFor="otp">Verification Code (OTP)</label>
+                        <input
+                            type="text"
+                            id="otp"
+                            placeholder="Enter 6-digit OTP"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            required
+                            maxLength={6}
+                        />
+                    </div>
+                    {error && (
+                        <p style={{ color: "#ef4444", fontSize: "14px", margin: "0", padding: "8px 12px", background: "#fef2f2", borderRadius: "8px", border: "1px solid #fecaca" }}>
+                            {error}
+                        </p>
+                    )}
+                    <button type="submit" className="login-submit-btn" disabled={isLoading || !otp} style={{ background: "linear-gradient(90deg, #ef4444, #f87171)", color: "#fff", opacity: (isLoading || !otp) ? 0.7 : 1, cursor: (isLoading || !otp) ? "not-allowed" : "pointer" }}>
+                        {isLoading ? "Creating Account..." : "Verify & Register"}
+                    </button>
+                </form>
+                )}
             </div>
         </div>
     );
