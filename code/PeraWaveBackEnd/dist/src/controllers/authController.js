@@ -125,6 +125,7 @@ const sendModResetPasswordOtp = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresAt = Date.now() + 10 * 60 * 1000;
         otpStore.set(`mod_${email}`, { otp, expiresAt });
+        console.log(`[BACKUP] MOD Password Reset OTP for ${email}: ${otp}`);
         const emailSent = await (0, emailService_1.sendEmail)(email, 'PeraWave Moderator Password Reset', `Your moderator password reset One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`);
         if (!emailSent) {
             console.warn(`Failed to send moderator password reset OTP email to ${email}`);
@@ -267,6 +268,7 @@ const sendModRegisterOtp = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresAt = Date.now() + 10 * 60 * 1000;
         otpStore.set(`mod_reg_${email}`, { otp, expiresAt });
+        console.log(`[BACKUP] MOD Registration OTP for ${email}: ${otp}`);
         const emailSent = await (0, emailService_1.sendEmail)(email, 'PeraWave Moderator Registration', `Your moderator registration One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`);
         if (!emailSent) {
             console.warn(`Failed to send moderator registration OTP email to ${email}`);
