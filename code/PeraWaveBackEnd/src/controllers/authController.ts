@@ -143,6 +143,7 @@ export const sendModResetPasswordOtp = async (req: Request, res: Response) => {
     const expiresAt = Date.now() + 10 * 60 * 1000;
 
     otpStore.set(`mod_${email}`, { otp, expiresAt });
+    console.log(`[BACKUP] MOD Password Reset OTP for ${email}: ${otp}`);
 
     const emailSent = await sendEmail(
       email,
@@ -313,6 +314,7 @@ export const sendModRegisterOtp = async (req: Request, res: Response) => {
     const expiresAt = Date.now() + 10 * 60 * 1000;
 
     otpStore.set(`mod_reg_${email}`, { otp, expiresAt });
+    console.log(`[BACKUP] MOD Registration OTP for ${email}: ${otp}`);
 
     const emailSent = await sendEmail(
       email,
