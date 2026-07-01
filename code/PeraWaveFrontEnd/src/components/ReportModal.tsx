@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_URL } from '../config';
 
 interface ReportModalProps {
   contentType: 'POST' | 'COMMENT';
@@ -30,7 +31,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ contentType, contentId, onClo
 
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/reports', {
+      const res = await fetch(`${API_URL}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ contentType, contentId, reason, description }),

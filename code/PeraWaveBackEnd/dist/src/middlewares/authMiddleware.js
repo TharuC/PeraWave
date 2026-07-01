@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireModerator = exports.verifyToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const verifyToken = (req, res, next) => {
+const db_1 = __importDefault(require("../config/db"));
+const verifyToken = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -13,6 +14,19 @@ const verifyToken = (req, res, next) => {
         }
         const token = authHeader.split(' ')[1];
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+        // Validate that the user still exists in the database
+        if (decoded.role === 'MODERATOR' || decoded.role === 'SUPER_ADMIN') {
+            const mod = await db_1.default.moderator.findUnique({ where: { id: decoded.userId } });
+            if (!mod) {
+                return res.status(401).json({ error: 'Account no longer exists.' });
+            }
+        }
+        else {
+            const user = await db_1.default.user.findUnique({ where: { id: decoded.userId } });
+            if (!user || user.isDeleted) {
+                return res.status(401).json({ error: 'Account no longer exists.' });
+            }
+        }
         req.user = decoded;
         next();
     }

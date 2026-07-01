@@ -3,10 +3,170 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.markNotificationsRead = exports.getAllUsers = exports.getCurrentUser = exports.modLogin = exports.modRegister = exports.loginUser = exports.registerUser = void 0;
+exports.getNotifications = exports.markNotificationsRead = exports.getAllUsers = exports.deleteMe = exports.getCurrentUser = exports.modLogin = exports.modRegister = exports.sendModRegisterOtp = exports.loginUser = exports.registerUser = exports.modResetPassword = exports.sendModResetPasswordOtp = exports.resetPassword = exports.sendResetPasswordOtp = exports.verifyOtp = exports.sendOtp = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = __importDefault(require("../config/db"));
+// Temporary in-memory store for OTPs (For prototype purposes)
+// In production, this should be stored in a database or Redis with an expiration.
+const otpStore = new Map();
+const emailService_1 = require("../utils/emailService");
+const sendOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email)
+            return res.status(400).json({ error: 'Email is required' });
+        const existingUser = await db_1.default.user.findUnique({ where: { email } });
+        if (existingUser)
+            return res.status(409).json({ error: 'User with this email already exists' });
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+        otpStore.set(email, { otp, expiresAt });
+        const emailSent = await (0, emailService_1.sendEmail)(email, 'Your PeraWave OTP', `Your One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`);
+        if (!emailSent) {
+            console.warn(`Failed to send OTP email to ${email}`);
+            // Depending on your requirements, you could fail here or just log the warning
+        }
+        return res.status(200).json({ message: 'OTP sent successfully' });
+    }
+    catch (error) {
+        console.error('Send OTP error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.sendOtp = sendOtp;
+const verifyOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        if (!email || !otp)
+            return res.status(400).json({ error: 'Email and OTP are required' });
+        const storedOtpData = otpStore.get(email);
+        if (!storedOtpData)
+            return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+        if (Date.now() > storedOtpData.expiresAt) {
+            otpStore.delete(email);
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+        if (storedOtpData.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+        otpStore.delete(email); // OTP consumed
+        return res.status(200).json({ message: 'OTP verified successfully' });
+    }
+    catch (error) {
+        console.error('Verify OTP error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.verifyOtp = verifyOtp;
+const sendResetPasswordOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email)
+            return res.status(400).json({ error: 'Email is required' });
+        const existingUser = await db_1.default.user.findUnique({ where: { email } });
+        if (!existingUser || existingUser.isDeleted) {
+            return res.status(404).json({ error: 'User with this email not found' });
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+        otpStore.set(email, { otp, expiresAt });
+        const emailSent = await (0, emailService_1.sendEmail)(email, 'PeraWave Password Reset OTP', `Your password reset One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`);
+        if (!emailSent) {
+            console.warn(`Failed to send password reset OTP email to ${email}`);
+        }
+        return res.status(200).json({ message: 'OTP sent successfully' });
+    }
+    catch (error) {
+        console.error('Send Reset OTP error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.sendResetPasswordOtp = sendResetPasswordOtp;
+const resetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email || !otp || !newPassword)
+            return res.status(400).json({ error: 'Email, OTP, and new password are required' });
+        const storedOtpData = otpStore.get(email);
+        if (!storedOtpData)
+            return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+        if (Date.now() > storedOtpData.expiresAt) {
+            otpStore.delete(email);
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+        if (storedOtpData.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt_1.default.hash(newPassword, saltRounds);
+        await db_1.default.user.update({
+            where: { email },
+            data: { password: hashedPassword }
+        });
+        otpStore.delete(email);
+        return res.status(200).json({ message: 'Password reset successfully' });
+    }
+    catch (error) {
+        console.error('Reset Password error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.resetPassword = resetPassword;
+const sendModResetPasswordOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email)
+            return res.status(400).json({ error: 'Email is required' });
+        const existingMod = await db_1.default.moderator.findUnique({ where: { email } });
+        if (!existingMod) {
+            return res.status(404).json({ error: 'Moderator with this email not found' });
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = Date.now() + 10 * 60 * 1000;
+        otpStore.set(`mod_${email}`, { otp, expiresAt });
+        const emailSent = await (0, emailService_1.sendEmail)(email, 'PeraWave Moderator Password Reset', `Your moderator password reset One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`);
+        if (!emailSent) {
+            console.warn(`Failed to send moderator password reset OTP email to ${email}`);
+        }
+        return res.status(200).json({ message: 'OTP sent successfully' });
+    }
+    catch (error) {
+        console.error('Send Mod Reset OTP error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.sendModResetPasswordOtp = sendModResetPasswordOtp;
+const modResetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email || !otp || !newPassword)
+            return res.status(400).json({ error: 'Email, OTP, and new password are required' });
+        const storedOtpData = otpStore.get(`mod_${email}`);
+        if (!storedOtpData)
+            return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+        if (Date.now() > storedOtpData.expiresAt) {
+            otpStore.delete(`mod_${email}`);
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+        if (storedOtpData.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt_1.default.hash(newPassword, saltRounds);
+        await db_1.default.moderator.update({
+            where: { email },
+            data: { password: hashedPassword }
+        });
+        otpStore.delete(`mod_${email}`);
+        return res.status(200).json({ message: 'Moderator password reset successfully' });
+    }
+    catch (error) {
+        console.error('Mod Reset Password error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.modResetPassword = modResetPassword;
 const registerUser = async (req, res) => {
     try {
         const { email, password, fullName, faculty, registrationNumber } = req.body;
@@ -66,6 +226,10 @@ const loginUser = async (req, res) => {
         if (!user) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
+        // Block deleted accounts from logging in
+        if (user.isDeleted) {
+            return res.status(403).json({ error: 'This account has been permanently deleted.' });
+        }
         const isPasswordValid = await bcrypt_1.default.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid email or password' });
@@ -92,11 +256,44 @@ const loginUser = async (req, res) => {
     }
 };
 exports.loginUser = loginUser;
+const sendModRegisterOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email)
+            return res.status(400).json({ error: 'Email is required' });
+        const existingMod = await db_1.default.moderator.findUnique({ where: { email } });
+        if (existingMod)
+            return res.status(409).json({ error: 'Moderator with this email already exists' });
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = Date.now() + 10 * 60 * 1000;
+        otpStore.set(`mod_reg_${email}`, { otp, expiresAt });
+        const emailSent = await (0, emailService_1.sendEmail)(email, 'PeraWave Moderator Registration', `Your moderator registration One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`);
+        if (!emailSent) {
+            console.warn(`Failed to send moderator registration OTP email to ${email}`);
+        }
+        return res.status(200).json({ message: 'OTP sent successfully' });
+    }
+    catch (error) {
+        console.error('Send Mod Reg OTP error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.sendModRegisterOtp = sendModRegisterOtp;
 const modRegister = async (req, res) => {
     try {
-        const { name, email, password, adminCode } = req.body;
-        if (!name || !email || !password || !adminCode) {
+        const { name, email, password, adminCode, otp } = req.body;
+        if (!name || !email || !password || !adminCode || !otp) {
             return res.status(400).json({ error: 'All fields are required' });
+        }
+        const storedOtpData = otpStore.get(`mod_reg_${email}`);
+        if (!storedOtpData)
+            return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+        if (Date.now() > storedOtpData.expiresAt) {
+            otpStore.delete(`mod_reg_${email}`);
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+        if (storedOtpData.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
         }
         const expectedCode = process.env.ADMIN_REGISTRATION_CODE || 'PeraWaveAdmin2026';
         if (adminCode !== expectedCode) {
@@ -114,6 +311,7 @@ const modRegister = async (req, res) => {
                 fullName: name,
             },
         });
+        otpStore.delete(`mod_reg_${email}`);
         return res.status(201).json({
             message: 'Moderator registered successfully',
             user: {
@@ -189,6 +387,8 @@ const getCurrentUser = async (req, res) => {
             });
             if (!user)
                 return res.status(404).json({ error: 'User not found' });
+            if (user.isDeleted)
+                return res.status(403).json({ error: 'This account has been permanently deleted.' });
             return res.status(200).json({
                 id: user.id,
                 email: user.email,
@@ -209,6 +409,30 @@ const getCurrentUser = async (req, res) => {
     }
 };
 exports.getCurrentUser = getCurrentUser;
+const deleteMe = async (req, res) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return res.status(401).json({ error: 'Not authenticated' });
+        }
+        // Double check the user exists
+        const user = await db_1.default.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        // Soft delete the user
+        await db_1.default.user.update({
+            where: { id: userId },
+            data: { isDeleted: true, deletionReason: 'User deleted their own account' }
+        });
+        return res.status(200).json({ message: 'Account successfully deleted' });
+    }
+    catch (error) {
+        console.error('Error deleting account:', error);
+        return res.status(500).json({ error: 'Internal server error while deleting account' });
+    }
+};
+exports.deleteMe = deleteMe;
 const getAllUsers = async (req, res) => {
     try {
         const users = await db_1.default.user.findMany({
@@ -255,3 +479,20 @@ const markNotificationsRead = async (req, res) => {
     }
 };
 exports.markNotificationsRead = markNotificationsRead;
+const getNotifications = async (req, res) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId)
+            return res.status(401).json({ error: 'Not authenticated' });
+        const notifications = await db_1.default.notification.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' }
+        });
+        return res.status(200).json(notifications);
+    }
+    catch (error) {
+        console.error('Error fetching notifications:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.getNotifications = getNotifications;

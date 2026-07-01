@@ -6,6 +6,7 @@ import prisma from '../config/db';
 // Temporary in-memory store for OTPs (For prototype purposes)
 // In production, this should be stored in a database or Redis with an expiration.
 const otpStore = new Map<string, { otp: string; expiresAt: number }>();
+import { sendEmail } from '../utils/emailService';
 
 export const sendOtp = async (req: Request, res: Response) => {
   try {
@@ -20,9 +21,16 @@ export const sendOtp = async (req: Request, res: Response) => {
 
     otpStore.set(email, { otp, expiresAt });
 
-    console.log(`\n=================================================`);
-    console.log(`[DEVELOPMENT ONLY] OTP generated for ${email}: ${otp}`);
-    console.log(`=================================================\n`);
+    const emailSent = await sendEmail(
+      email,
+      'Your PeraWave OTP',
+      `Your One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`
+    );
+
+    if (!emailSent) {
+      console.warn(`Failed to send OTP email to ${email}`);
+      // Depending on your requirements, you could fail here or just log the warning
+    }
 
     return res.status(200).json({ message: 'OTP sent successfully' });
   } catch (error) {
@@ -71,9 +79,15 @@ export const sendResetPasswordOtp = async (req: Request, res: Response) => {
 
     otpStore.set(email, { otp, expiresAt });
 
-    console.log(`\n=================================================`);
-    console.log(`[DEVELOPMENT ONLY] Password Reset OTP for ${email}: ${otp}`);
-    console.log(`=================================================\n`);
+    const emailSent = await sendEmail(
+      email,
+      'PeraWave Password Reset OTP',
+      `Your password reset One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`
+    );
+
+    if (!emailSent) {
+      console.warn(`Failed to send password reset OTP email to ${email}`);
+    }
 
     return res.status(200).json({ message: 'OTP sent successfully' });
   } catch (error) {
@@ -130,9 +144,15 @@ export const sendModResetPasswordOtp = async (req: Request, res: Response) => {
 
     otpStore.set(`mod_${email}`, { otp, expiresAt });
 
-    console.log(`\n=================================================`);
-    console.log(`[DEVELOPMENT ONLY] MOD Password Reset OTP for ${email}: ${otp}`);
-    console.log(`=================================================\n`);
+    const emailSent = await sendEmail(
+      email,
+      'PeraWave Moderator Password Reset',
+      `Your moderator password reset One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`
+    );
+
+    if (!emailSent) {
+      console.warn(`Failed to send moderator password reset OTP email to ${email}`);
+    }
 
     return res.status(200).json({ message: 'OTP sent successfully' });
   } catch (error) {
@@ -294,9 +314,15 @@ export const sendModRegisterOtp = async (req: Request, res: Response) => {
 
     otpStore.set(`mod_reg_${email}`, { otp, expiresAt });
 
-    console.log(`\n=================================================`);
-    console.log(`[DEVELOPMENT ONLY] MOD Registration OTP for ${email}: ${otp}`);
-    console.log(`=================================================\n`);
+    const emailSent = await sendEmail(
+      email,
+      'PeraWave Moderator Registration',
+      `Your moderator registration One-Time Password is: ${otp}\nThis OTP is valid for 10 minutes.`
+    );
+
+    if (!emailSent) {
+      console.warn(`Failed to send moderator registration OTP email to ${email}`);
+    }
 
     return res.status(200).json({ message: 'OTP sent successfully' });
   } catch (error) {
