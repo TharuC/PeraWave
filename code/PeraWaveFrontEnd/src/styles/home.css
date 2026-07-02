@@ -94,6 +94,14 @@
     align-items: center;
     box-shadow: 0 1px 3px rgba(27, 31, 36, 0.04);
 }
+.home-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
 .create-post-card input {
     flex: 1;
     background: var(--bg-main);
