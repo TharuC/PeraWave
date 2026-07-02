@@ -1,9 +1,16 @@
 import { Resend } from 'resend';
 
-// Resend SDK - uses HTTPS (port 443), never blocked by cloud providers
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export const sendEmail = async (to: string, subject: string, text: string, html?: string) => {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    console.warn('RESEND_API_KEY is not set — skipping email send.');
+    return false;
+  }
+
+  // Resend SDK - uses HTTPS (port 443), never blocked by cloud providers
+  const resend = new Resend(apiKey);
+
   try {
     const { data, error } = await resend.emails.send({
       from: 'PeraWave <noreply@perawave.com>',
