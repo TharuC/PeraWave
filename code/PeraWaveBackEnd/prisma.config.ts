@@ -9,8 +9,10 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
-    // directUrl bypasses PgBouncer (port 6543) for migrations that require DDL support
-    directUrl: process.env["DIRECT_URL"],
+    // IMPORTANT: Use DIRECT_URL (port 5432, session mode) here — NOT DATABASE_URL.
+    // prisma.config.ts datasource.url is ONLY used by the CLI (migrate deploy, etc).
+    // PgBouncer (port 6543) hangs on advisory locks during migrations.
+    // The runtime PrismaClient uses DATABASE_URL via the pg adapter in db.ts separately.
+    url: process.env["DIRECT_URL"],
   },
 });
