@@ -1,163 +1,184 @@
-/* src/styles/dashboard.css */
+/* src/styles/dashboard.css — Unified with home.css design system */
 
+:root {
+  --bg-main: #f6f8fa;
+  --bg-card: #ffffff;
+  --border-color: #d0d7de;
+  --text-primary: #24292f;
+  --text-secondary: #57606a;
+  --text-muted: #8c959f;
+  --accent-color: #0969da;
+  --accent-hover: #035cc5;
+  --danger-color: #cf222e;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+/* ── Page Shell ──────────────────────────────────────────────────── */
 .dashboard-page {
-    min-height: 100vh;
-    width: 100%;
-    background-color: #f1f5f9;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: inherit;
-    background-image: url("../assets/chat_line_art_bg.png");
-    background-size: 700px;
-    background-position: center;
-    background-blend-mode: overlay;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-family);
+  color: var(--text-primary);
 }
 
 .dashboard-nav-wrapper {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-    z-index: 10;
+  width: 100%;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(27, 31, 36, 0.04);
 }
 
+/* ── Layout ──────────────────────────────────────────────────────── */
 .dashboard-layout {
-    width: 100%;
-    max-width: 1000px;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    align-items: center;
+  width: 100%;
+  max-width: 900px;
+  padding: 36px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* Profile Card matching HackerRank Style (Avatar, Name, Username) */
+/* ── Profile Card ────────────────────────────────────────────────── */
 .profile-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 30px 40px;
-    width: 100%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0 0 24px 0;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(27, 31, 36, 0.04);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Light Green Cover inside Profile Card */
+/* Cover strip — using the home accent color */
 .profile-cover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  position: relative;
+  width: 100%;
+  height: 80px;
+  background: linear-gradient(135deg, var(--accent-color) 0%, #1a8cff 100%);
 }
 
 .profile-card-content {
-    position: relative;
-    z-index: 2;
-    margin-top: 40px; /* offset for cover */
+  position: relative;
+  z-index: 2;
+  padding: 0 28px;
+  margin-top: -20px; /* avatar overlaps cover */
 }
 
 .profile-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #fff;
-    border: 4px solid #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 16px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--bg-card);
+  border: 3px solid var(--bg-card);
+  box-shadow: 0 2px 8px rgba(27, 31, 36, 0.12);
+  margin-bottom: 12px;
+  display: block;
 }
 
 .profile-name {
-    margin: 0 0 4px 0;
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e293b;
+  margin: 0 0 4px 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .profile-username {
-    margin: 0;
-    color: #64748b;
-    font-size: 15px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
-/* Information Grid */
+/* ── Info Section ────────────────────────────────────────────────── */
 .info-section {
-    width: 100%;
+  width: 100%;
 }
 
 .info-section-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
+/* ── Info Card ───────────────────────────────────────────────────── */
 .info-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(27, 31, 36, 0.04);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
 }
 
 .info-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
-    border-color: #cbd5e1;
+  border-color: var(--text-muted);
+  box-shadow: 0 4px 12px rgba(27, 31, 36, 0.08);
 }
 
 .info-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: #f8fafc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #10b981; /* Changed to green theme */
-    flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: #eaf1fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  flex-shrink: 0;
 }
 
 .info-content {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .info-card-label {
-    font-size: 13px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-    font-weight: 600;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 .info-card-value {
-    font-size: 17px;
-    color: #1e293b;
-    font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
-/* Responsive */
+/* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .profile-card {
-        padding: 20px;
-    }
+  .dashboard-layout {
+    padding: 24px 16px 40px;
+  }
+  .profile-card-content {
+    padding: 0 20px;
+  }
 }
