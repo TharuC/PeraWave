@@ -17,10 +17,10 @@ const IconChat = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewB
 const IconChart = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'15px',height:'15px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>;
 const IconPencil = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'15px',height:'15px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
 
-const VISIBILITY_LABELS: Record<string, { label: string; color: string; bg: string; Icon: () => React.ReactElement }> = {
-    UNIVERSITY_WIDE: { label: 'University-Wide', color: '#1d4ed8', bg: '#dbeafe', Icon: IconGlobe },
-    FACULTY_ONLY: { label: 'Faculty-Only', color: '#6d28d9', bg: '#ede9fe', Icon: IconBuilding },
-    BATCH_ONLY: { label: 'Batch-Only', color: '#92400e', bg: '#fef3c7', Icon: IconAcademic },
+const VISIBILITY_LABELS: Record<string, { label: string; badgeClass: string; Icon: () => React.ReactElement }> = {
+    UNIVERSITY_WIDE: { label: 'University-Wide', badgeClass: 'badge-university', Icon: IconGlobe },
+    FACULTY_ONLY: { label: 'Faculty-Only', badgeClass: 'badge-faculty', Icon: IconBuilding },
+    BATCH_ONLY: { label: 'Batch-Only', badgeClass: 'badge-batch', Icon: IconAcademic },
 };
 
 const Home: React.FC = () => {
@@ -193,8 +193,7 @@ const Home: React.FC = () => {
                                 {([{ f: 'all', label: 'All Posts', Icon: IconHome }, { f: 'UNIVERSITY_WIDE', label: 'University-Wide', Icon: IconGlobe }, { f: 'FACULTY_ONLY', label: 'Faculty-Only', Icon: IconBuilding }, { f: 'BATCH_ONLY', label: 'Batch-Only', Icon: IconAcademic }] as const).map(({ f, label, Icon }) => (
                                     <button
                                         key={f}
-                                        className={`sidebar-link${activeFilter === (f as any) ? ' active' : ''}`}
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '7px' }}
+                                        className={`sidebar-link ${activeFilter === (f as any) ? 'active' : ''}`}
                                         onClick={() => setActiveFilter(f as any)}
                                     >
                                         <Icon />{label}
@@ -215,29 +214,14 @@ const Home: React.FC = () => {
                             </div>
 
                             {/* Filter + Sort Chips */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                            <div className="feed-filters">
                                 {/* Visibility filter chips */}
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                <div className="filter-chips">
                                     {([{ f: 'all', label: 'All', Icon: IconHome }, { f: 'UNIVERSITY_WIDE', label: 'University', Icon: IconGlobe }, { f: 'FACULTY_ONLY', label: 'Faculty', Icon: IconBuilding }, { f: 'BATCH_ONLY', label: 'Batch', Icon: IconAcademic }] as const).map(({ f, label, Icon }) => (
                                         <button
                                             key={f}
                                             onClick={() => setActiveFilter(f as any)}
-                                            style={{
-                                                padding: '6px 14px',
-                                                borderRadius: '999px',
-                                                border: '1.5px solid',
-                                                borderColor: activeFilter === (f as any) ? '#2563eb' : '#e2e8f0',
-                                                background: activeFilter === (f as any) ? '#eff6ff' : '#fff',
-                                                color: activeFilter === (f as any) ? '#1d4ed8' : '#64748b',
-                                                fontWeight: 600,
-                                                fontSize: '12px',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s',
-                                                fontFamily: 'Inter, sans-serif',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '5px',
-                                            }}
+                                            className={`chip-btn ${activeFilter === (f as any) ? 'active' : ''}`}
                                         >
                                             <Icon />{label}
                                         </button>
@@ -245,25 +229,13 @@ const Home: React.FC = () => {
                                 </div>
 
                                 {/* Sort toggle */}
-                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>Sort:</span>
+                                <div className="sort-chips">
+                                    <span className="sort-label">Sort:</span>
                                     {([{ value: 'date', label: 'Newest' }, { value: 'votes', label: 'Top Voted' }] as const).map(opt => (
                                         <button
                                             key={opt.value}
                                             onClick={() => setSortBy(opt.value)}
-                                            style={{
-                                                padding: '5px 12px',
-                                                borderRadius: '999px',
-                                                border: '1.5px solid',
-                                                borderColor: sortBy === opt.value ? '#16a34a' : '#e2e8f0',
-                                                background: sortBy === opt.value ? '#f0fdf4' : '#fff',
-                                                color: sortBy === opt.value ? '#15803d' : '#64748b',
-                                                fontWeight: 600,
-                                                fontSize: '12px',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s',
-                                                fontFamily: 'Inter, sans-serif',
-                                            }}
+                                            className={`chip-btn ${sortBy === opt.value ? 'active' : ''}`}
                                         >
                                             {opt.label}
                                         </button>
@@ -275,118 +247,111 @@ const Home: React.FC = () => {
                             {postsLoading ? (
                                 <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'20px',height:'20px',animation:'spin 1s linear infinite'}}><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
-                                    Loading posts…
+                                    Loading posts...
                                 </div>
                             ) : filteredPosts.length === 0 ? (
-                                <div style={{ background: '#fff', borderRadius: '12px', padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
-                                    <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="#cbd5e1" style={{width:'56px',height:'56px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg></div>
-                                    <p style={{ fontWeight: 600, fontSize: '16px', color: '#475569' }}>No posts yet in this category.</p>
-                                    <p style={{ fontSize: '14px' }}>Be the first to start a discussion!</p>
+                                <div className="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'48px',height:'48px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
+                                    <div>
+                                        <h3>No posts found</h3>
+                                        <p>Be the first to start a discussion in this feed.</p>
+                                    </div>
                                     <button
-                                        style={{ marginTop: '16px', padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                                        className="empty-btn"
                                         onClick={() => navigate('/create-post')}
                                     >
-                                        Create a Post
+                                        Create Post
                                     </button>
                                 </div>
                             ) : (
-                                filteredPosts.map(post => {
-                                    const vis = VISIBILITY_LABELS[post.visibility];
-                                    return (
-                                        <article
-                                            key={post.id}
-                                            className="forum-post"
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => navigate(`/post/${post.id}`)}
-                                        >
-                                            <div className="post-header">
-                                                {vis && (
-                                                    <span style={{
-                                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
-                                                        padding: '3px 10px', borderRadius: '999px', fontSize: '11px',
-                                                        fontWeight: 700, background: vis.bg, color: vis.color
-                                                    }}>
-                                                        <vis.Icon /> {vis.label}
+                                <div className="forum-posts-list">
+                                    {filteredPosts.map(post => {
+                                        const vis = VISIBILITY_LABELS[post.visibility];
+                                        return (
+                                            <article
+                                                key={post.id}
+                                                className="forum-post"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => navigate(`/post/${post.id}`)}
+                                            >
+                                                <div className="post-header">
+                                                    {vis && (
+                                                        <span className={`badge ${vis.badgeClass}`}>
+                                                            <vis.Icon /> {vis.label}
+                                                        </span>
+                                                    )}
+                                                    {post.isAnonymous && (
+                                                        <span className="badge badge-anonymous">
+                                                            <IconMask /> Anonymous
+                                                        </span>
+                                                    )}
+                                                    <span className="post-meta">
+                                                        • by {post.displayName} • {timeAgo(post.createdAt)}
                                                     </span>
-                                                )}
-                                                {post.isAnonymous && (
-                                                    <span style={{
-                                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
-                                                        padding: '3px 10px', borderRadius: '999px', fontSize: '11px',
-                                                        fontWeight: 700, background: '#f1f5f9', color: '#475569'
-                                                    }}>
-                                                        <IconMask /> Anonymous
-                                                    </span>
-                                                )}
-                                                <span className="post-meta">
-                                                    • by {post.displayName} • {timeAgo(post.createdAt)}
-                                                </span>
-                                            </div>
+                                                </div>
 
-                                            <h2 className="post-title">{post.title}</h2>
-                                            <p className="post-content" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                {post.content}
-                                            </p>
+                                                <h2 className="post-title">{post.title}</h2>
+                                                <p className="post-content" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    {post.content}
+                                                </p>
 
-                                            <div className="post-actions">
-                                                <button
-                                                    className="post-action-btn"
-                                                    onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`); }}
-                                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                                                >
-                                                    <IconUpvote /> {post.upvotes}
-                                                </button>
-                                                <button
-                                                    className="post-action-btn"
-                                                    onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`); }}
-                                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                                                >
-                                                    <IconChat />
-                                                    {post.commentCount} Comments
-                                                </button>
-                                                {post.isAuthor && (
+                                                <div className="post-actions">
                                                     <button
                                                         className="post-action-btn"
-                                                        style={{ color: '#ef4444', marginLeft: 'auto' }}
-                                                        onClick={e => { e.stopPropagation(); handleDeletePost(post.id); }}
+                                                        onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`); }}
                                                     >
-                                                        Delete
+                                                        <IconUpvote /> {post.upvotes}
                                                     </button>
-                                                )}
-                                            </div>
-                                        </article>
-                                    );
-                                })
+                                                    <button
+                                                        className="post-action-btn"
+                                                        onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`); }}
+                                                    >
+                                                        <IconChat />
+                                                        {post.commentCount} Comments
+                                                    </button>
+                                                    {post.isAuthor && (
+                                                        <button
+                                                            className="post-action-btn delete"
+                                                            onClick={e => { e.stopPropagation(); handleDeletePost(post.id); }}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </article>
+                                        );
+                                    })}
+                                </div>
                             )}
                         </main>
 
                         {/* Right Sidebar - Widgets */}
                         <aside className="home-widgets">
                             <div className="widget-card">
-                                <h3 className="widget-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><IconChart /> Feed Stats</h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <h3 className="widget-title"><IconChart /> Feed Stats</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     {[
                                         { label: 'Total Posts', count: posts.length },
                                         { label: 'University-Wide', count: posts.filter(p => p.visibility === 'UNIVERSITY_WIDE').length },
                                         { label: 'Faculty-Only', count: posts.filter(p => p.visibility === 'FACULTY_ONLY').length },
                                         { label: 'Batch-Only', count: posts.filter(p => p.visibility === 'BATCH_ONLY').length },
                                     ].map(s => (
-                                        <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                                            <span style={{ color: '#64748b' }}>{s.label}</span>
+                                        <div key={s.label} className="stat-row">
+                                            <span>{s.label}</span>
                                             <strong>{s.count}</strong>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="widget-card" style={{ background: 'linear-gradient(135deg, #e0e7ff, #ede9fe)' }}>
-                                <h3 className="widget-title" style={{ borderBottomColor: '#c7d2fe', display: 'flex', alignItems: 'center', gap: '6px' }}><IconPencil /> New Post</h3>
-                                <p style={{ fontSize: '14px', color: '#475569', marginBottom: '15px' }}>
-                                    Start a discussion, ask a question, or share an announcement.
+                            <div className="widget-card widget-cta">
+                                <h3 className="widget-title"><IconPencil /> New Post</h3>
+                                <p>
+                                    Start a discussion, ask a question, or share an announcement with the community.
                                 </p>
                                 <button
                                     id="widget-create-post-btn"
-                                    style={{ width: '100%', padding: '10px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                                    className="widget-btn"
                                     onClick={() => navigate('/create-post')}
                                 >
                                     Create Post
