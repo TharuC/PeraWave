@@ -8,10 +8,14 @@ import { API_URL } from '../config';
 
 type Visibility = 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY';
 
-const VISIBILITY_OPTIONS: { value: Visibility; label: string; icon: string; desc: string }[] = [
-  { value: 'UNIVERSITY_WIDE', label: 'University-Wide', icon: '🌐', desc: 'Visible to all users' },
-  { value: 'FACULTY_ONLY', label: 'Faculty-Only', icon: '🏛️', desc: 'Visible to your faculty' },
-  { value: 'BATCH_ONLY', label: 'Batch-Only', icon: '🎓', desc: 'Visible to your batch' },
+const IconGlobe = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'24px',height:'24px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>;
+const IconBuilding = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'24px',height:'24px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" /></svg>;
+const IconAcademic = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'24px',height:'24px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" /></svg>;
+
+const VISIBILITY_OPTIONS: { value: Visibility; label: string; icon: () => React.ReactElement; desc: string }[] = [
+  { value: 'UNIVERSITY_WIDE', label: 'University-Wide', icon: IconGlobe, desc: 'Visible to all users' },
+  { value: 'FACULTY_ONLY', label: 'Faculty-Only', icon: IconBuilding, desc: 'Visible to your faculty' },
+  { value: 'BATCH_ONLY', label: 'Batch-Only', icon: IconAcademic, desc: 'Visible to your batch' },
 ];
 
 const CreatePost: React.FC = () => {
@@ -140,9 +144,9 @@ const CreatePost: React.FC = () => {
                     className={`cp-vis-btn${visibility === opt.value ? ' active' : ''}`}
                     onClick={() => setVisibility(opt.value)}
                   >
-                    <span className="cp-vis-icon">{opt.icon}</span>
+                    <span className="cp-vis-icon"><opt.icon /></span>
                     <span className="cp-vis-label">{opt.label}</span>
-                    <span style={{ fontSize: '10px', color: '#94a3b8', textAlign: 'center' }}>{opt.desc}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center', marginTop: '2px' }}>{opt.desc}</span>
                   </button>
                 ))}
               </div>
@@ -160,7 +164,10 @@ const CreatePost: React.FC = () => {
                 <div className={`cp-toggle-thumb${isAnonymous ? ' on' : ''}`} />
               </div>
               <div className="cp-anon-info">
-                <h4>🎭 Post Anonymously</h4>
+                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'18px',height:'18px', color: 'var(--text-muted)'}}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                  Post Anonymously
+                </h4>
                 <p>
                   Your name won't be shown to other users.{' '}
                 </p>

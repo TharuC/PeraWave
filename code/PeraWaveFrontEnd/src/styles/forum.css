@@ -22,36 +22,37 @@
 
 /* ─── Create Post Card ──────────────────────────────────────────── */
 .cp-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(27, 31, 36, 0.04);
   overflow: hidden;
 }
 
 .cp-card-header {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  padding: 28px 32px;
-  color: #fff;
+  background: var(--bg-card);
+  padding: 24px 32px 20px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .cp-card-header h1 {
   margin: 0;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .cp-card-header p {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-size: 14px;
-  opacity: 0.85;
+  color: var(--text-secondary);
 }
 
 .cp-card-body {
-  padding: 32px;
+  padding: 24px 32px 32px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
 }
 
 /* ─── Field Label ───────────────────────────────────────────────── */
@@ -62,25 +63,24 @@
 }
 
 .cp-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
 }
 
 .cp-input,
 .cp-textarea,
 .cp-select {
   width: 100%;
-  padding: 13px 16px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 15px;
-  font-family: 'Inter', sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font-family);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  transition: all 0.2s;
   box-sizing: border-box;
 }
 
@@ -88,15 +88,15 @@
 .cp-textarea:focus,
 .cp-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  border-color: var(--accent-color);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
 }
 
 .cp-textarea {
   resize: vertical;
   min-height: 140px;
-  line-height: 1.65;
+  line-height: 1.5;
 }
 
 /* ─── Visibility Selector (pill buttons) ────────────────────────── */
@@ -111,24 +111,24 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 16px 10px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: #f8fafc;
+  padding: 16px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-family);
 }
 
 .cp-vis-btn:hover {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: var(--text-muted);
+  background: var(--bg-card);
 }
 
 .cp-vis-btn.active {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border-color: var(--accent-color);
+  background: #eaf1fb;
+  color: var(--accent-color);
 }
 
 .cp-vis-icon {
@@ -138,13 +138,14 @@
 .cp-vis-label {
   font-size: 12px;
   font-weight: 700;
-  color: #334155;
+  color: var(--text-primary);
   text-align: center;
   line-height: 1.3;
 }
 
-.cp-vis-btn.active .cp-vis-label {
-  color: #1d4ed8;
+.cp-vis-btn.active .cp-vis-label,
+.cp-vis-btn.active .cp-vis-icon svg {
+  color: var(--accent-color);
 }
 
 /* ─── Anonymous Toggle ──────────────────────────────────────────── */
@@ -152,17 +153,16 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  background: #fafafa;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   padding: 16px 20px;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: all 0.2s;
 }
 
 .cp-anon-row:hover {
-  background: #f0fdf4;
-  border-color: #86efac;
+  background: var(--bg-main);
 }
 
 .cp-anon-row.anon-on {
@@ -218,48 +218,45 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  padding-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
 }
 
 .cp-cancel-btn {
-  padding: 12px 24px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  background: #fff;
-  color: #64748b;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-main);
+  color: var(--text-primary);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .cp-cancel-btn:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+  background: #e5e7eb;
 }
 
 .cp-submit-btn {
-  padding: 12px 32px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  padding: 8px 16px;
+  border: 1px solid rgba(27, 31, 36, 0.15);
+  border-radius: var(--radius-sm);
+  background: var(--accent-color);
   color: #fff;
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .cp-submit-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  background: var(--accent-hover);
 }
 
 .cp-submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 /* ─── Error / Success Banner ────────────────────────────────────── */
