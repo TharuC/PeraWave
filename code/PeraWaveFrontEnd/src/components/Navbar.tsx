@@ -40,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({
     <nav className="navbar">
       <div className="logo-container" style={{ cursor: "pointer" }} onClick={() => navigate(isLoggedIn ? (userRole === 'MODERATOR' ? "/mod-home" : "/home") : "/")}>
         <img src={logo} alt="PeraWave Logo" className="logo-img" />
-        <div className="logo" style={{ background: 'linear-gradient(45deg, #2563eb, #d946ef)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 800 }}>PeraWave</div>
+        <div className="logo" style={{ color: '#000', fontWeight: 800 }}>PeraWave</div>
       </div>
 
       <div className="nav-buttons" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
