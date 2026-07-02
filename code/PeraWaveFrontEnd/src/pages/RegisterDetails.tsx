@@ -107,7 +107,7 @@ const RegisterDetails: React.FC = () => {
       }
 
       // Success! Navigate to login or dashboard
-      console.log("Registration successful!", data);
+      // Registration successful
       navigate("/login", { state: { message: "Account created successfully! Please log in." } });
 
     } catch (err: any) {

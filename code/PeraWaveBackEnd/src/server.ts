@@ -1,13 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+
 import authRoutes from './routes/authRoutes';
 import modRoutes from './routes/modRoutes';
 import forumRoutes from './routes/forumRoutes';
 import reportRoutes from './routes/reportRoutes';
 
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
