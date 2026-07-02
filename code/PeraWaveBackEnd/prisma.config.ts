@@ -10,5 +10,7 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"],
+    // directUrl bypasses PgBouncer (port 6543) for migrations that require DDL support
+    directUrl: process.env["DIRECT_URL"],
   },
 });
