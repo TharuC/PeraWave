@@ -13,6 +13,7 @@ export default defineConfig({
     // prisma.config.ts datasource.url is ONLY used by the CLI (migrate deploy, etc).
     // PgBouncer (port 6543) hangs on advisory locks during migrations.
     // The runtime PrismaClient uses DATABASE_URL via the pg adapter in db.ts separately.
-    url: process.env["DIRECT_URL"],
+    // Falls back to DATABASE_URL if DIRECT_URL is not set (e.g., on Railway where both point to the same DB).
+    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL"],
   },
 });
