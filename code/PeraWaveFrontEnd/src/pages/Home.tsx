@@ -28,7 +28,7 @@ const Home: React.FC = () => {
     const location = useLocation();
 
     const [user, setUser] = useState({
-        name: "Guest",
+        name: "",
         avatar: userAvatarImg,
         isSuspended: false,
         suspensionReason: ""
@@ -42,6 +42,16 @@ const Home: React.FC = () => {
     useEffect(() => {
         const token = sessionStorage.getItem('token');
 
+        // Pre-populate from cache to avoid flash of empty/guest name
+        const cached = sessionStorage.getItem('cachedUser');
+        if (cached) {
+            try {
+                const c = JSON.parse(cached);
+                const isSuspended = c.suspendedUntil && new Date(c.suspendedUntil) > new Date();
+                setUser({ name: c.fullName || "", avatar: userAvatarImg, isSuspended, suspensionReason: c.suspensionReason || "" });
+            } catch {}
+        }
+
         const fetchUser = async () => {
             if (!token) { navigate('/login'); return; }
             try {
@@ -51,14 +61,26 @@ const Home: React.FC = () => {
                 if (response.ok) {
                     const data = await response.json();
                     const isSuspended = data.suspendedUntil && new Date(data.suspendedUntil) > new Date();
-                    setUser({
+                    const fresh = {
                         name: data.fullName,
                         avatar: userAvatarImg,
                         isSuspended,
                         suspensionReason: data.suspensionReason || ""
-                    });
+                    };
+                    setUser(fresh);
+                    // Update the cache so dashboard also gets fresh data
+                    sessionStorage.setItem('cachedUser', JSON.stringify({
+                        fullName: data.fullName,
+                        email: data.email,
+                        faculty: data.faculty,
+                        registrationNumber: data.registrationNumber,
+                        joinDate: data.createdAt,
+                        suspendedUntil: data.suspendedUntil || null,
+                        suspensionReason: data.suspensionReason || ""
+                    }));
                 } else {
                     sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('cachedUser');
                     navigate('/login');
                 }
             } catch (err) {
@@ -152,6 +174,7 @@ const Home: React.FC = () => {
 
     const handleLogout = () => {
         sessionStorage.removeItem('token');
+        sessionStorage.removeItem('cachedUser');
         navigate('/');
     };
 

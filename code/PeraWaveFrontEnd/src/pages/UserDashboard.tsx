@@ -8,15 +8,18 @@ import { API_URL } from "../config";
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
 
-  const [userData, setUserData] = useState({
-    fullName: "Test User",
-    email: "e23900@eng.pdn.ac.lk",
-    faculty: "Faculty of Engineering",
-    registrationNumber: "E/23/900",
-    joinDate: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
-    suspendedUntil: null as string | null,
-    suspensionReason: "",
-  });
+  type UserData = {
+    fullName: string;
+    email: string;
+    faculty: string;
+    registrationNumber: string;
+    joinDate: string;
+    suspendedUntil: string | null;
+    suspensionReason: string;
+  };
+
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showWarningPopup, setShowWarningPopup] = useState(false);
@@ -30,13 +33,19 @@ const UserDashboard: React.FC = () => {
     const token = sessionStorage.getItem("token");
     if (!token) { navigate("/login"); return; }
 
+    // Pre-populate from cache immediately to avoid flash
+    const cached = sessionStorage.getItem("cachedUser");
+    if (cached) {
+      try { setUserData(JSON.parse(cached)); setUserLoading(false); } catch {}
+    }
+
     // 1. Fetch user profile
     fetch(`${API_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((user) => {
-        setUserData({
+        const fresh: UserData = {
           fullName: user.fullName || "User",
           email: user.email || "",
           faculty: user.faculty || "",
@@ -46,14 +55,19 @@ const UserDashboard: React.FC = () => {
             : new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
           suspendedUntil: user.suspendedUntil || null,
           suspensionReason: user.suspensionReason || "",
-        });
+        };
+        setUserData(fresh);
+        sessionStorage.setItem("cachedUser", JSON.stringify(fresh));
+        setUserLoading(false);
       })
       .catch((err) => {
         if (err === 401 || err === 403) {
           sessionStorage.removeItem("token");
+          sessionStorage.removeItem("cachedUser");
           navigate("/login");
         }
         console.error("Error fetching user", err);
+        setUserLoading(false);
       });
 
     // 2. Fetch notifications independently (always fresh)
@@ -113,6 +127,7 @@ const UserDashboard: React.FC = () => {
       
       if (response.ok) {
         sessionStorage.removeItem("token");
+        sessionStorage.removeItem("cachedUser");
         navigate("/");
       } else {
         const data = await response.json();
@@ -130,8 +145,17 @@ const UserDashboard: React.FC = () => {
     }
   };
 
-  const isSuspended = userData.suspendedUntil && new Date(userData.suspendedUntil) > new Date();
+  const isSuspended = userData?.suspendedUntil && new Date(userData.suspendedUntil) > new Date();
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  // Skeleton loader style
+  const skeletonStyle: React.CSSProperties = {
+    background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'shimmer 1.5s infinite',
+    borderRadius: '6px',
+    display: 'inline-block',
+  };
 
   return (
     <div className="dashboard-page">
@@ -139,13 +163,16 @@ const UserDashboard: React.FC = () => {
         <Navbar
           isLoggedIn={true}
           onLogout={handleLogout}
-          userName={userData.fullName}
+          userName={userData?.fullName || ""}
           userAvatar={userAvatar}
           notifications={notifications}
           unreadCount={unreadCount}
           onMarkAllRead={markAllRead}
         />
       </div>
+
+      {/* Shimmer keyframes injected inline */}
+      <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
       <div className="dashboard-layout">
 
@@ -164,10 +191,10 @@ const UserDashboard: React.FC = () => {
             <span style={{ fontSize: '24px', flexShrink: 0 }}>🚫</span>
             <div>
               <p style={{ margin: 0, fontWeight: 700, color: '#991b1b', fontSize: '15px' }}>
-                Account Suspended until {new Date(userData.suspendedUntil!).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                Account Suspended until {new Date(userData!.suspendedUntil!).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
               </p>
               <p style={{ margin: '4px 0 0 0', color: '#b91c1c', fontSize: '14px' }}>
-                Reason: {userData.suspensionReason || "Violation of community guidelines"}
+                Reason: {userData!.suspensionReason || "Violation of community guidelines"}
               </p>
             </div>
           </div>
@@ -178,8 +205,17 @@ const UserDashboard: React.FC = () => {
           <div className="profile-cover"></div>
           <div className="profile-card-content">
             <img src={userAvatar} alt="Avatar" className="profile-avatar" />
-            <h2 className="profile-name">{userData.fullName}</h2>
-            <p className="profile-username">{userData.email}</p>
+            {userLoading && !userData ? (
+              <>
+                <div style={{ ...skeletonStyle, width: '160px', height: '24px', margin: '8px auto 6px' }} />
+                <div style={{ ...skeletonStyle, width: '220px', height: '16px', margin: '0 auto' }} />
+              </>
+            ) : (
+              <>
+                <h2 className="profile-name">{userData?.fullName}</h2>
+                <p className="profile-username">{userData?.email}</p>
+              </>
+            )}
           </div>
         </div>
 
@@ -196,7 +232,11 @@ const UserDashboard: React.FC = () => {
               </div>
               <div className="info-content">
                 <span className="info-card-label">Faculty</span>
-                <span className="info-card-value">{userData.faculty}</span>
+                {userLoading && !userData ? (
+                  <div style={{ ...skeletonStyle, width: '120px', height: '16px' }} />
+                ) : (
+                  <span className="info-card-value">{userData?.faculty}</span>
+                )}
               </div>
             </div>
 
@@ -208,7 +248,11 @@ const UserDashboard: React.FC = () => {
               </div>
               <div className="info-content">
                 <span className="info-card-label">Registration No</span>
-                <span className="info-card-value">{userData.registrationNumber}</span>
+                {userLoading && !userData ? (
+                  <div style={{ ...skeletonStyle, width: '90px', height: '16px' }} />
+                ) : (
+                  <span className="info-card-value">{userData?.registrationNumber}</span>
+                )}
               </div>
             </div>
 
@@ -220,7 +264,11 @@ const UserDashboard: React.FC = () => {
               </div>
               <div className="info-content">
                 <span className="info-card-label">Date Joined</span>
-                <span className="info-card-value">{userData.joinDate}</span>
+                {userLoading && !userData ? (
+                  <div style={{ ...skeletonStyle, width: '140px', height: '16px' }} />
+                ) : (
+                  <span className="info-card-value">{userData?.joinDate}</span>
+                )}
               </div>
             </div>
 
