@@ -23,6 +23,7 @@ const UserDashboard: React.FC = () => {
   const [currentWarning, setCurrentWarning] = useState<any>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   // Always fetch fresh data from backend on mount
   useEffect(() => {
@@ -118,12 +119,14 @@ const UserDashboard: React.FC = () => {
         alert(data.error || "Failed to delete account");
         setIsDeleting(false);
         setShowDeleteConfirm(false);
+        setDeleteConfirmText("");
       }
     } catch (e) {
       console.error(e);
       alert("Network error occurred.");
       setIsDeleting(false);
       setShowDeleteConfirm(false);
+      setDeleteConfirmText("");
     }
   };
 
@@ -280,14 +283,37 @@ const UserDashboard: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 }}>
-          <div style={{ background: '#fff', padding: '32px', borderRadius: '16px', width: '400px', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', animation: 'fadeIn 0.2s ease' }}>
-            <h2 style={{ margin: '0 0 15px 0', color: '#0f172a', fontSize: '20px' }}>Delete Account?</h2>
-            <p style={{ color: '#475569', fontSize: '15px', lineHeight: '1.5', marginBottom: '25px' }}>
-              Are you absolutely sure you want to delete your account? This action <strong>cannot be undone</strong> and you will lose access to all your data immediately.
+          <div style={{ background: '#fff', padding: '32px', borderRadius: '16px', width: '420px', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', animation: 'fadeIn 0.2s ease' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ background: '#fef2f2', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: '26px', height: '26px', color: '#ef4444' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div>
+                <h2 style={{ margin: 0, color: '#0f172a', fontSize: '20px' }}>Delete Account?</h2>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '13px' }}>This action is permanent and cannot be undone</p>
+              </div>
+            </div>
+            <p style={{ color: '#475569', fontSize: '14px', lineHeight: '1.6', marginBottom: '20px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px' }}>
+              You will lose access to all your posts, comments, and data immediately. This account <strong>cannot be recovered</strong>.
             </p>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
+                Type <span style={{ color: '#ef4444', fontFamily: 'monospace', background: '#fef2f2', padding: '1px 5px', borderRadius: '4px' }}>delete account</span> to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="delete account"
+                disabled={isDeleting}
+                style={{ width: '100%', padding: '10px 12px', border: `1px solid ${deleteConfirmText === 'delete account' ? '#10b981' : '#e2e8f0'}`, borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+              />
+            </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
-                onClick={() => setShowDeleteConfirm(false)}
+                onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(""); }}
                 disabled={isDeleting}
                 style={{ flex: 1, padding: '12px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '15px' }}
               >
@@ -295,8 +321,8 @@ const UserDashboard: React.FC = () => {
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={isDeleting}
-                style={{ flex: 1, padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '15px' }}
+                disabled={isDeleting || deleteConfirmText !== 'delete account'}
+                style={{ flex: 1, padding: '12px', background: deleteConfirmText === 'delete account' ? '#ef4444' : '#fca5a5', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: deleteConfirmText === 'delete account' && !isDeleting ? 'pointer' : 'not-allowed', fontSize: '15px', transition: 'background 0.2s' }}
               >
                 {isDeleting ? "Deleting..." : "Yes, Delete My Account"}
               </button>

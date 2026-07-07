@@ -16,6 +16,7 @@ const ForgotPassword: React.FC = () => {
     const [error, setError] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     const [loading, setLoading] = useState(false);
+    const [otpLocked, setOtpLocked] = useState(false);
 
     const handleSendOTP = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,13 +38,40 @@ const ForgotPassword: React.FC = () => {
 
             const data = await res.json();
             if (res.ok) {
-                setSuccessMsg("Reset OTP sent!");
+                setSuccessMsg(`Reset OTP sent to ${email}. Please check your inbox.`);
+                setOtp("");
+                setOtpLocked(false);
                 setStep(2);
             } else {
                 setError(data.error || "Failed to send OTP");
             }
         } catch (err) {
             setError("Network error. Please make sure the backend is running.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        setError("");
+        setSuccessMsg("");
+        setOtp("");
+        setOtpLocked(false);
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/api/auth/reset-password-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setSuccessMsg(`New OTP sent to ${email}. Please check your inbox.`);
+            } else {
+                setError(data.error || "Failed to resend OTP");
+            }
+        } catch {
+            setError("Network error. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -82,6 +110,9 @@ const ForgotPassword: React.FC = () => {
                 alert("Password reset successfully! You can now log in.");
                 navigate("/login");
             } else {
+                if (data.locked) {
+                    setOtpLocked(true);
+                }
                 setError(data.error || "Failed to reset password");
             }
         } catch (err) {
@@ -138,7 +169,7 @@ const ForgotPassword: React.FC = () => {
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
                                 maxLength={6}
-                                disabled={loading}
+                                disabled={loading || otpLocked}
                             />
                         </div>
                         
@@ -151,7 +182,7 @@ const ForgotPassword: React.FC = () => {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
-                                disabled={loading}
+                                disabled={loading || otpLocked}
                                 style={{ paddingRight: "44px" }}
                             />
                             <button
@@ -181,7 +212,7 @@ const ForgotPassword: React.FC = () => {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
-                                disabled={loading}
+                                disabled={loading || otpLocked}
                                 style={{ paddingRight: "44px" }}
                             />
                             <button
@@ -204,9 +235,21 @@ const ForgotPassword: React.FC = () => {
 
                         {error && <p className="error-message fade-in" style={{ color: '#ff6b6b', fontSize: '0.9rem', marginBottom: '1rem' }}>{error}</p>}
 
-                        <button type="submit" className="login-submit-btn" disabled={loading}>
-                            {loading ? "Resetting..." : "Reset Password"}
-                        </button>
+                        {otpLocked ? (
+                            <button
+                                type="button"
+                                className="login-submit-btn"
+                                onClick={handleResendOTP}
+                                disabled={loading}
+                                style={{ background: 'linear-gradient(45deg, #f59e0b, #d97706)' }}
+                            >
+                                {loading ? "Resending..." : "Resend OTP"}
+                            </button>
+                        ) : (
+                            <button type="submit" className="login-submit-btn" disabled={loading}>
+                                {loading ? "Resetting..." : "Reset Password"}
+                            </button>
+                        )}
                     </form>
                 )}
             </div>

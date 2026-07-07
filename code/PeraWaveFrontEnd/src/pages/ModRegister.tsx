@@ -20,6 +20,7 @@ const ModRegister: React.FC = () => {
 
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [otpLocked, setOtpLocked] = useState(false);
 
     // Password Standard Flags
     const hasLength = password.length >= 8;
@@ -59,12 +60,39 @@ const ModRegister: React.FC = () => {
 
             const data = await response.json();
             if (response.ok) {
-                setSuccessMsg("Reset OTP sent!");
+                setSuccessMsg(`OTP sent to ${email}. Please check your inbox.`);
+                setOtp("");
+                setOtpLocked(false);
                 setStep(2);
             } else {
                 setError(data.error || "Failed to send OTP.");
             }
         } catch (err) {
+            setError("Failed to connect to the server.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        setError("");
+        setSuccessMsg("");
+        setOtp("");
+        setOtpLocked(false);
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${API_URL}/api/auth/mod-register-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setSuccessMsg(`New OTP sent to ${email}. Please check your inbox.`);
+            } else {
+                setError(data.error || "Failed to resend OTP.");
+            }
+        } catch {
             setError("Failed to connect to the server.");
         } finally {
             setIsLoading(false);
@@ -97,6 +125,9 @@ const ModRegister: React.FC = () => {
             const data = await response.json();
 
             if (!response.ok) {
+                if (data.locked) {
+                    setOtpLocked(true);
+                }
                 setError(data.error || "Registration failed. Please try again.");
                 return;
             }
@@ -273,9 +304,21 @@ const ModRegister: React.FC = () => {
                             {error}
                         </p>
                     )}
-                    <button type="submit" className="login-submit-btn" disabled={isLoading || !otp} style={{ background: "linear-gradient(90deg, #ef4444, #f87171)", color: "#fff", opacity: (isLoading || !otp) ? 0.7 : 1, cursor: (isLoading || !otp) ? "not-allowed" : "pointer" }}>
-                        {isLoading ? "Creating Account..." : "Verify & Register"}
-                    </button>
+                    {otpLocked ? (
+                        <button
+                            type="button"
+                            className="login-submit-btn"
+                            onClick={handleResendOTP}
+                            disabled={isLoading}
+                            style={{ background: 'linear-gradient(45deg, #f59e0b, #d97706)', color: '#fff' }}
+                        >
+                            {isLoading ? "Resending..." : "Resend OTP"}
+                        </button>
+                    ) : (
+                        <button type="submit" className="login-submit-btn" disabled={isLoading || !otp} style={{ background: "linear-gradient(90deg, #ef4444, #f87171)", color: "#fff", opacity: (isLoading || !otp) ? 0.7 : 1, cursor: (isLoading || !otp) ? "not-allowed" : "pointer" }}>
+                            {isLoading ? "Creating Account..." : "Verify & Register"}
+                        </button>
+                    )}
                 </form>
                 )}
             </div>

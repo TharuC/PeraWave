@@ -5,7 +5,7 @@ import prisma from '../config/db';
 
 // Temporary in-memory store for OTPs (For prototype purposes)
 // In production, this should be stored in a database or Redis with an expiration.
-const otpStore = new Map<string, { otp: string; expiresAt: number }>();
+const otpStore = new Map<string, { otp: string; expiresAt: number; attempts: number }>();
 import { sendEmail } from '../utils/emailService';
 
 export const sendOtp = async (req: Request, res: Response) => {
@@ -19,7 +19,7 @@ export const sendOtp = async (req: Request, res: Response) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    otpStore.set(email, { otp, expiresAt });
+    otpStore.set(email, { otp, expiresAt, attempts: 0 });
 
     const emailSent = await sendEmail(
       email,
@@ -45,15 +45,21 @@ export const verifyOtp = async (req: Request, res: Response) => {
     if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
 
     const storedOtpData = otpStore.get(email);
-    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired', locked: true });
 
     if (Date.now() > storedOtpData.expiresAt) {
       otpStore.delete(email);
-      return res.status(400).json({ error: 'OTP has expired' });
+      return res.status(400).json({ error: 'OTP has expired', locked: true });
     }
 
     if (storedOtpData.otp !== otp) {
-      return res.status(400).json({ error: 'Invalid OTP' });
+      storedOtpData.attempts += 1;
+      if (storedOtpData.attempts >= 3) {
+        otpStore.delete(email);
+        return res.status(400).json({ error: 'Too many failed attempts. Please request a new OTP.', locked: true });
+      }
+      const remaining = 3 - storedOtpData.attempts;
+      return res.status(400).json({ error: `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
     }
 
     otpStore.delete(email); // OTP consumed
@@ -77,7 +83,7 @@ export const sendResetPasswordOtp = async (req: Request, res: Response) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    otpStore.set(email, { otp, expiresAt });
+    otpStore.set(email, { otp, expiresAt, attempts: 0 });
 
     const emailSent = await sendEmail(
       email,
@@ -102,15 +108,21 @@ export const resetPassword = async (req: Request, res: Response) => {
     if (!email || !otp || !newPassword) return res.status(400).json({ error: 'Email, OTP, and new password are required' });
 
     const storedOtpData = otpStore.get(email);
-    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired', locked: true });
 
     if (Date.now() > storedOtpData.expiresAt) {
       otpStore.delete(email);
-      return res.status(400).json({ error: 'OTP has expired' });
+      return res.status(400).json({ error: 'OTP has expired', locked: true });
     }
 
     if (storedOtpData.otp !== otp) {
-      return res.status(400).json({ error: 'Invalid OTP' });
+      storedOtpData.attempts += 1;
+      if (storedOtpData.attempts >= 3) {
+        otpStore.delete(email);
+        return res.status(400).json({ error: 'Too many failed attempts. Please request a new OTP.', locked: true });
+      }
+      const remaining = 3 - storedOtpData.attempts;
+      return res.status(400).json({ error: `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
     }
 
     const saltRounds = 10;
@@ -142,7 +154,7 @@ export const sendModResetPasswordOtp = async (req: Request, res: Response) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000;
 
-    otpStore.set(`mod_${email}`, { otp, expiresAt });
+    otpStore.set(`mod_${email}`, { otp, expiresAt, attempts: 0 });
 
     const emailSent = await sendEmail(
       email,
@@ -167,15 +179,21 @@ export const modResetPassword = async (req: Request, res: Response) => {
     if (!email || !otp || !newPassword) return res.status(400).json({ error: 'Email, OTP, and new password are required' });
 
     const storedOtpData = otpStore.get(`mod_${email}`);
-    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired', locked: true });
 
     if (Date.now() > storedOtpData.expiresAt) {
       otpStore.delete(`mod_${email}`);
-      return res.status(400).json({ error: 'OTP has expired' });
+      return res.status(400).json({ error: 'OTP has expired', locked: true });
     }
 
     if (storedOtpData.otp !== otp) {
-      return res.status(400).json({ error: 'Invalid OTP' });
+      storedOtpData.attempts += 1;
+      if (storedOtpData.attempts >= 3) {
+        otpStore.delete(`mod_${email}`);
+        return res.status(400).json({ error: 'Too many failed attempts. Please request a new OTP.', locked: true });
+      }
+      const remaining = 3 - storedOtpData.attempts;
+      return res.status(400).json({ error: `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
     }
 
     const saltRounds = 10;
@@ -312,7 +330,7 @@ export const sendModRegisterOtp = async (req: Request, res: Response) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000;
 
-    otpStore.set(`mod_reg_${email}`, { otp, expiresAt });
+    otpStore.set(`mod_reg_${email}`, { otp, expiresAt, attempts: 0 });
 
     const emailSent = await sendEmail(
       email,
@@ -340,15 +358,21 @@ export const modRegister = async (req: Request, res: Response) => {
     }
 
     const storedOtpData = otpStore.get(`mod_reg_${email}`);
-    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired' });
+    if (!storedOtpData) return res.status(400).json({ error: 'No OTP requested or OTP has expired', locked: true });
 
     if (Date.now() > storedOtpData.expiresAt) {
       otpStore.delete(`mod_reg_${email}`);
-      return res.status(400).json({ error: 'OTP has expired' });
+      return res.status(400).json({ error: 'OTP has expired', locked: true });
     }
 
     if (storedOtpData.otp !== otp) {
-      return res.status(400).json({ error: 'Invalid OTP' });
+      storedOtpData.attempts += 1;
+      if (storedOtpData.attempts >= 3) {
+        otpStore.delete(`mod_reg_${email}`);
+        return res.status(400).json({ error: 'Too many failed attempts. Please request a new OTP.', locked: true });
+      }
+      const remaining = 3 - storedOtpData.attempts;
+      return res.status(400).json({ error: `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
     }
 
     const expectedCode = process.env.ADMIN_REGISTRATION_CODE || 'PeraWaveAdmin2026';

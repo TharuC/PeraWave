@@ -17,6 +17,7 @@ const RegisterEmail: React.FC = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
+    const [otpLocked, setOtpLocked] = useState(false);
 
     const handleSendOTP = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,13 +51,40 @@ const RegisterEmail: React.FC = () => {
 
             const data = await res.json();
             if (res.ok) {
-                setSuccessMsg("OTP sent! Please check your backend terminal for the code.");
+                setSuccessMsg(`OTP sent to ${email}. Please check your inbox.`);
+                setOtp("");
+                setOtpLocked(false);
                 setStep(2);
             } else {
                 setError(data.error || "Failed to send OTP");
             }
         } catch (err) {
             setError("Network error. Please make sure the backend is running.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        setError("");
+        setSuccessMsg("");
+        setOtp("");
+        setOtpLocked(false);
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/api/auth/send-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setSuccessMsg(`New OTP sent to ${email}. Please check your inbox.`);
+            } else {
+                setError(data.error || "Failed to resend OTP");
+            }
+        } catch {
+            setError("Network error. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -91,6 +119,9 @@ const RegisterEmail: React.FC = () => {
                     state: { regNumber, faculty, email }
                 });
             } else {
+                if (data.locked) {
+                    setOtpLocked(true);
+                }
                 setError(data.error || "Invalid OTP");
             }
         } catch (err) {
@@ -147,15 +178,27 @@ const RegisterEmail: React.FC = () => {
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
                                 maxLength={6}
-                                disabled={loading}
+                                disabled={loading || otpLocked}
                             />
                         </div>
 
                         {error && <p className="error-message fade-in" style={{ color: '#ff6b6b', fontSize: '0.9rem', marginBottom: '1rem' }}>{error}</p>}
 
-                        <button type="submit" className="login-submit-btn" disabled={loading}>
-                            {loading ? "Verifying..." : "Verify OTP & Continue"}
-                        </button>
+                        {otpLocked ? (
+                            <button
+                                type="button"
+                                className="login-submit-btn"
+                                onClick={handleResendOTP}
+                                disabled={loading}
+                                style={{ background: 'linear-gradient(45deg, #f59e0b, #d97706)' }}
+                            >
+                                {loading ? "Resending..." : "Resend OTP"}
+                            </button>
+                        ) : (
+                            <button type="submit" className="login-submit-btn" disabled={loading}>
+                                {loading ? "Verifying..." : "Verify OTP & Continue"}
+                            </button>
+                        )}
                     </form>
                 )}
 
