@@ -547,3 +547,86 @@
   color: #94a3b8;
   font-size: 14px;
 }
+
+/* ─── RESPONSIVE ────────────────────────────────────────────────── */
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .forum-layout {
+    padding: 24px 20px 40px;
+  }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  .forum-layout {
+    padding: 16px 12px 30px;
+  }
+  
+  /* Create Post Card */
+  .cp-card-header {
+    padding: 20px 20px 16px;
+  }
+  .cp-card-body {
+    padding: 20px 20px 24px;
+    gap: 20px;
+  }
+  .cp-card-header h1 {
+    font-size: 18px;
+  }
+  
+  /* Make visibility buttons stack on mobile to avoid text squishing */
+  .cp-visibility-group {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .cp-vis-btn {
+    flex-direction: row;
+    padding: 12px 16px;
+    justify-content: flex-start;
+  }
+  .cp-vis-label {
+    text-align: left;
+    font-size: 13px;
+  }
+  .cp-vis-icon {
+    font-size: 20px;
+  }
+  
+  .cp-anon-row {
+    padding: 14px 16px;
+  }
+  
+  /* Post Detail Card */
+  .pd-card {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+  .pd-title {
+    font-size: 20px;
+  }
+  .pd-content {
+    font-size: 14px;
+  }
+  
+  /* Wrap actions so report button doesn't go off-screen */
+  .pd-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  /* Comments Section */
+  .pd-comments-section {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+  .pd-comment-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pd-comment-submit {
+    width: 100%;
+    padding: 12px;
+  }
+}
+

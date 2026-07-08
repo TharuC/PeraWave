@@ -109,7 +109,7 @@ body {
 
 /* ── HERO ─────────────────────────────────────────────────────────── */
 .hero {
-  height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px);
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -334,10 +334,10 @@ body {
   }
   /* Hero full-width on mobile */
   .hero {
-    padding: 0 20px;
+    padding: 20px;
     justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 80px;
+    align-items: center;
+    padding-bottom: 100px; /* room for footer */
   }
   .glass-card {
     width: 100%;
