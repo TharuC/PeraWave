@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes';
 import modRoutes from './routes/modRoutes';
 import forumRoutes from './routes/forumRoutes';
 import reportRoutes from './routes/reportRoutes';
+import eventRoutes from './routes/eventRoutes';
 
 
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/mod', modRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/events', eventRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -1,0 +1,285 @@
+/* ── Create Event Page ──────────────────────────────────────────────── */
+.create-event-page {
+  min-height: 100vh;
+  background: var(--bg-main, #f8fafc);
+  font-family: 'Inter', 'Outfit', sans-serif;
+}
+
+.create-event-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 80px 20px 60px;
+}
+
+/* ── Card ───────────────────────────────────────────────────────────── */
+.ce-card {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  padding: 36px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.ce-back-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #64748b);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  display: block;
+  transition: color 0.2s;
+}
+.ce-back-btn:hover { color: #667eea; }
+
+.ce-header { margin-bottom: 28px; }
+
+.ce-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ce-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+}
+
+/* ── Form ───────────────────────────────────────────────────────────── */
+.ce-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ce-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ce-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ce-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+}
+
+.ce-required { color: #ef4444; }
+.ce-optional { color: var(--text-secondary, #94a3b8); font-weight: 400; }
+
+.ce-input {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-primary, #1e293b);
+  background: var(--bg-main, #f8fafc);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ce-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  background: #fff;
+}
+
+.ce-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ── Flyer Upload Zone ──────────────────────────────────────────────── */
+.ce-upload-zone {
+  border: 2px dashed var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: hidden;
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-main, #f8fafc);
+}
+
+.ce-upload-zone:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.04);
+}
+
+.ce-upload-zone.has-preview {
+  border-style: solid;
+  border-color: #667eea44;
+  min-height: 200px;
+}
+
+.ce-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary, #94a3b8);
+  padding: 24px;
+  text-align: center;
+}
+
+.ce-upload-placeholder svg {
+  width: 36px;
+  height: 36px;
+  color: #667eea;
+}
+
+.ce-upload-placeholder span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #475569);
+}
+
+.ce-upload-placeholder small {
+  font-size: 12px;
+}
+
+.ce-preview-img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  display: block;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.ce-remove-img {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  width: fit-content;
+  transition: opacity 0.2s;
+}
+.ce-remove-img:hover { opacity: 0.7; }
+
+/* ── Error ──────────────────────────────────────────────────────────── */
+.ce-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+/* ── Submit ─────────────────────────────────────────────────────────── */
+.ce-submit-btn {
+  padding: 13px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.ce-submit-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.ce-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Success Card ───────────────────────────────────────────────────── */
+.ce-success-card {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  padding: 48px 36px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.ce-success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea22, #764ba222);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.ce-success-icon svg {
+  width: 40px;
+  height: 40px;
+  color: #667eea;
+}
+
+.ce-success-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary, #1e293b);
+  margin: 0 0 8px;
+}
+
+.ce-success-card p {
+  color: var(--text-secondary, #64748b);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+.ce-success-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ce-btn-primary {
+  padding: 11px 22px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ce-btn-secondary {
+  padding: 11px 22px;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .ce-card { padding: 24px 16px; }
+  .ce-row { grid-template-columns: 1fr; }
+}

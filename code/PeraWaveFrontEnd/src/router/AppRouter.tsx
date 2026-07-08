@@ -16,6 +16,9 @@ import PostDetail from "../pages/PostDetail";
 import MyForums from "../pages/MyForums";
 import ModReports from "../pages/ModReports";
 import UserProfile from "../pages/UserProfile";
+import Events from "../pages/Events";
+import CreateEvent from "../pages/CreateEvent";
+import ModEvents from "../pages/ModEvents";
 
 const AppRouter = () => {
   return (
@@ -39,6 +42,10 @@ const AppRouter = () => {
         <Route path="/my-forums"       element={<MyForums />} />
         <Route path="/mod-reports"     element={<ModReports />} />
         <Route path="/user/:id"        element={<UserProfile />} />
+        {/* Events routes */}
+        <Route path="/events"          element={<Events />} />
+        <Route path="/create-event"    element={<CreateEvent />} />
+        <Route path="/mod-events"      element={<ModEvents />} />
       </Routes>
     </BrowserRouter>
   );

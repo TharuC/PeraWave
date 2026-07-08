@@ -1,0 +1,188 @@
+/* ── Upcoming Events Carousel ─────────────────────────────────────── */
+
+.uec-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Slide ─────────────────────────────────────────────────────────── */
+.uec-slide {
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #fff);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: uec-fade 0.4s ease;
+}
+
+.uec-slide:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+@keyframes uec-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Flyer Image ────────────────────────────────────────────────────── */
+.uec-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
+}
+
+.uec-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.uec-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.uec-image-placeholder svg {
+  width: 40px;
+  height: 40px;
+}
+
+.uec-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* ── Info ───────────────────────────────────────────────────────────── */
+.uec-info {
+  padding: 10px 12px 12px;
+}
+
+.uec-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.uec-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary, #64748b);
+}
+
+.uec-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.uec-meta svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--accent-color, #6366f1);
+}
+
+/* ── Dot Indicators ─────────────────────────────────────────────────── */
+.uec-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.uec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  background: var(--border-color, #cbd5e1);
+  transition: background 0.25s ease, width 0.25s ease;
+}
+
+.uec-dot.active {
+  background: var(--accent-color, #6366f1);
+  width: 18px;
+  border-radius: 999px;
+}
+
+/* ── View All ───────────────────────────────────────────────────────── */
+.uec-view-all {
+  background: none;
+  border: none;
+  color: var(--accent-color, #6366f1);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 0;
+  text-align: left;
+  letter-spacing: 0.1px;
+  transition: opacity 0.2s;
+}
+
+.uec-view-all:hover { opacity: 0.7; }
+
+/* ── Skeleton / Empty ───────────────────────────────────────────────── */
+.uec-skeleton {
+  border-radius: 12px;
+  overflow: hidden;
+  height: 190px;
+  background: var(--bg-card, #f1f5f9);
+}
+
+.uec-shimmer {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.uec-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 13px;
+}
+
+.uec-empty svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}

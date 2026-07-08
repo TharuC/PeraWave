@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import UpcomingEventsCarousel from '../components/UpcomingEventsCarousel';
 import '../styles/home.css';
 // import logo from '../assets/PeraWaveLogo.png';
 import userAvatarImg from '../assets/UserAvatar.png';
@@ -254,6 +255,16 @@ const Home: React.FC = () => {
                                 ))}
                             </div>
 
+                            <div className="sidebar-section" style={{ marginTop: '12px' }}>
+                                <div className="sidebar-title">Discover</div>
+                                <button
+                                    className="sidebar-link"
+                                    onClick={() => navigate('/events')}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'13px',height:'13px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+                                    Events
+                                </button>
+                            </div>
 
                         </aside>
 
@@ -445,6 +456,14 @@ const Home: React.FC = () => {
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div className="widget-card">
+                                <h3 className="widget-title">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'15px',height:'15px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+                                    Upcoming Events
+                                </h3>
+                                <UpcomingEventsCarousel />
                             </div>
 
                             <div className="widget-card widget-cta">

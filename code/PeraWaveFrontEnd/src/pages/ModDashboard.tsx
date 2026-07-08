@@ -223,6 +223,13 @@ const ModDashboard: React.FC = () => {
                 >
                     Review Reports
                 </button>
+                <button
+                    onClick={() => navigate('/mod-events')}
+                    style={{ width: '100%', padding: '10px 14px', marginBottom: '10px', background: 'linear-gradient(90deg, #10b981, #059669)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                    Manage Events
+                </button>
+
 
                 <div className="mod-nav-links">
                     {Object.keys(TAB_TITLES).map(tab => (
