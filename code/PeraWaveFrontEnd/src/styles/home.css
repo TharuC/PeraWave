@@ -419,18 +419,20 @@
     /* Show mobile search bar inside feed */
     .mobile-search-bar {
         display: block !important;
+        margin-bottom: -4px; /* closes the gap before create-post-card */
     }
 
-    /* Sidebar becomes a horizontal scrolling pill row */
+    /* Sidebar pill row — tighter top spacing */
     .home-sidebar {
         position: static;
         display: flex;
         flex-direction: row;
         overflow-x: auto;
         gap: 8px;
-        padding-bottom: 4px;
+        padding-bottom: 2px;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
+        margin-bottom: -4px;
     }
     .home-sidebar::-webkit-scrollbar { display: none; }
     .sidebar-section {
@@ -439,7 +441,7 @@
         flex-shrink: 0;
     }
     .sidebar-title {
-        display: none; /* hide section label on mobile */
+        display: none;
     }
     .sidebar-link {
         white-space: nowrap;
@@ -455,37 +457,27 @@
         border-color: var(--text-primary);
     }
 
-    /* Create Post Card */
-    .create-post-card {
-        padding: 12px;
-        gap: 8px;
-    }
-    .home-avatar {
-        width: 30px;
-        height: 30px;
-    }
-    .create-post-card input {
-        font-size: 13px;
-        padding: 8px 14px;
-    }
-    .create-post-btn {
-        padding: 7px 14px;
-        font-size: 13px;
+    /* HIDE duplicate filter chips — sidebar pills already do this */
+    .filter-chips {
+        display: none;
     }
 
-    /* Filter & Sort chips */
+    /* Sort row: stays horizontal and compact */
     .feed-filters {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 4px 0;
+        border-bottom: none;
+        margin-bottom: 0;
     }
-    .filter-chips {
-        overflow-x: auto;
-        width: 100%;
-        scrollbar-width: none;
-        padding-bottom: 2px;
+    .sort-label {
+        font-size: 12px;
     }
-    .filter-chips::-webkit-scrollbar { display: none; }
+    .sort-chips {
+        gap: 6px;
+    }
     .chip-btn {
         white-space: nowrap;
         font-size: 12px;
