@@ -44,7 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {isLoggedIn && (
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '0 20px' }}>
+        <div className="navbar-search-wrap" style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '0 20px' }}>
           <div style={{ position: 'relative', width: '100%', maxWidth: '450px' }}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#94a3b8" style={{ width: '16px', height: '16px', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0016.803 15.803z" />
@@ -156,8 +156,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", userSelect: "none" }}
                   onClick={() => { if (userRole !== 'MODERATOR') setIsDropdownOpen(!isDropdownOpen); setIsNotifOpen(false); }}
               >
-                <img src={userAvatar || userAvatarDefault} alt="User" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} />
-                <span style={{ fontWeight: 600, color: "#1e293b", fontSize: "15px" }}>{userName || "User"}</span>
+                <img src={userAvatar || userAvatarDefault} alt="User" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flexShrink: 0 }} />
+                <span className="navbar-username" style={{ fontWeight: 600, color: "#1e293b", fontSize: "15px" }}>{userName || "User"}</span>
                 {userRole !== 'MODERATOR' && (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: "14px", height: "14px", color: "#64748b" }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />

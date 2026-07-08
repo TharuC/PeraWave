@@ -27,7 +27,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding: 0 24px;
   height: 60px;
   background-color: var(--bg-card);
   position: sticky;
@@ -35,6 +35,7 @@ body {
   z-index: 1000;
   border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 3px rgba(27, 31, 36, 0.04);
+  gap: 12px;
 }
 
 .logo-container {
@@ -271,4 +272,89 @@ body {
 .footer-content a:hover {
   color: #ffffff;
   text-decoration: underline;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+
+/* Tablet (769px – 1024px) */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 20px;
+  }
+  .hero {
+    padding: 0 40px;
+  }
+  .glass-card {
+    width: 360px;
+    padding: 36px 40px;
+  }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 56px;
+  }
+  /* Hide logo text on very small screens, keep logo image */
+  .logo {
+    display: none;
+  }
+  .logo-img {
+    height: 70px;
+    margin-top: -20px;
+    margin-bottom: -20px;
+  }
+  /* Hide search bar in navbar — it moves into the feed page */
+  .navbar-search-wrap {
+    display: none;
+  }
+  /* Hide username — avatar is enough */
+  .navbar-username {
+    display: none;
+  }
+  /* Shrink auth buttons */
+  .create-btn {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+  .login-btn {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+  /* Hero full-width on mobile */
+  .hero {
+    padding: 0 20px;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 80px;
+  }
+  .glass-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px;
+    box-sizing: border-box;
+  }
+  .glass-card h1 {
+    font-size: 28px;
+  }
+  .tagline {
+    font-size: 15px;
+  }
+  .help-btn {
+    bottom: 16px;
+    right: 16px;
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+  .footer-content {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+    text-align: center;
+  }
+  .footer-content p:first-child,
+  .footer-content p:last-child {
+    grid-column: 1;
+    text-align: center;
+  }
 }

@@ -392,21 +392,142 @@
     background: #e5e7eb;
 }
 
-/* Responsive */
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+
+/* Tablet (769px – 1024px): collapse to 2 columns, hide right widgets */
 @media (max-width: 1024px) {
     .home-container {
         grid-template-columns: 200px 1fr;
+        padding: 24px 20px;
+        gap: 16px;
     }
+    .home-widgets {
+        display: none;
+    }
+    .home-sidebar {
+        top: 80px;
+    }
+}
+
+/* Large Mobile / Small Tablet (≤ 768px): single column, collapsible sidebar */
+@media (max-width: 768px) {
+    .home-container {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 12px;
+    }
+    /* Show mobile search bar inside feed */
+    .mobile-search-bar {
+        display: block !important;
+    }
+
+    /* Sidebar becomes a horizontal scrolling pill row */
+    .home-sidebar {
+        position: static;
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 8px;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    .home-sidebar::-webkit-scrollbar { display: none; }
+    .sidebar-section {
+        flex-direction: row;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+    .sidebar-title {
+        display: none; /* hide section label on mobile */
+    }
+    .sidebar-link {
+        white-space: nowrap;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 6px 14px;
+        background: var(--bg-card);
+        font-size: 13px;
+    }
+    .sidebar-link.active {
+        background: var(--text-primary);
+        color: #fff;
+        border-color: var(--text-primary);
+    }
+
+    /* Create Post Card */
+    .create-post-card {
+        padding: 12px;
+        gap: 8px;
+    }
+    .home-avatar {
+        width: 30px;
+        height: 30px;
+    }
+    .create-post-card input {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
+    .create-post-btn {
+        padding: 7px 14px;
+        font-size: 13px;
+    }
+
+    /* Filter & Sort chips */
+    .feed-filters {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .filter-chips {
+        overflow-x: auto;
+        width: 100%;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+    .filter-chips::-webkit-scrollbar { display: none; }
+    .chip-btn {
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    /* Post Card */
+    .forum-post {
+        padding: 16px;
+    }
+    .post-title {
+        font-size: 16px;
+    }
+    .post-content {
+        font-size: 13px;
+    }
+
+    /* Widgets hidden on mobile */
     .home-widgets {
         display: none;
     }
 }
 
-@media (max-width: 768px) {
+/* Small Mobile (≤ 480px) */
+@media (max-width: 480px) {
     .home-container {
-        grid-template-columns: 1fr;
+        padding: 12px;
     }
-    .home-sidebar {
-        display: none;
+    .create-post-card input {
+        font-size: 12px;
+        padding: 7px 12px;
+    }
+    .post-title {
+        font-size: 15px;
+    }
+    .post-actions {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .post-action-btn {
+        font-size: 12px;
+        padding: 5px 8px;
     }
 }
+

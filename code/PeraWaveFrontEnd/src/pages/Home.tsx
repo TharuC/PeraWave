@@ -239,6 +239,35 @@ const Home: React.FC = () => {
 
                         {/* Main Feed */}
                         <main className="home-feed">
+                            {/* Mobile-only search bar (navbar search hidden on mobile) */}
+                            <div className="mobile-search-bar" style={{ display: 'none' }}>
+                                <div style={{ position: 'relative' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#94a3b8" style={{ width: '16px', height: '16px', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0016.803 15.803z" />
+                                    </svg>
+                                    <input
+                                        type="text"
+                                        placeholder="Search posts..."
+                                        style={{
+                                            width: '100%', boxSizing: 'border-box',
+                                            padding: '10px 12px 10px 36px',
+                                            borderRadius: '10px',
+                                            border: '1px solid var(--border-color)',
+                                            background: 'var(--bg-card)',
+                                            fontSize: '14px',
+                                            color: 'var(--text-primary)',
+                                            outline: 'none',
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const val = e.currentTarget.value.trim();
+                                                navigate(val ? `/home?search=${encodeURIComponent(val)}` : '/home');
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
                             {/* Create Post Input Box */}
                             <div className="create-post-card">
                                 <img src={user.avatar} alt="Profile" className="home-avatar" />
