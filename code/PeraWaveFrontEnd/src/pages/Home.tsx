@@ -146,10 +146,19 @@ const Home: React.FC = () => {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
+    const queryParams = new URLSearchParams(location.search);
+    const searchFilter = queryParams.get('search') || '';
+
     const filteredPosts = (activeFilter === 'all'
         ? posts
         : posts.filter(p => p.visibility === activeFilter)
-    ).slice().sort((a, b) =>
+    ).filter(p => {
+        if (searchFilter) {
+            const q = searchFilter.toLowerCase();
+            return p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q);
+        }
+        return true;
+    }).slice().sort((a, b) =>
         sortBy === 'votes'
             ? b.upvotes - a.upvotes
             : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -266,6 +275,22 @@ const Home: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Search Results Header */}
+                            {searchFilter && (
+                                <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <div style={{ color: '#1e3a8a', fontSize: '14px' }}>
+                                        Showing results for: <strong style={{ fontSize: '16px' }}>"{searchFilter}"</strong>
+                                    </div>
+                                    <button 
+                                        onClick={() => navigate('/home')}
+                                        style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'14px',height:'14px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        Clear Search
+                                    </button>
+                                </div>
+                            )}
 
                             {/* Feed Posts */}
                             {postsLoading ? (

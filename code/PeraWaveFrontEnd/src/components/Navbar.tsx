@@ -43,6 +43,52 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="logo" style={{ color: '#000', fontWeight: 800 }}>PeraWave</div>
       </div>
 
+      {isLoggedIn && (
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '0 20px' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '450px' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#94a3b8" style={{ width: '16px', height: '16px', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0016.803 15.803z" />
+            </svg>
+            <input 
+              type="text" 
+              placeholder="Search PeraWave..." 
+              style={{
+                width: '100%',
+                padding: '8px 12px 8px 36px',
+                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                background: '#f8fafc',
+                fontSize: '14px',
+                color: '#1e293b',
+                outline: 'none',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s'
+              }}
+              onFocus={(e) => {
+                e.target.style.background = '#fff';
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.background = '#f8fafc';
+                e.target.style.borderColor = '#cbd5e1';
+                e.target.style.boxShadow = 'none';
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = e.currentTarget.value.trim();
+                  if (val) {
+                    navigate(`/home?search=${encodeURIComponent(val)}`);
+                  } else {
+                    navigate(`/home`);
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="nav-buttons" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         {isLoggedIn ? (
           <>
