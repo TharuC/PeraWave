@@ -277,19 +277,6 @@ const Home: React.FC = () => {
 
                             {/* Filter + Sort Chips */}
                             <div className="feed-filters">
-                                {/* Visibility filter chips */}
-                                <div className="filter-chips">
-                                    {([{ f: 'all', label: 'All', Icon: IconHome }, { f: 'UNIVERSITY_WIDE', label: 'University', Icon: IconGlobe }, { f: 'FACULTY_ONLY', label: 'Faculty', Icon: IconBuilding }, { f: 'BATCH_ONLY', label: 'Batch', Icon: IconAcademic }] as const).map(({ f, label, Icon }) => (
-                                        <button
-                                            key={f}
-                                            onClick={() => setActiveFilter(f as any)}
-                                            className={`chip-btn ${activeFilter === (f as any) ? 'active' : ''}`}
-                                        >
-                                            <Icon />{label}
-                                        </button>
-                                    ))}
-                                </div>
-
                                 {/* Sort toggle */}
                                 <div className="sort-chips">
                                     <span className="sort-label">Sort:</span>

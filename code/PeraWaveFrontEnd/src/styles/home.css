@@ -135,16 +135,16 @@
     background: var(--accent-hover);
 }
 
-/* Filters */
+/* Sort Filter Row */
 .feed-filters {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 8px 0;
     border-bottom: 1px solid var(--border-color);
     margin-bottom: -8px; /* Offset gap */
 }
-.filter-chips, .sort-chips {
+.sort-chips {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -455,11 +455,6 @@
         background: var(--text-primary);
         color: #fff;
         border-color: var(--text-primary);
-    }
-
-    /* HIDE duplicate filter chips — sidebar pills already do this */
-    .filter-chips {
-        display: none;
     }
 
     /* Sort row: stays horizontal and compact */

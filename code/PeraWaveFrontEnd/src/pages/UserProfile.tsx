@@ -10,6 +10,7 @@ interface PublicProfile {
     id: number;
     fullName: string;
     faculty: string | null;
+    batch: string | null;
     joinedAt: string;
 }
 
@@ -68,7 +69,7 @@ const UserProfile: React.FC = () => {
                 userRole="USER"
             />
 
-            <div className="dashboard-layout" style={{ maxWidth: '680px' }}>
+            <div className="dashboard-layout">
                 {/* Back button */}
                 <button
                     onClick={() => navigate(-1)}
@@ -135,7 +136,11 @@ const UserProfile: React.FC = () => {
                                     </div>
                                     <div className="info-content">
                                         <span className="info-card-label">Faculty / Batch</span>
-                                        <span className="info-card-value">{profile.faculty || 'Not specified'}</span>
+                                        <span className="info-card-value">
+                                            {profile.faculty && profile.batch
+                                                ? `${profile.faculty} — Batch ${profile.batch}`
+                                                : profile.faculty || (profile.batch ? `Batch ${profile.batch}` : 'Not specified')}
+                                        </span>
                                     </div>
                                 </div>
 

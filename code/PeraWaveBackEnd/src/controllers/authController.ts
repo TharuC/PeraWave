@@ -612,6 +612,7 @@ export const getPublicProfile = async (req: Request, res: Response) => {
         id: true,
         fullName: true,
         faculty: true,
+        registrationNumber: true,
         createdAt: true,
         isDeleted: true,
       }
@@ -621,10 +622,25 @@ export const getPublicProfile = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Derive batch from registration number
+    let batch = null;
+    if (user.registrationNumber) {
+      const reg = user.registrationNumber.trim();
+      if (reg.includes('/')) {
+        const parts = reg.split('/');
+        if (parts.length >= 2) batch = `${parts[0]}/${parts[1]}`;
+      } else if (reg.includes('-')) {
+        batch = reg.split('-')[0];
+      } else {
+        batch = reg.substring(0, 3); // e.g. E23
+      }
+    }
+
     return res.status(200).json({
       id: user.id,
       fullName: user.fullName,
       faculty: user.faculty,
+      batch: batch,
       joinedAt: user.createdAt,
     });
   } catch (error) {
