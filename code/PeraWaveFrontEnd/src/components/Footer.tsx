@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
     return (
         <footer className="footer-glass">
             <div className="footer-content">
-                <p>&copy; {new Date().getFullYear()} ProWave. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} PeraWave. All rights reserved.</p>
                 <p>Contact: <a href="mailto:support.perawave@gmail.com">support@perawave.com</a></p>
             </div>
         </footer>

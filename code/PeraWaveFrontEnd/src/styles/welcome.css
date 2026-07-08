@@ -234,6 +234,13 @@ body {
 }
 
 /* ── FOOTER ──────────────────────────────────────────────────────── */
+.welcome-page-container {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 50px; /* Space for the footer */
+  background: var(--bg-main);
+}
+
 .footer-glass {
   position: absolute;
   bottom: 0;
@@ -248,6 +255,89 @@ body {
   align-items: center;
   z-index: 10;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── FEATURES SECTION ────────────────────────────────────────────── */
+.features-section {
+  padding: 80px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  background: var(--bg-main);
+}
+
+.features-header {
+  margin-bottom: 60px;
+}
+
+.features-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.features-subtitle {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+  padding: 20px 0;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 40px 30px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(27, 31, 36, 0.04);
+  text-align: left;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(27, 31, 36, 0.08);
+  border-color: rgba(9, 105, 218, 0.3);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(9, 105, 218, 0.1);
+  color: var(--accent-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.feature-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.feature-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.feature-card-text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
 }
 
 .footer-content {
