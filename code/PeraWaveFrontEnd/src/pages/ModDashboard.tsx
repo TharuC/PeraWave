@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/mod-dashboard.css';
 import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
-import { getToken, clearToken } from '../utils/auth';
+import { clearToken } from '../utils/auth';
 
 const TAB_TITLES: Record<string, string> = {
     overview: 'Overview Analytics',
