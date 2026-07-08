@@ -591,3 +591,45 @@ export const getNotifications = async (req: any, res: Response) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+/**
+ * GET /api/auth/users/:id/profile
+ * Public profile — returns only name, faculty/batch, and joined date.
+ * Email and registration number are intentionally excluded.
+ */
+export const getPublicProfile = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = parseInt(id, 10);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        fullName: true,
+        faculty: true,
+        createdAt: true,
+        isDeleted: true,
+      }
+    });
+
+    if (!user || user.isDeleted) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.status(200).json({
+      id: user.id,
+      fullName: user.fullName,
+      faculty: user.faculty,
+      joinedAt: user.createdAt,
+    });
+  } catch (error) {
+    console.error('Error fetching public profile:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+

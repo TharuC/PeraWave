@@ -364,7 +364,15 @@ const Home: React.FC = () => {
                                                         </span>
                                                     )}
                                                     <span className="post-meta">
-                                                        • by {post.displayName} • {timeAgo(post.createdAt)}
+                                                        • by{' '}
+                                                        {post.authorId && !post.isAnonymous ? (
+                                                            <span
+                                                                style={{ color: 'var(--accent-color)', cursor: 'pointer', fontWeight: 600 }}
+                                                                onClick={e => { e.stopPropagation(); navigate(`/user/${post.authorId}`); }}
+                                                            >
+                                                                {post.displayName}
+                                                            </span>
+                                                        ) : post.displayName} • {timeAgo(post.createdAt)}
                                                     </span>
                                                 </div>
 

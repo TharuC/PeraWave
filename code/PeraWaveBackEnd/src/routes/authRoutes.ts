@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser, loginUser, modRegister, modLogin, getCurrentUser, getAllUsers, markNotificationsRead, getNotifications, sendOtp, verifyOtp, deleteMe, sendResetPasswordOtp, resetPassword, sendModResetPasswordOtp, modResetPassword, sendModRegisterOtp } from '../controllers/authController';
+import { registerUser, loginUser, modRegister, modLogin, getCurrentUser, getAllUsers, markNotificationsRead, getNotifications, sendOtp, verifyOtp, deleteMe, sendResetPasswordOtp, resetPassword, sendModResetPasswordOtp, modResetPassword, sendModRegisterOtp, getPublicProfile } from '../controllers/authController';
 import { verifyToken, requireModerator } from '../middlewares/authMiddleware';
 
 const router = Router();
@@ -51,5 +51,8 @@ router.delete('/me', verifyToken, deleteMe);
 
 // GET /api/auth/users (Moderators Only)
 router.get('/users', requireModerator, getAllUsers);
+
+// GET /api/auth/users/:id/profile (Authenticated users — public profile, no email/e-number)
+router.get('/users/:id/profile', verifyToken, getPublicProfile);
 
 export default router;

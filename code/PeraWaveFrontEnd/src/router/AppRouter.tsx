@@ -15,6 +15,7 @@ import CreatePost from "../pages/CreatePost";
 import PostDetail from "../pages/PostDetail";
 import MyForums from "../pages/MyForums";
 import ModReports from "../pages/ModReports";
+import UserProfile from "../pages/UserProfile";
 
 const AppRouter = () => {
   return (
@@ -37,6 +38,7 @@ const AppRouter = () => {
         <Route path="/post/:id"       element={<PostDetail />} />
         <Route path="/my-forums"       element={<MyForums />} />
         <Route path="/mod-reports"     element={<ModReports />} />
+        <Route path="/user/:id"        element={<UserProfile />} />
       </Routes>
     </BrowserRouter>
   );

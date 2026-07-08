@@ -216,22 +216,30 @@ const PostDetail: React.FC = () => {
           <h1 className="pd-title">{post.title}</h1>
 
           {/* Author */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <img
-              src={userAvatarImg}
-              alt="Author"
-              style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid #e2e8f0' }}
-            />
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {post.displayName}
-                {isMod && post.isAnonymous && post.realName && (
-                  <span className="mod-reveal-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><IconKey /> {post.realName} ({post.realEmail})</span>
-                )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <img
+                src={userAvatarImg}
+                alt="Author"
+                style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid #e2e8f0' }}
+              />
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {post.authorId && !post.isAnonymous ? (
+                    <span
+                      style={{ cursor: 'pointer', color: 'var(--accent-color, #0969da)', textDecoration: 'none' }}
+                      onClick={() => navigate(`/user/${post.authorId}`)}
+                      title="View profile"
+                    >
+                      {post.displayName}
+                    </span>
+                  ) : post.displayName}
+                  {isMod && post.isAnonymous && post.realName && (
+                    <span className="mod-reveal-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><IconKey /> {post.realName} ({post.realEmail})</span>
+                  )}
+                </div>
+                <div style={{ fontSize: '12px', color: '#94a3b8' }}>{timeAgo(post.createdAt)}</div>
               </div>
-              <div style={{ fontSize: '12px', color: '#94a3b8' }}>{timeAgo(post.createdAt)}</div>
             </div>
-          </div>
 
           <p className="pd-content">{post.content}</p>
 
