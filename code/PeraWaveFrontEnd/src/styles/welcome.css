@@ -156,7 +156,7 @@ body {
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
   transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease;
   overflow: hidden;
-  animation: slideDownFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideDownFade 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Liquid reflection glow */
@@ -302,18 +302,12 @@ body {
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
   padding: 20px 0;
 }
 
-@media (max-width: 1100px) {
-  .features-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 650px) {
+@media (max-width: 768px) {
   .features-grid {
     grid-template-columns: 1fr;
   }
