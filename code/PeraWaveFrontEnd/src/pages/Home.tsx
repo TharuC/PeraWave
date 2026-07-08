@@ -37,7 +37,7 @@ const Home: React.FC = () => {
     const [notifications, setNotifications] = useState<any[]>([]);
     const [posts, setPosts] = useState<any[]>([]);
     const [postsLoading, setPostsLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState<'all' | 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY'>('all');
+    const [activeFilter, setActiveFilter] = useState<'all' | 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY' | 'SAVED'>('all');
     const [sortBy, setSortBy] = useState<'date' | 'votes'>('date');
 
     useEffect(() => {
