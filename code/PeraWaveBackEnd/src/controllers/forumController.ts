@@ -59,7 +59,11 @@ export const getPosts = async (req: any, res: Response) => {
       }
     }
 
-    const whereClause = isMod ? {} : { OR: orConditions };
+    const whereClause: any = isMod ? {} : { OR: orConditions };
+
+    if (req.query.saved === 'true' && userId) {
+      whereClause.savedBy = { some: { userId } };
+    }
 
     const posts = await prisma.forumPost.findMany({
       where: whereClause,
@@ -67,6 +71,7 @@ export const getPosts = async (req: any, res: Response) => {
       include: {
         _count: { select: { comments: true } },
         votes: userId ? { where: { userId } } : false,
+        savedBy: userId ? { where: { userId } } : false,
       },
     });
 
@@ -113,6 +118,7 @@ export const getPosts = async (req: any, res: Response) => {
         commentCount: post._count.comments,
         createdAt:    post.createdAt,
         userVote,
+        isSaved:      post.savedBy && (post.savedBy as any[]).length > 0,
         isAuthor:     post.authorId === userId,
         // Always expose email to mods; for normal users only if not anonymous
         authorEmail:  isMod ? (author as any).email : (!post.isAnonymous ? (author as any).email : undefined),
@@ -181,6 +187,7 @@ export const getPostById = async (req: any, res: Response) => {
       include: {
         comments: { orderBy: { createdAt: 'asc' } },
         votes: userId ? { where: { userId } } : false,
+        savedBy: userId ? { where: { userId } } : false,
       },
     });
 
@@ -234,6 +241,7 @@ export const getPostById = async (req: any, res: Response) => {
       upvotes:      post.upvotes,
       createdAt:    post.createdAt,
       userVote,
+      isSaved:      post.savedBy && (post.savedBy as any[]).length > 0,
       isAuthor:     post.authorId === userId,
       comments:     commentsResult,
       ...authorInfo,
@@ -417,6 +425,38 @@ export const deleteComment = async (req: any, res: Response) => {
     return res.status(200).json({ message: 'Comment deleted successfully' });
   } catch (error) {
     console.error('Error deleting comment:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ─── POST /api/forum/posts/:id/save (toggle save) ──────────────────────────────
+export const toggleSavePost = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+
+    const postId = parseInt(req.params.id);
+    const post = await prisma.forumPost.findUnique({ where: { id: postId } });
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const existingSave = await prisma.savedPost.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+
+    if (existingSave) {
+      // Unsave
+      await prisma.savedPost.delete({ where: { userId_postId: { userId, postId } } });
+      return res.status(200).json({ message: 'Post unsaved', isSaved: false });
+    } else {
+      // Save
+      await prisma.savedPost.create({ data: { userId, postId } });
+      return res.status(200).json({ message: 'Post saved', isSaved: true });
+    }
+  } catch (error) {
+    console.error('Error toggling save post:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

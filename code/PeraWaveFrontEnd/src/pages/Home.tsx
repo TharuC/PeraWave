@@ -151,6 +151,8 @@ const Home: React.FC = () => {
 
     const filteredPosts = (activeFilter === 'all'
         ? posts
+        : activeFilter === 'SAVED'
+        ? posts.filter(p => p.isSaved)
         : posts.filter(p => p.visibility === activeFilter)
     ).filter(p => {
         if (searchFilter) {
@@ -178,7 +180,25 @@ const Home: React.FC = () => {
                 alert('Failed to delete post.');
             }
         } catch (error) {
-            console.error('Failed to delete post:', error);
+            console.error('Error deleting post', error);
+        }
+    };
+
+    const handleToggleSave = async (postId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const token = getToken();
+        if (!token) return;
+        try {
+            const response = await fetch(`${API_URL}/api/forum/posts/${postId}/save`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setPosts(prev => prev.map(p => p.id === postId ? { ...p, isSaved: data.isSaved } : p));
+            }
+        } catch (error) {
+            console.error('Error saving post', error);
         }
     };
 
@@ -223,7 +243,7 @@ const Home: React.FC = () => {
                         <aside className="home-sidebar">
                             <div className="sidebar-section">
                                 <div className="sidebar-title">Feeds</div>
-                                {([{ f: 'all', label: 'All Posts', Icon: IconHome }, { f: 'UNIVERSITY_WIDE', label: 'University-Wide', Icon: IconGlobe }, { f: 'FACULTY_ONLY', label: 'Faculty-Only', Icon: IconBuilding }, { f: 'BATCH_ONLY', label: 'Batch-Only', Icon: IconAcademic }] as const).map(({ f, label, Icon }) => (
+                                {([{ f: 'all', label: 'All Posts', Icon: IconHome }, { f: 'UNIVERSITY_WIDE', label: 'University-Wide', Icon: IconGlobe }, { f: 'FACULTY_ONLY', label: 'Faculty-Only', Icon: IconBuilding }, { f: 'BATCH_ONLY', label: 'Batch-Only', Icon: IconAcademic }, { f: 'SAVED', label: 'Saved Posts', Icon: () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'16px',height:'16px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg> }] as const).map(({ f, label, Icon }) => (
                                     <button
                                         key={f}
                                         className={`sidebar-link ${activeFilter === (f as any) ? 'active' : ''}`}
@@ -381,6 +401,16 @@ const Home: React.FC = () => {
                                                     >
                                                         <IconChat />
                                                         {post.commentCount} Comments
+                                                    </button>
+                                                    <button
+                                                        className="post-action-btn"
+                                                        onClick={e => handleToggleSave(post.id, e)}
+                                                        style={{ color: post.isSaved ? 'var(--accent-color)' : 'inherit' }}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill={post.isSaved ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '16px', height: '16px' }}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                                        </svg>
+                                                        {post.isSaved ? 'Saved' : 'Save'}
                                                     </button>
                                                     {post.isAuthor && (
                                                         <button

@@ -25,6 +25,7 @@ model User {
 
   notifications      Notification[]
   reports            Report[]
+  savedPosts         SavedPost[]
 }
 
 model Moderator {
@@ -77,6 +78,7 @@ model ForumPost {
 
   comments     Comment[]
   votes        PostVote[]
+  savedBy      SavedPost[]
 }
 
 model Comment {
@@ -98,6 +100,17 @@ model PostVote {
   value   Int       // 1 for upvote, -1 for downvote
 
   @@unique([postId, userId])
+}
+
+model SavedPost {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    Int
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  savedAt   DateTime  @default(now())
+
+  @@unique([userId, postId])
 }
 
 // ─── Reporting System ───────────────────────────────────────────────────────────

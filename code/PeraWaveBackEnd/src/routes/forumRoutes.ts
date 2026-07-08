@@ -8,6 +8,7 @@ import {
   votePost,
   deletePost,
   deleteComment,
+  toggleSavePost,
 } from '../controllers/forumController';
 import { verifyToken, requireModerator } from '../middlewares/authMiddleware';
 
@@ -30,6 +31,9 @@ router.post('/posts/:id/comments', verifyToken, addComment);
 
 // POST /api/forum/posts/:id/vote      – upvote/downvote
 router.post('/posts/:id/vote', verifyToken, votePost);
+
+// POST /api/forum/posts/:id/save      – save/unsave post
+router.post('/posts/:id/save', verifyToken, toggleSavePost);
 
 // DELETE /api/forum/posts/:id  – author or moderator removes a post
 router.delete('/posts/:id', verifyToken, deletePost);

@@ -93,6 +93,22 @@ const PostDetail: React.FC = () => {
     }
   };
 
+  const handleToggleSave = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/forum/posts/${id}/save`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPost((prev: any) => ({ ...prev, isSaved: data.isSaved }));
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+    }
+  };
+
   const handleComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim() || !token) return;
@@ -269,6 +285,22 @@ const PostDetail: React.FC = () => {
             <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
               <IconChat /> {post.comments?.length ?? 0} {post.comments?.length === 1 ? 'Comment' : 'Comments'}
             </span>
+
+            <button
+              onClick={handleToggleSave}
+              style={{
+                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                fontSize: '14px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px',
+                color: post.isSaved ? 'var(--accent-color)' : '#64748b',
+                marginLeft: '15px'
+              }}
+              title={post.isSaved ? "Unsave Post" : "Save Post"}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill={post.isSaved ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: '16px', height: '16px' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+              </svg>
+              {post.isSaved ? 'Saved' : 'Save'}
+            </button>
 
             {(isMod || post.isAuthor) && (
               <button
