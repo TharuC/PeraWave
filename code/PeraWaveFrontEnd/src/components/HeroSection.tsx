@@ -1,8 +1,18 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import backgroundImage from "../assets/Background_Image.jpg";
 import "../styles/welcome.css";
 
 const HeroSection: React.FC = () => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = backgroundImage;
+    img.onload = () => {
+      setIsLoaded(true);
+    };
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -15,11 +25,12 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <div className="hero">
+    <div className={`hero ${isLoaded ? "bg-loaded" : ""}`}>
       <div
-        className="glass-card"
+        className={`glass-card ${isLoaded ? "animate-slide" : ""}`}
         ref={cardRef}
         onMouseMove={handleMouseMove}
+        style={{ opacity: isLoaded ? 1 : 0 }}
       >
         <h1>
           Welcome to <br /> PeraWave
