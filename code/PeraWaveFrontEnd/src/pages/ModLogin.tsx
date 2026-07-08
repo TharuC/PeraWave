@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
 import { API_URL } from "../config";
@@ -8,8 +8,18 @@ const ModLogin: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    // Pre-fill email & restore remember-me preference from a previous session
+    useEffect(() => {
+        const savedEmail = localStorage.getItem("modRememberedEmail");
+        if (savedEmail) {
+            setEmail(savedEmail);
+            setRememberMe(true);
+        }
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,7 +43,17 @@ const ModLogin: React.FC = () => {
             }
 
             if (data.token) {
-                sessionStorage.setItem("token", data.token);
+                if (rememberMe) {
+                    // Persist token and email across browser sessions
+                    localStorage.setItem("modToken", data.token);
+                    localStorage.setItem("modRememberedEmail", email);
+                    sessionStorage.removeItem("token");
+                } else {
+                    // Only keep token for the current tab/session
+                    sessionStorage.setItem("token", data.token);
+                    localStorage.removeItem("modToken");
+                    localStorage.removeItem("modRememberedEmail");
+                }
             }
 
             // Navigate to mod forum home
@@ -108,7 +128,12 @@ const ModLogin: React.FC = () => {
 
                     <div className="form-options">
                         <label className="remember-me">
-                            <input type="checkbox" /> Remember me
+                            <input
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                            />
+                            Remember me
                         </label>
                         <a href="#" className="forgot-password" style={{ color: "#ef4444" }} onClick={(e) => { e.preventDefault(); navigate("/mod-forgot-password"); }}>Forgot Password?</a>
                     </div>
