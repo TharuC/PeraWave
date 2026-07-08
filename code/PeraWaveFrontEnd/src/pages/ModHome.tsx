@@ -5,6 +5,7 @@ import '../styles/home.css';
 import '../styles/mod-dashboard.css';
 import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
+import { getToken as authGetToken, clearToken } from '../utils/auth';
 
 const FACULTIES = [
   { code: 'eng', label: 'Engineering' },
@@ -58,7 +59,7 @@ const ModHome: React.FC = () => {
   const [suspendDays, setSuspendDays] = useState(1);
   const [modalLoading, setModalLoading] = useState(false);
 
-  const getToken = () => sessionStorage.getItem('token');
+  const getToken = () => authGetToken();
 
   const fetchData = useCallback(async () => {
     const token = getToken();
@@ -71,7 +72,7 @@ const ModHome: React.FC = () => {
         fetch(`${API_URL}/api/forum/posts`, { headers }),
       ]);
 
-      if (!meRes.ok) { sessionStorage.removeItem('token'); navigate('/mods'); return; }
+      if (!meRes.ok) { clearToken(); navigate('/mods'); return; }
       const me = await meRes.json();
       setModInfo({ fullName: me.fullName || 'Moderator', email: me.email || '' });
 
@@ -88,7 +89,7 @@ const ModHome: React.FC = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleLogout = () => { sessionStorage.removeItem('token'); navigate('/'); };
+  const handleLogout = () => { clearToken(); navigate('/'); };
 
   const handleDeletePost = async (postId: number, e: React.MouseEvent) => {
     e.stopPropagation();

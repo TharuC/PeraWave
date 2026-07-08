@@ -5,6 +5,7 @@ import '../styles/forum.css';
 import '../styles/home.css';
 // import logo from '../assets/PeraWaveLogo.png';
 import { API_URL } from '../config';
+import { getToken, clearToken } from '../utils/auth';
 
 type Visibility = 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY';
 
@@ -29,7 +30,7 @@ const CreatePost: React.FC = () => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     if (!token) { navigate('/login'); return; }
 
     fetch(`${API_URL}/api/auth/me`, {
@@ -41,11 +42,11 @@ const CreatePost: React.FC = () => {
         if (isSuspended) { navigate('/home'); return; }
         setUser(data);
       })
-      .catch(() => { sessionStorage.removeItem('token'); navigate('/login'); });
+      .catch(() => { clearToken(); navigate('/login'); });
   }, [navigate]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('token');
+    clearToken();
     navigate('/');
   };
 
@@ -56,7 +57,7 @@ const CreatePost: React.FC = () => {
     if (!title.trim()) { setError('Please enter a title for your post.'); return; }
     if (!content.trim()) { setError('Please enter some content for your post.'); return; }
 
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     if (!token) { navigate('/login'); return; }
 
     setLoading(true);

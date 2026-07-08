@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import "../styles/dashboard.css";
 import userAvatar from "../assets/UserAvatar.png";
 import { API_URL } from "../config";
+import { getToken, clearToken } from "../utils/auth";
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const UserDashboard: React.FC = () => {
 
   // Always fetch fresh data from backend on mount
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    const token = getToken();
     if (!token) { navigate("/login"); return; }
 
     // Pre-populate from cache immediately to avoid flash
@@ -62,7 +63,7 @@ const UserDashboard: React.FC = () => {
       })
       .catch((err) => {
         if (err === 401 || err === 403) {
-          sessionStorage.removeItem("token");
+          clearToken();
           sessionStorage.removeItem("cachedUser");
           navigate("/login");
         }
@@ -93,7 +94,7 @@ const UserDashboard: React.FC = () => {
     setShowWarningPopup(false);
     // Mark only this notification as read
     try {
-      const token = sessionStorage.getItem("token");
+      const token = getToken();
       await fetch(`${API_URL}/api/auth/notifications/read`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -107,7 +108,7 @@ const UserDashboard: React.FC = () => {
 
   const markAllRead = async () => {
     try {
-      const token = sessionStorage.getItem("token");
+      const token = getToken();
       await fetch(`${API_URL}/api/auth/notifications/read`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -119,14 +120,14 @@ const UserDashboard: React.FC = () => {
   const handleDeleteAccount = async () => {
     try {
       setIsDeleting(true);
-      const token = sessionStorage.getItem("token");
+      const token = getToken();
       const response = await fetch(`${API_URL}/api/auth/me`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
       
       if (response.ok) {
-        sessionStorage.removeItem("token");
+        clearToken();
         sessionStorage.removeItem("cachedUser");
         navigate("/");
       } else {

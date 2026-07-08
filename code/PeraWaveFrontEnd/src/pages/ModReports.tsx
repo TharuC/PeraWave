@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/home.css';
 import { API_URL } from '../config';
+import { getToken, clearToken } from '../utils/auth';
 
 // ── Icon helpers ──────────────────────────────────────────────────────────────
 const IconFlag    = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'15px',height:'15px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 011.743-1.342 48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664L19.5 19.5" /></svg>;
@@ -68,7 +69,7 @@ const ModReports: React.FC = () => {
   const [toast, setToast]         = useState('');
   const [modInfo, setModInfo]     = useState<{ fullName: string } | null>(null);
 
-  const token = sessionStorage.getItem('token');
+  const token = getToken();
 
   const headers = { Authorization: `Bearer ${token}` };
   const headersJson = { ...headers, 'Content-Type': 'application/json' };
@@ -130,7 +131,7 @@ const ModReports: React.FC = () => {
         isLoggedIn={true}
         userName={modInfo?.fullName || 'Moderator'}
         userRole="MODERATOR"
-        onLogout={() => { sessionStorage.removeItem('token'); navigate('/mods'); }}
+        onLogout={() => { clearToken(); navigate('/mods'); }}
       />
 
       {/* Toast */}

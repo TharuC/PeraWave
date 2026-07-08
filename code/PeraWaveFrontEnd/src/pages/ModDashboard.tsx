@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/mod-dashboard.css';
 import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
+import { getToken, clearToken } from '../utils/auth';
 
 const TAB_TITLES: Record<string, string> = {
     overview: 'Overview Analytics',
@@ -47,7 +48,7 @@ const ModDashboard: React.FC = () => {
     const [suspendDuration, setSuspendDuration] = useState(1);
 
     const getToken = () => {
-        const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem('token') ?? localStorage.getItem('token');
         if (!token) { navigate('/mods'); return null; }
         return token;
     };
@@ -62,7 +63,7 @@ const ModDashboard: React.FC = () => {
             // 1. Moderator profile
             const meRes = await fetch(`${API_URL}/api/auth/me`, { headers });
             if (meRes.status === 401 || meRes.status === 403) {
-                sessionStorage.removeItem('token');
+                clearToken();
                 navigate('/mods');
                 return;
             }
@@ -166,7 +167,7 @@ const ModDashboard: React.FC = () => {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('token');
+        clearToken();
         navigate('/mods');
     };
 
