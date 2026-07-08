@@ -600,7 +600,7 @@ export const getNotifications = async (req: any, res: Response) => {
 export const getPublicProfile = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = parseInt(id, 10);
+    const userId = parseInt(id as string, 10);
 
     if (isNaN(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
