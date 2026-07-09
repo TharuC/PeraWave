@@ -211,10 +211,15 @@ const EventDetail: React.FC = () => {
           </div>
         )}
 
-        {/* Back button */}
         <button
           className="event-detail-back"
-          onClick={() => navigate(isMod ? '/mod-events' : '/events')}
+          onClick={() => {
+            if (window.history.state && window.history.state.idx > 0) {
+              navigate(-1);
+            } else {
+              navigate(isMod ? '/mod-events' : '/events');
+            }
+          }}
           id="event-detail-back-btn"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
