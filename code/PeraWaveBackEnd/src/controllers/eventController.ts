@@ -70,6 +70,35 @@ export const getApprovedEvents = async (req: Request, res: Response) => {
   }
 };
 
+// ── GET /api/events/:id ───────────────────────────────────────────────────────
+// Returns a single APPROVED event by ID (requires auth)
+export const getEventById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const eventId = Number(id);
+
+    if (isNaN(eventId)) {
+      return res.status(400).json({ error: 'Invalid event ID.' });
+    }
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      include: {
+        organizer: { select: { fullName: true, faculty: true } },
+      },
+    });
+
+    if (!event || event.status !== 'APPROVED') {
+      return res.status(404).json({ error: 'Event not found.' });
+    }
+
+    return res.json(event);
+  } catch (err) {
+    console.error('getEventById error:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
 // ── GET /api/events/upcoming ──────────────────────────────────────────────────
 // Returns the top 5 upcoming APPROVED events (for home page widget)
 export const getUpcomingEvents = async (req: Request, res: Response) => {

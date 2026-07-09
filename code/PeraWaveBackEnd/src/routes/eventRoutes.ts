@@ -4,6 +4,7 @@ import path from 'path';
 import {
   createEvent,
   getApprovedEvents,
+  getEventById,
   getUpcomingEvents,
   getPendingEvents,
   updateEventStatus,
@@ -27,14 +28,17 @@ const upload = multer({
   },
 });
 
-// ── Public (authenticated users) ─────────────────────────────────────────────
+// ── Public (authenticated users) ────────────────────────────────────────────────────────────────
 router.get('/', verifyToken, getApprovedEvents);
 router.get('/upcoming', verifyToken, getUpcomingEvents);
 router.post('/', verifyToken, upload.single('flyer'), createEvent);
-router.delete('/:id', verifyToken, deleteEvent);
 
-// ── Moderator only ────────────────────────────────────────────────────────────
+// ── Moderator only ────────────────────────────────────────────────────────────────
 router.get('/pending', requireModerator, getPendingEvents);
 router.patch('/:id/status', requireModerator, updateEventStatus);
+
+// ── Parameterised routes (must come after named sub-routes) ──────────────────
+router.get('/:id', verifyToken, getEventById);
+router.delete('/:id', verifyToken, deleteEvent);
 
 export default router;
