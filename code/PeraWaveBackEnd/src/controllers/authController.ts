@@ -14,7 +14,8 @@ export const sendOtp = async (req: Request, res: Response) => {
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) return res.status(409).json({ error: 'User with this email already exists' });
+    // Allow deleted users to re-register (soft-delete: record still exists)
+    if (existingUser && !existingUser.isDeleted) return res.status(409).json({ error: 'User with this email already exists' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
@@ -226,7 +227,7 @@ export const registerUser = async (req: Request, res: Response) => {
       where: { email },
     });
 
-    if (existingUser) {
+    if (existingUser && !existingUser.isDeleted) {
       return res.status(409).json({ error: 'User with this email already exists' });
     }
 
@@ -234,16 +235,33 @@ export const registerUser = async (req: Request, res: Response) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // 4. Save the user to the database
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        fullName,
-        faculty,
-        registrationNumber,
-      },
-    });
+    let newUser;
+    if (existingUser && existingUser.isDeleted) {
+      // 4a. Reactivate a previously soft-deleted account
+      newUser = await prisma.user.update({
+        where: { email },
+        data: {
+          password: hashedPassword,
+          fullName,
+          faculty,
+          registrationNumber,
+          isDeleted: false,
+          deletionReason: null,
+          interests: [],
+        },
+      });
+    } else {
+      // 4b. Create a brand-new user record
+      newUser = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          fullName,
+          faculty,
+          registrationNumber,
+        },
+      });
+    }
 
     // 5. Issue a JWT so the client can call /interests without logging in
     const token = jwt.sign(
