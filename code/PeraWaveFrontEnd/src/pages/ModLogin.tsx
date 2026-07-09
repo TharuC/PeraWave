@@ -47,10 +47,11 @@ const ModLogin: React.FC = () => {
                     // Persist token and email across browser sessions
                     localStorage.setItem("modToken", data.token);
                     localStorage.setItem("modRememberedEmail", email);
-                    sessionStorage.removeItem("token");
+                    sessionStorage.removeItem("modToken");
                 } else {
-                    // Only keep token for the current tab/session
-                    sessionStorage.setItem("token", data.token);
+                    // Only keep token for the current tab/session — use "modToken" to
+                    // avoid overwriting the user's "token" in the same browser window.
+                    sessionStorage.setItem("modToken", data.token);
                     localStorage.removeItem("modToken");
                     localStorage.removeItem("modRememberedEmail");
                 }
