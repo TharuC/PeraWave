@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { API_URL } from '../config';
+import { getToken } from '../utils/auth';
 import '../styles/interests.css';
 
 export const ALL_TAGS = [
