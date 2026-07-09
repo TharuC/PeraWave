@@ -150,7 +150,7 @@ const CreatePost: React.FC = () => {
                     className={`cp-tag-chip${selectedTags.includes(tag.id) ? ' selected' : ''}`}
                     onClick={() => toggleTag(tag.id)}
                   >
-                    <span>{tag.emoji}</span> {tag.label}
+                    {tag.label}
                   </button>
                 ))}
               </div>

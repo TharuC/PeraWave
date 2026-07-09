@@ -4,28 +4,42 @@ import { API_URL } from '../config';
 import '../styles/interests.css';
 
 export const ALL_TAGS = [
-  { id: 'academics',     emoji: '📚', label: 'Academics' },
-  { id: 'non-academics', emoji: '🎭', label: 'Non-Academics' },
-  { id: 'social',        emoji: '🤝', label: 'Social' },
-  { id: 'entertainment', emoji: '🎬', label: 'Entertainment' },
-  { id: 'sports',        emoji: '⚽', label: 'Sports' },
-  { id: 'arts & culture',emoji: '🎨', label: 'Arts & Culture' },
-  { id: 'music',         emoji: '🎵', label: 'Music' },
-  { id: 'travel',        emoji: '✈️', label: 'Travel' },
-  { id: 'innovation',    emoji: '💡', label: 'Innovation' },
-  { id: 'technology',    emoji: '💻', label: 'Technology' },
-  { id: 'funny',         emoji: '😂', label: 'Funny' },
+  { id: 'academics',     label: 'Academics' },
+  { id: 'non-academics', label: 'Non-Academics' },
+  { id: 'social',        label: 'Social' },
+  { id: 'entertainment', label: 'Entertainment' },
+  { id: 'sports',        label: 'Sports' },
+  { id: 'arts & culture',label: 'Arts & Culture' },
+  { id: 'music',         label: 'Music' },
+  { id: 'travel',        label: 'Travel' },
+  { id: 'innovation',    label: 'Innovation' },
+  { id: 'technology',    label: 'Technology' },
+  { id: 'funny',         label: 'Funny' },
 ];
 
 const SelectInterests: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Token is passed from RegisterDetails via location state
-  const token: string | undefined = (location.state as any)?.token;
+  // Token is passed from location state (registration flow) or from auth (app flow)
+  const token: string | undefined = (location.state as any)?.token || getToken();
+  const isAppFlow = !!getToken();
 
   const [selected, setSelected] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  // Pre-load existing interests if the user is already logged in
+  React.useEffect(() => {
+    if (isAppFlow) {
+      const cached = sessionStorage.getItem('cachedUser');
+      if (cached) {
+        try {
+          const c = JSON.parse(cached);
+          if (c.interests) setSelected(c.interests);
+        } catch {}
+      }
+    }
+  }, [isAppFlow]);
 
   const toggle = (id: string) => {
     setSelected(prev =>
@@ -56,12 +70,29 @@ const SelectInterests: React.FC = () => {
       // Non-fatal — interests just won't be saved
     } finally {
       setSaving(false);
-      navigate('/login', { state: { message: 'Account created! Your interests are saved. Please log in.' } });
+      if (isAppFlow) {
+        // Update session storage for immediate reflection in Home
+        const cached = sessionStorage.getItem('cachedUser');
+        if (cached) {
+          try {
+            const c = JSON.parse(cached);
+            c.interests = selected;
+            sessionStorage.setItem('cachedUser', JSON.stringify(c));
+          } catch {}
+        }
+        navigate('/home');
+      } else {
+        navigate('/login', { state: { message: 'Account created! Your interests are saved. Please log in.' } });
+      }
     }
   };
 
   const skip = () => {
-    navigate('/login', { state: { message: 'Account created successfully! Please log in.' } });
+    if (isAppFlow) {
+      navigate('/home');
+    } else {
+      navigate('/login', { state: { message: 'Account created successfully! Please log in.' } });
+    }
   };
 
   return (
@@ -92,7 +123,6 @@ const SelectInterests: React.FC = () => {
               type="button"
               id={`interest-${tag.id.replace(/[^a-z]/g, '-')}`}
             >
-              <span className="interest-chip-emoji">{tag.emoji}</span>
               {tag.label}
             </button>
           ))}
@@ -108,7 +138,7 @@ const SelectInterests: React.FC = () => {
         {/* Actions */}
         <div className="interests-actions">
           <button className="interests-skip-btn" onClick={skip} type="button" id="interests-skip">
-            Skip for now
+            {isAppFlow ? 'Cancel' : 'Skip for now'}
           </button>
           <button
             className="interests-finish-btn"
@@ -117,7 +147,7 @@ const SelectInterests: React.FC = () => {
             type="button"
             id="interests-finish"
           >
-            {saving ? 'Saving…' : 'Finish →'}
+            {saving ? 'Saving…' : (isAppFlow ? 'Save Interests' : 'Finish →')}
           </button>
         </div>
       </div>

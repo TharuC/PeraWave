@@ -42,39 +42,6 @@ const Home: React.FC = () => {
     const [postsLoading, setPostsLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<'all' | 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY' | 'SAVED'>('all');
     const [sortBy, setSortBy] = useState<'preferred' | 'date' | 'votes'>('preferred');
-    const [showTagDropdown, setShowTagDropdown] = useState(false);
-
-    const handleAddInterest = async (tagId: string) => {
-        const token = getToken();
-        if (!token) return;
-        const newInterests = [...user.interests, tagId];
-        // Optimistic update
-        setUser(prev => ({ ...prev, interests: newInterests }));
-        setShowTagDropdown(false);
-
-        // Update session storage
-        const cached = sessionStorage.getItem('cachedUser');
-        if (cached) {
-            try {
-                const c = JSON.parse(cached);
-                c.interests = newInterests;
-                sessionStorage.setItem('cachedUser', JSON.stringify(c));
-            } catch {}
-        }
-
-        try {
-            await fetch(`${API_URL}/api/auth/interests`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ interests: newInterests })
-            });
-        } catch (error) {
-            console.error('Error updating interests', error);
-        }
-    };
 
     useEffect(() => {
         const token = getToken();
@@ -317,7 +284,7 @@ const Home: React.FC = () => {
                                             if (!tag) return null;
                                             return (
                                                 <span key={id} className="sidebar-interest-chip">
-                                                    {tag.emoji} {tag.label}
+                                                    {tag.label}
                                                 </span>
                                             );
                                         })}
@@ -326,23 +293,10 @@ const Home: React.FC = () => {
                                             <div className="sidebar-tag-dropdown">
                                                 <button 
                                                     className="sidebar-add-interest"
-                                                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                                                    onClick={() => navigate('/select-interests')}
                                                 >
-                                                    + Add
+                                                    + Add / Manage
                                                 </button>
-                                                {showTagDropdown && (
-                                                    <div className="sidebar-tag-dropdown-menu">
-                                                        {ALL_TAGS.filter(t => !user.interests.includes(t.id)).map(tag => (
-                                                            <button 
-                                                                key={tag.id}
-                                                                className="sidebar-tag-option"
-                                                                onClick={() => handleAddInterest(tag.id)}
-                                                            >
-                                                                {tag.emoji} {tag.label}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -485,7 +439,7 @@ const Home: React.FC = () => {
                                                             if (!tag) return null;
                                                             return (
                                                                 <span key={tagId} className="post-tag-chip">
-                                                                    {tag.emoji} {tag.label}
+                                                                    {tag.label}
                                                                 </span>
                                                             );
                                                         })}
