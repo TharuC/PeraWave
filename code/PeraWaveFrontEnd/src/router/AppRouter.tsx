@@ -19,6 +19,7 @@ import UserProfile from "../pages/UserProfile";
 import Events from "../pages/Events";
 import CreateEvent from "../pages/CreateEvent";
 import ModEvents from "../pages/ModEvents";
+import EventDetail from "../pages/EventDetail";
 
 const AppRouter = () => {
   return (
@@ -44,6 +45,7 @@ const AppRouter = () => {
         <Route path="/user/:id"        element={<UserProfile />} />
         {/* Events routes */}
         <Route path="/events"          element={<Events />} />
+        <Route path="/events/:id"      element={<EventDetail />} />
         <Route path="/create-event"    element={<CreateEvent />} />
         <Route path="/mod-events"      element={<ModEvents />} />
       </Routes>

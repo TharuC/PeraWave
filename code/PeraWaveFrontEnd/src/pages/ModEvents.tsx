@@ -82,6 +82,28 @@ const ModEvents: React.FC = () => {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Are you sure you want to permanently delete this event? This cannot be undone.')) return;
+    const token = getToken();
+    if (!token) return;
+    setActionLoading(id);
+    try {
+      const res = await fetch(`${API_URL}/api/events/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setAllEvents(prev => prev.filter(e => e.id !== id));
+      } else {
+        alert('Failed to delete event. Please try again.');
+      }
+    } catch {
+      alert('Network error.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleLogout = () => { clearToken(); navigate('/mods'); };
 
   const formatDate = (dateStr: string) =>
@@ -143,7 +165,12 @@ const ModEvents: React.FC = () => {
             {events.map(ev => (
               <div key={ev.id} className="mes-event-card">
                 {/* Flyer thumbnail */}
-                <div className="mes-flyer">
+                <div
+                  className="mes-flyer"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/events/${ev.id}`)}
+                  title="View event detail"
+                >
                   {ev.imageUrl ? (
                     <img src={ev.imageUrl} alt={ev.title} />
                   ) : (
@@ -154,7 +181,13 @@ const ModEvents: React.FC = () => {
                 {/* Details */}
                 <div className="mes-event-details">
                   <div className="mes-event-top">
-                    <h2 className="mes-event-title">{ev.title}</h2>
+                    <h2
+                      className="mes-event-title"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => navigate(`/events/${ev.id}`)}
+                    >
+                      {ev.title}
+                    </h2>
                     <span className={`mes-status-badge mes-status-${ev.status.toLowerCase()}`}>{ev.status}</span>
                   </div>
 
@@ -163,7 +196,7 @@ const ModEvents: React.FC = () => {
                   <div className="mes-event-meta">
                     <span>📅 {formatDate(ev.eventDate)} · {ev.eventTime}</span>
                     <span>📍 {ev.location}</span>
-                    {ev.link && <a href={ev.link} target="_blank" rel="noopener noreferrer" className="mes-link">🔗 More info</a>}
+                    {ev.link && <a href={ev.link} target="_blank" rel="noopener noreferrer" className="mes-link" onClick={e => e.stopPropagation()}>🔗 More info</a>}
                   </div>
 
                   <div className="mes-organizer">
@@ -172,27 +205,37 @@ const ModEvents: React.FC = () => {
                     {ev.organizer?.faculty && <span className="mes-org-faculty"> · {ev.organizer.faculty}</span>}
                   </div>
 
-                  {/* Actions — only for PENDING */}
-                  {ev.status === 'PENDING' && (
-                    <div className="mes-actions">
-                      <button
-                        className="mes-approve-btn"
-                        id={`approve-event-${ev.id}`}
-                        disabled={actionLoading === ev.id}
-                        onClick={() => handleStatus(ev.id, 'APPROVED')}
-                      >
-                        {actionLoading === ev.id ? '…' : '✓ Approve'}
-                      </button>
-                      <button
-                        className="mes-reject-btn"
-                        id={`reject-event-${ev.id}`}
-                        disabled={actionLoading === ev.id}
-                        onClick={() => handleStatus(ev.id, 'REJECTED')}
-                      >
-                        {actionLoading === ev.id ? '…' : '✕ Reject'}
-                      </button>
-                    </div>
-                  )}
+                  {/* Actions */}
+                  <div className="mes-actions">
+                    {ev.status === 'PENDING' && (
+                      <>
+                        <button
+                          className="mes-approve-btn"
+                          id={`approve-event-${ev.id}`}
+                          disabled={actionLoading === ev.id}
+                          onClick={() => handleStatus(ev.id, 'APPROVED')}
+                        >
+                          {actionLoading === ev.id ? '…' : '✓ Approve'}
+                        </button>
+                        <button
+                          className="mes-reject-btn"
+                          id={`reject-event-${ev.id}`}
+                          disabled={actionLoading === ev.id}
+                          onClick={() => handleStatus(ev.id, 'REJECTED')}
+                        >
+                          {actionLoading === ev.id ? '…' : '✕ Reject'}
+                        </button>
+                      </>
+                    )}
+                    <button
+                      className="mes-delete-btn"
+                      id={`delete-event-${ev.id}`}
+                      disabled={actionLoading === ev.id}
+                      onClick={() => handleDelete(ev.id)}
+                    >
+                      {actionLoading === ev.id ? '…' : '🗑 Delete'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

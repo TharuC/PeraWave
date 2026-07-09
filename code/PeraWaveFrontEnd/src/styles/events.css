@@ -223,6 +223,22 @@
   background: linear-gradient(135deg, #667eea33, #764ba233);
 }
 
+/* View hint */
+.event-card-view-hint {
+  display: block;
+  font-size: 11px;
+  color: #a5b4fc;
+  font-weight: 600;
+  margin-top: auto;
+  padding-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.event-card:hover .event-card-view-hint {
+  opacity: 1;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .events-header { flex-direction: column; align-items: flex-start; }

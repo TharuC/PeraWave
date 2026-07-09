@@ -304,8 +304,24 @@
   color: #fff;
 }
 
+.mes-delete-btn {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-left: auto;
+}
+
+.mes-delete-btn:hover:not(:disabled) { opacity: 0.85; }
+
 .mes-approve-btn:disabled,
-.mes-reject-btn:disabled {
+.mes-reject-btn:disabled,
+.mes-delete-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

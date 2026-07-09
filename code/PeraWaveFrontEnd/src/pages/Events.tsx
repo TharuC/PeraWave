@@ -116,7 +116,15 @@ const Events: React.FC = () => {
         ) : (
           <div className="events-grid">
             {events.map(ev => (
-              <article key={ev.id} className="event-card">
+              <article
+                key={ev.id}
+                className="event-card"
+                style={{ cursor: 'pointer' }}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/events/${ev.id}`)}
+                onKeyDown={e => e.key === 'Enter' && navigate(`/events/${ev.id}`)}
+              >
                 {/* Flyer */}
                 <div className="event-card-image">
                   {ev.imageUrl ? (
@@ -170,6 +178,7 @@ const Events: React.FC = () => {
                       More Info →
                     </a>
                   )}
+                  <span className="event-card-view-hint">Click to view details →</span>
                 </div>
               </article>
             ))}
