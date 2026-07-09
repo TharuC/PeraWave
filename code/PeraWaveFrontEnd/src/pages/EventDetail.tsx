@@ -196,7 +196,13 @@ const EventDetail: React.FC = () => {
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <section className="event-detail-hero">
         {event.imageUrl ? (
-          <img src={event.imageUrl} alt={event.title} className="event-detail-hero-img" />
+          <>
+            <div 
+              className="event-detail-hero-bg" 
+              style={{ backgroundImage: `url(${event.imageUrl})` }} 
+            />
+            <img src={event.imageUrl} alt={event.title} className="event-detail-hero-img" />
+          </>
         ) : (
           <div className="event-detail-hero-placeholder">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={0.8} stroke="currentColor">
@@ -204,9 +210,6 @@ const EventDetail: React.FC = () => {
             </svg>
           </div>
         )}
-
-        {/* Gradient overlay */}
-        <div className="event-detail-hero-overlay" />
 
         {/* Back button */}
         <button
@@ -219,9 +222,13 @@ const EventDetail: React.FC = () => {
           </svg>
           Back
         </button>
+      </section>
 
-        {/* Title block */}
-        <div className="event-detail-hero-content">
+      {/* ── Body ────────────────────────────────────────────────────── */}
+      <div className="event-detail-body">
+        
+        {/* Title block moved above columns */}
+        <div className="event-detail-header">
           <div className="event-detail-status-badge">Upcoming Event</div>
           <h1 className="event-detail-title">{event.title}</h1>
           {event.organizer?.fullName && (
@@ -231,13 +238,10 @@ const EventDetail: React.FC = () => {
             </p>
           )}
         </div>
-      </section>
 
-      {/* ── Body ────────────────────────────────────────────────────── */}
-      <div className="event-detail-body">
-
-        {/* Left — Description */}
-        <div className="event-detail-left">
+        <div className="event-detail-content-grid">
+          {/* Left — Description */}
+          <div className="event-detail-left">
           <div>
             <p className="event-detail-section-title">About this Event</p>
             <p className="event-detail-description">{event.description}</p>
@@ -346,6 +350,7 @@ const EventDetail: React.FC = () => {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
 
