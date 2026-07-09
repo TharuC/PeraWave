@@ -22,12 +22,13 @@ export const getPlatformStats = async (req: Request, res: Response) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [totalUsers, newUsersToday, suspendedUsers, totalPosts, totalModerators] = await Promise.all([
+    const [totalUsers, newUsersToday, suspendedUsers, totalPosts, totalModerators, pendingEvents] = await Promise.all([
       prisma.user.count({ where: { isDeleted: false } }),
       prisma.user.count({ where: { isDeleted: false, createdAt: { gte: today } } }),
       prisma.user.count({ where: { isDeleted: false, suspendedUntil: { gt: new Date() } } }),
       prisma.forumPost.count(),
       prisma.moderator.count(),
+      prisma.event.count({ where: { status: 'PENDING' } }),
     ]);
 
     res.status(200).json({
@@ -36,6 +37,7 @@ export const getPlatformStats = async (req: Request, res: Response) => {
       suspendedUsers,
       totalPosts,
       totalModerators,
+      pendingEvents,
     });
   } catch (error) {
     console.error('Error fetching platform stats:', error);

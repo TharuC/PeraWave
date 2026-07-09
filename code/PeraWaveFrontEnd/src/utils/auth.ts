@@ -12,6 +12,19 @@ export function getToken(): string | null {
 }
 
 /**
+ * Retrieves the MODERATOR auth token.
+ *
+ * - Mod "Remember Me" login → stored in localStorage (key: "modToken")
+ * - Mod normal login        → stored in sessionStorage (key: "token")
+ *
+ * Use this in mod-only pages instead of getToken() to correctly distinguish
+ * between user and moderator sessions.
+ */
+export function getModToken(): string | null {
+    return sessionStorage.getItem("token") ?? localStorage.getItem("modToken");
+}
+
+/**
  * Removes the token from both storages and clears the remembered email.
  * Call this on logout.
  */

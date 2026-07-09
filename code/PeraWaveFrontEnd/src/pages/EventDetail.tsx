@@ -15,6 +15,7 @@ interface Event {
   location: string;
   link: string | null;
   imageUrl: string | null;
+  organizerId: number | null;
   organizer: { fullName: string | null; faculty: string | null };
 }
 
@@ -26,6 +27,7 @@ const EventDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [user, setUser] = useState({ name: '', avatar: userAvatarImg });
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isMod, setIsMod] = useState(false);
 
@@ -53,7 +55,12 @@ const EventDetail: React.FC = () => {
       // Fetch user profile
       fetch(`${API_URL}/api/auth/me`, { headers })
         .then(r => r.ok ? r.json() : null)
-        .then(d => { if (d) setUser({ name: d.fullName || '', avatar: userAvatarImg }); })
+        .then(d => {
+          if (d) {
+            setUser({ name: d.fullName || '', avatar: userAvatarImg });
+            setCurrentUserId(d.id || null);
+          }
+        })
         .catch(() => {});
 
       // Fetch notifications
@@ -339,9 +346,11 @@ const EventDetail: React.FC = () => {
           </div>
 
           {/* Moderator delete card */}
-          {isMod && (
+          {(isMod || (currentUserId !== null && event.organizerId === currentUserId)) && (
             <div className="event-detail-mod-card">
-              <span className="event-detail-mod-label">⚠ Moderator Actions</span>
+              <span className="event-detail-mod-label">
+                {isMod ? '⚠ Moderator Actions' : '⚙ Event Actions'}
+              </span>
               <button
                 className="event-detail-delete-btn"
                 id="event-detail-delete-btn"

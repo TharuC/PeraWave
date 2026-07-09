@@ -27,7 +27,7 @@ const ModEvents: React.FC = () => {
   const [filter, setFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING');
   const [allEvents, setAllEvents] = useState<PendingEvent[]>([]);
 
-  const getToken = () => sessionStorage.getItem('token') ?? localStorage.getItem('token');
+  const getToken = () => sessionStorage.getItem('token') ?? localStorage.getItem('modToken');
 
   const fetchEvents = async () => {
     const token = getToken();

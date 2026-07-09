@@ -79,6 +79,7 @@ export const getApprovedEvents = async (req: Request, res: Response) => {
   }
 };
 
+
 // ── GET /api/events/:id ───────────────────────────────────────────────────────
 // Returns a single APPROVED event by ID (requires auth)
 export const getEventById = async (req: Request, res: Response) => {
@@ -108,6 +109,7 @@ export const getEventById = async (req: Request, res: Response) => {
         fullName: event.organizerName || event.organizer?.fullName,
         faculty: event.organizer?.faculty,
       },
+      organizerId: event.organizerId,
     };
 
     return res.json(result);

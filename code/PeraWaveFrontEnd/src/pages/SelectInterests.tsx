@@ -29,18 +29,21 @@ const SelectInterests: React.FC = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  // Pre-load existing interests if the user is already logged in
+  // Always fetch fresh interests from the API when in app flow
   React.useEffect(() => {
-    if (isAppFlow) {
-      const cached = sessionStorage.getItem('cachedUser');
-      if (cached) {
-        try {
-          const c = JSON.parse(cached);
-          if (c.interests) setSelected(c.interests);
-        } catch {}
-      }
+    if (isAppFlow && token) {
+      fetch(`${API_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.interests && Array.isArray(data.interests)) {
+            setSelected(data.interests);
+          }
+        })
+        .catch(() => {});
     }
-  }, [isAppFlow]);
+  }, [isAppFlow, token]);
 
   const toggle = (id: string) => {
     setSelected(prev =>

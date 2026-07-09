@@ -27,6 +27,7 @@ const ModDashboard: React.FC = () => {
         suspendedUsers: 0,
         totalPosts: 0,
         totalModerators: 0,
+        pendingEvents: 0,
     });
 
     // --- Users & Moderators ---
@@ -48,7 +49,9 @@ const ModDashboard: React.FC = () => {
     const [suspendDuration, setSuspendDuration] = useState(1);
 
     const getToken = () => {
-        const token = sessionStorage.getItem('token') ?? localStorage.getItem('token');
+        // Mod login without remember-me stores as sessionStorage["token"]
+        // Mod login with remember-me stores as localStorage["modToken"]
+        const token = sessionStorage.getItem('token') ?? localStorage.getItem('modToken');
         if (!token) { navigate('/mods'); return null; }
         return token;
     };
@@ -298,6 +301,18 @@ const ModDashboard: React.FC = () => {
                             <div className="mod-stat-card">
                                 <h3>Moderators</h3>
                                 <p style={{ color: '#f59e0b' }}>{stats.totalModerators}</p>
+                            </div>
+                            <div
+                                className="mod-stat-card"
+                                style={{ cursor: stats.pendingEvents > 0 ? 'pointer' : 'default', border: stats.pendingEvents > 0 ? '2px solid #f59e0b' : undefined }}
+                                onClick={() => stats.pendingEvents > 0 && navigate('/mod-events')}
+                                title={stats.pendingEvents > 0 ? 'Click to manage pending events' : ''}
+                            >
+                                <h3>Pending Events</h3>
+                                <p style={{ color: stats.pendingEvents > 0 ? '#d97706' : '#94a3b8' }}>
+                                    {stats.pendingEvents}
+                                    {stats.pendingEvents > 0 && <span style={{ fontSize: '13px', marginLeft: '6px', color: '#d97706' }}>⚠</span>}
+                                </p>
                             </div>
                         </div>
 

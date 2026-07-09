@@ -5,7 +5,7 @@ import '../styles/home.css';
 import '../styles/mod-dashboard.css';
 import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
-import { getToken as authGetToken, clearToken } from '../utils/auth';
+import { getModToken as authGetToken, clearToken } from '../utils/auth';
 
 const FACULTIES = [
   { code: 'eng', label: 'Engineering' },
