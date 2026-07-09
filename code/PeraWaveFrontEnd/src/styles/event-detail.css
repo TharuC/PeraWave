@@ -1,7 +1,8 @@
 /* ── Event Detail Page ──────────────────────────────────────────────── */
 .event-detail-page {
   min-height: 100vh;
-  background: #0f172a;
+  background: var(--bg-main, #f6f8fa);
+  color: var(--text-primary, #24292f);
   font-family: 'Inter', 'Outfit', sans-serif;
 }
 
@@ -40,7 +41,8 @@
 .event-detail-hero-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1e2a4a 0%, #667eea 50%, #764ba2 100%);
+  background: var(--bg-card, #ffffff);
+  border-bottom: 1px solid var(--border-color, #d0d7de);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,7 +51,7 @@
 .event-detail-hero-placeholder svg {
   width: 100px;
   height: 100px;
-  color: rgba(255,255,255,0.2);
+  color: var(--border-color, #d0d7de);
 }
 
 /* Gradient overlay from transparent to dark at bottom - Removed as no longer needed over image */
@@ -64,21 +66,22 @@
   align-items: center;
   gap: 7px;
   padding: 9px 18px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color, #d0d7de);
   border-radius: 99px;
-  color: #fff;
+  color: var(--text-primary, #24292f);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .event-detail-back:hover {
-  background: rgba(255,255,255,0.22);
+  background: #ffffff;
   transform: translateX(-3px);
 }
 
@@ -102,14 +105,14 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--accent-color, #0969da);
   color: #fff;
 }
 
 .event-detail-title {
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 900;
-  color: #ffffff;
+  color: var(--text-primary, #24292f);
   margin: 0 0 12px;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -117,12 +120,12 @@
 
 .event-detail-organizer-line {
   font-size: 15px;
-  color: rgba(255,255,255,0.7);
+  color: var(--text-secondary, #57606a);
   margin: 0;
 }
 
 .event-detail-organizer-line strong {
-  color: rgba(255,255,255,0.95);
+  color: var(--text-primary, #24292f);
 }
 
 /* ── Body Content ───────────────────────────────────────────────────── */
@@ -151,13 +154,13 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #667eea;
+  color: var(--accent-color, #0969da);
   margin: 0 0 14px;
 }
 
 .event-detail-description {
   font-size: 16px;
-  color: #cbd5e1;
+  color: var(--text-secondary, #57606a);
   line-height: 1.85;
   margin: 0;
   white-space: pre-wrap;
@@ -173,14 +176,15 @@
 }
 
 .event-detail-info-card {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 20px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #d0d7de);
+  border-radius: 16px;
   padding: 28px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   animation: slideUp 0.45s ease both;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
 @keyframes slideUp {
@@ -198,8 +202,8 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #667eea22, #764ba233);
-  border: 1px solid #667eea44;
+  background: rgba(9, 105, 218, 0.08);
+  border: 1px solid rgba(9, 105, 218, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,7 +213,7 @@
 .event-detail-info-icon svg {
   width: 18px;
   height: 18px;
-  color: #a5b4fc;
+  color: var(--accent-color, #0969da);
 }
 
 .event-detail-info-text {
@@ -223,20 +227,20 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--text-muted, #8c959f);
 }
 
 .event-detail-info-value {
   font-size: 14px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-primary, #24292f);
   line-height: 1.4;
 }
 
 /* Divider inside info card */
 .event-detail-info-divider {
   border: none;
-  border-top: 1px solid #334155;
+  border-top: 1px solid var(--border-color, #d0d7de);
   margin: 0;
 }
 
@@ -247,18 +251,18 @@
   justify-content: center;
   gap: 8px;
   padding: 13px 20px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--accent-color, #0969da);
   color: #fff;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   text-decoration: none;
-  border-radius: 12px;
-  transition: opacity 0.2s, transform 0.2s;
+  border-radius: var(--radius-sm, 6px);
+  transition: background 0.2s, transform 0.2s;
   text-align: center;
 }
 
 .event-detail-cta:hover {
-  opacity: 0.88;
+  background: var(--accent-hover, #035cc5);
   transform: translateY(-2px);
 }
 
@@ -269,14 +273,15 @@
 
 /* ── Moderator Delete Card ───────────────────────────────────────────── */
 .event-detail-mod-card {
-  background: #1e293b;
-  border: 1px solid #ef444433;
-  border-radius: 20px;
+  background: #fffafa;
+  border: 1px solid #ffdce0;
+  border-radius: 16px;
   padding: 22px 28px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   animation: slideUp 0.55s ease both;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .event-detail-mod-label {
@@ -284,28 +289,28 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #ef4444;
+  color: var(--danger-color, #cf222e);
 }
 
 .event-detail-delete-btn {
   width: 100%;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: var(--danger-color, #cf222e);
   color: #fff;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-sm, 6px);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 0.2s, transform 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .event-detail-delete-btn:hover:not(:disabled) {
-  opacity: 0.88;
+  background: #a40e26;
   transform: translateY(-1px);
 }
 
@@ -339,14 +344,15 @@
 }
 
 .event-confirm-modal {
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 20px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #d0d7de);
+  border-radius: 16px;
   padding: 36px;
   max-width: 420px;
   width: 100%;
   text-align: center;
   animation: scaleIn 0.25s ease;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
 }
 
 @keyframes scaleIn {
@@ -357,8 +363,8 @@
 .event-confirm-icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #ef444422, #dc262622);
-  border: 1px solid #ef444433;
+  background: #fffafa;
+  border: 1px solid #ffdce0;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -369,19 +375,19 @@
 .event-confirm-icon svg {
   width: 28px;
   height: 28px;
-  color: #ef4444;
+  color: var(--danger-color, #cf222e);
 }
 
 .event-confirm-modal h3 {
   font-size: 20px;
-  font-weight: 800;
-  color: #f1f5f9;
+  font-weight: 700;
+  color: var(--text-primary, #24292f);
   margin: 0 0 10px;
 }
 
 .event-confirm-modal p {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--text-secondary, #57606a);
   margin: 0 0 26px;
   line-height: 1.6;
 }
@@ -394,32 +400,32 @@
 .event-confirm-cancel {
   flex: 1;
   padding: 11px;
-  background: #0f172a;
-  color: #94a3b8;
-  border: 1px solid #334155;
-  border-radius: 10px;
+  background: var(--bg-main, #f6f8fa);
+  color: var(--text-secondary, #57606a);
+  border: 1px solid var(--border-color, #d0d7de);
+  border-radius: var(--radius-sm, 6px);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.event-confirm-cancel:hover { background: #1e293b; color: #fff; }
+.event-confirm-cancel:hover { background: #e5e7eb; color: var(--text-primary, #24292f); }
 
 .event-confirm-delete {
   flex: 1;
   padding: 11px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: var(--danger-color, #cf222e);
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm, 6px);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 
-.event-confirm-delete:hover { opacity: 0.88; }
+.event-confirm-delete:hover { background: #a40e26; }
 .event-confirm-delete:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
