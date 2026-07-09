@@ -19,7 +19,7 @@ const uploadToCloudinary = async (filePath: string): Promise<string> => {
 // Authenticated users submit a new event (starts as PENDING)
 export const createEvent = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, eventDate, eventTime, location, link } = req.body;
+    const { title, description, eventDate, eventTime, location, link, organizerName } = req.body;
     const organizerId = req.user?.userId;
 
     if (!title || !description || !eventDate || !eventTime || !location) {
@@ -40,6 +40,7 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
         location,
         link: link || null,
         imageUrl: imageUrl || null,
+        organizerName: organizerName || null,
         organizerId,
         status: 'PENDING',
       },
@@ -63,7 +64,15 @@ export const getApprovedEvents = async (req: Request, res: Response) => {
         organizer: { select: { fullName: true, faculty: true } },
       },
     });
-    return res.json(events);
+    // Overlay custom organizerName when provided
+    const result = events.map(e => ({
+      ...e,
+      organizer: {
+        fullName: e.organizerName || e.organizer?.fullName,
+        faculty: e.organizer?.faculty,
+      },
+    }));
+    return res.json(result);
   } catch (err) {
     console.error('getApprovedEvents error:', err);
     return res.status(500).json({ error: 'Internal server error.' });
@@ -92,7 +101,16 @@ export const getEventById = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Event not found.' });
     }
 
-    return res.json(event);
+    // Overlay custom organizerName when provided
+    const result = {
+      ...event,
+      organizer: {
+        fullName: event.organizerName || event.organizer?.fullName,
+        faculty: event.organizer?.faculty,
+      },
+    };
+
+    return res.json(result);
   } catch (err) {
     console.error('getEventById error:', err);
     return res.status(500).json({ error: 'Internal server error.' });

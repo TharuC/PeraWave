@@ -136,17 +136,18 @@ model Report {
 // ─── Events ──────────────────────────────────────────────────────────────────
 
 model Event {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  eventDate   DateTime
-  eventTime   String
-  location    String
-  link        String?
-  imageUrl    String?  // Cloudinary URL for the event flyer
-  status      String   @default("PENDING") // 'PENDING' | 'APPROVED' | 'REJECTED'
-  organizerId Int
-  organizer   User     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  eventDate     DateTime
+  eventTime     String
+  location      String
+  link          String?
+  imageUrl      String?  // Cloudinary URL for the event flyer
+  organizerName String?  // Custom organizer name entered by the publisher
+  status        String   @default("PENDING") // 'PENDING' | 'APPROVED' | 'REJECTED'
+  organizerId   Int
+  organizer     User     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

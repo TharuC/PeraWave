@@ -16,6 +16,7 @@ const CreateEvent: React.FC = () => {
     eventTime: '',
     location: '',
     link: '',
+    organizerName: '',
   });
   const [flyer, setFlyer] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -57,6 +58,7 @@ const CreateEvent: React.FC = () => {
       fd.append('eventDate', form.eventDate);
       fd.append('eventTime', form.eventTime);
       fd.append('location', form.location);
+      if (form.organizerName) fd.append('organizerName', form.organizerName);
       if (form.link) fd.append('link', form.link);
       if (flyer) fd.append('flyer', flyer);
 
@@ -94,7 +96,7 @@ const CreateEvent: React.FC = () => {
             <p>Your event is pending moderator approval. It will appear on the Events page once approved.</p>
             <div className="ce-success-actions">
               <button className="ce-btn-primary" onClick={() => navigate('/events')}>View Events</button>
-              <button className="ce-btn-secondary" onClick={() => { setSuccess(false); setForm({ title: '', description: '', eventDate: '', eventTime: '', location: '', link: '' }); setFlyer(null); setPreview(null); }}>
+              <button className="ce-btn-secondary" onClick={() => { setSuccess(false); setForm({ title: '', description: '', eventDate: '', eventTime: '', location: '', link: '', organizerName: '' }); setFlyer(null); setPreview(null); }}>
                 Submit Another
               </button>
             </div>
@@ -164,6 +166,26 @@ const CreateEvent: React.FC = () => {
                 onChange={handleChange}
                 maxLength={120}
               />
+            </div>
+
+            {/* Organizer Name */}
+            <div className="ce-field">
+              <label className="ce-label" htmlFor="ce-organizer-name">
+                Organizer Name <span className="ce-optional">(optional)</span>
+              </label>
+              <input
+                id="ce-organizer-name"
+                name="organizerName"
+                className="ce-input"
+                type="text"
+                placeholder="e.g. IEEE Student Branch, Faculty of Engineering"
+                value={form.organizerName}
+                onChange={handleChange}
+                maxLength={120}
+              />
+              <small style={{ color: 'var(--text-muted, #8c959f)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                If left blank, your account name will be shown as the organizer.
+              </small>
             </div>
 
             {/* Description */}
