@@ -299,7 +299,7 @@ const ModReports: React.FC = () => {
               )}
 
               {/* View content button */}
-              <button onClick={() => navigate(`/post/${selectedReport.contentId}`)}
+              <button onClick={() => navigate(`/post/${selectedReport.contentId}`, { state: { fromMod: true } })}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontSize: '13px', fontWeight: 600, width: 'fit-content' }}>
                 <IconEye /> View Reported {selectedReport.contentType === 'POST' ? 'Post' : 'Comment'}
               </button>

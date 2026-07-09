@@ -301,7 +301,7 @@ const ModHome: React.FC = () => {
                   key={post.id}
                   className="forum-post"
                   style={{ cursor: 'pointer', borderLeft: '3px solid transparent', transition: 'border-color 0.2s' }}
-                  onClick={() => navigate(`/post/${post.id}`)}
+                  onClick={() => navigate(`/post/${post.id}`, { state: { fromMod: true } })}
                   onMouseEnter={e => (e.currentTarget.style.borderLeftColor = '#ef4444')}
                   onMouseLeave={e => (e.currentTarget.style.borderLeftColor = 'transparent')}
                 >
@@ -342,10 +342,10 @@ const ModHome: React.FC = () => {
                   </p>
 
                   <div className="post-actions">
-                    <button className="post-action-btn" onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <button className="post-action-btn" onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`, { state: { fromMod: true } }); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <IconUpvote /> {post.upvotes}
                     </button>
-                    <button className="post-action-btn" onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <button className="post-action-btn" onClick={e => { e.stopPropagation(); navigate(`/post/${post.id}`, { state: { fromMod: true } }); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <IconChat /> {post.commentCount}
                     </button>
 
