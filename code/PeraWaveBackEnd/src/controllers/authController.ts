@@ -317,6 +317,7 @@ export const loginUser = async (req: Request, res: Response) => {
         registrationNumber: user.registrationNumber,
         suspendedUntil: user.suspendedUntil,
         suspensionReason: user.suspensionReason,
+        interests: user.interests,
         createdAt: user.createdAt,
       },
     });

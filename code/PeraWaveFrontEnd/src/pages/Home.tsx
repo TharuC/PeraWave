@@ -97,6 +97,7 @@ const Home: React.FC = () => {
         if (location.state && location.state.user) {
             const loggedInUser = location.state.user;
             const isSuspended = loggedInUser.suspendedUntil && new Date(loggedInUser.suspendedUntil) > new Date();
+            // Set immediate state from login response to avoid flash of empty name
             setUser({
                 name: loggedInUser.fullName || "User",
                 avatar: userAvatarImg,
@@ -104,9 +105,9 @@ const Home: React.FC = () => {
                 suspensionReason: loggedInUser.suspensionReason || "",
                 interests: loggedInUser.interests || []
             });
-        } else {
-            fetchUser();
         }
+        // Always fetch fresh user data from API to ensure interests (and all fields) are up-to-date
+        fetchUser();
 
         if (token) {
             // Fetch notifications
