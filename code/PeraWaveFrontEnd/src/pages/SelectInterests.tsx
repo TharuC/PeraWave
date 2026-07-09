@@ -101,7 +101,6 @@ const SelectInterests: React.FC = () => {
       <div className="interests-card">
         {/* Logo */}
         <div className="interests-logo">
-          <span style={{ fontSize: 28 }}>🌊</span>
           <span>PeraWave</span>
         </div>
 

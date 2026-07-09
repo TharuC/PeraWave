@@ -14,7 +14,7 @@
   border: 1px solid var(--border-color, #d0d7de);
   border-radius: 16px;
   padding: 48px 52px;
-  max-width: 620px;
+  max-width: 800px;
   width: 100%;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   text-align: center;
