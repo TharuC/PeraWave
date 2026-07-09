@@ -6,6 +6,7 @@ import '../styles/home.css';
 // import logo from '../assets/PeraWaveLogo.png';
 import { API_URL } from '../config';
 import { getToken, clearToken } from '../utils/auth';
+import { ALL_TAGS } from './SelectInterests';
 
 type Visibility = 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY';
 
@@ -25,7 +26,12 @@ const CreatePost: React.FC = () => {
   const [content, setContent] = useState('');
   const [visibility, setVisibility] = useState<Visibility>('UNIVERSITY_WIDE');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const toggleTag = (id: string) => {
+    setSelectedTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  };
   const [error, setError] = useState('');
   const [user, setUser] = useState<any>(null);
 
@@ -65,7 +71,7 @@ const CreatePost: React.FC = () => {
       const res = await fetch(`${API_URL}/api/forum/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title, content, visibility, isAnonymous }),
+        body: JSON.stringify({ title, content, visibility, isAnonymous, tags: selectedTags }),
       });
 
       const data = await res.json();
@@ -131,6 +137,23 @@ const CreatePost: React.FC = () => {
                 onChange={e => setContent(e.target.value)}
                 rows={7}
               />
+            </div>
+
+            {/* Categories */}
+            <div className="cp-field">
+              <label className="cp-label">Categories</label>
+              <div className="cp-tag-grid">
+                {ALL_TAGS.map(tag => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    className={`cp-tag-chip${selectedTags.includes(tag.id) ? ' selected' : ''}`}
+                    onClick={() => toggleTag(tag.id)}
+                  >
+                    <span>{tag.emoji}</span> {tag.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Visibility */}

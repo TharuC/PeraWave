@@ -117,6 +117,7 @@ export const getPosts = async (req: any, res: Response) => {
         upvotes:      post.upvotes,
         commentCount: post._count.comments,
         createdAt:    post.createdAt,
+        tags:         (post as any).tags || [],
         userVote,
         isSaved:      post.savedBy && (post.savedBy as any[]).length > 0,
         isAuthor:     post.authorId === userId,
@@ -240,6 +241,7 @@ export const getPostById = async (req: any, res: Response) => {
       isAnonymous:  post.isAnonymous,
       upvotes:      post.upvotes,
       createdAt:    post.createdAt,
+      tags:         (post as any).tags || [],
       userVote,
       isSaved:      post.savedBy && (post.savedBy as any[]).length > 0,
       isAuthor:     post.authorId === userId,
@@ -265,7 +267,7 @@ export const createPost = async (req: any, res: Response) => {
       return res.status(403).json({ error: 'Your account is suspended. You cannot post.' });
     }
 
-    const { title, content, visibility, isAnonymous, faculty, batch } = req.body;
+    const { title, content, visibility, isAnonymous, faculty, batch, tags } = req.body;
 
     if (!title || !content || !visibility) {
       return res.status(400).json({ error: 'title, content, and visibility are required' });
@@ -276,6 +278,14 @@ export const createPost = async (req: any, res: Response) => {
       return res.status(400).json({ error: 'Invalid visibility value' });
     }
 
+    const VALID_TAGS = [
+      'academics', 'non-academics', 'social', 'entertainment', 'sports',
+      'arts & culture', 'music', 'travel', 'innovation', 'technology', 'funny'
+    ];
+    const cleanedTags = Array.isArray(tags)
+      ? tags.filter((t: any) => typeof t === 'string' && VALID_TAGS.includes(t))
+      : [];
+
     const post = await prisma.forumPost.create({
       data: {
         authorId:    userId,
@@ -285,6 +295,7 @@ export const createPost = async (req: any, res: Response) => {
         isAnonymous: isAnonymous === true,
         faculty:     faculty || user.faculty || null,
         batch:       batch   || deriveBatch(user.registrationNumber) || null,
+        tags:        cleanedTags,
       },
     });
 

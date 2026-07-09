@@ -27,6 +27,7 @@ model User {
   reports            Report[]
   savedPosts         SavedPost[]
   events             Event[]
+  interests          String[]  @default([])
 }
 
 
@@ -81,6 +82,7 @@ model ForumPost {
   comments     Comment[]
   votes        PostVote[]
   savedBy      SavedPost[]
+  tags         String[]  @default([])
 }
 
 model Comment {

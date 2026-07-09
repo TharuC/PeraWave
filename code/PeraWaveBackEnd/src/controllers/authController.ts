@@ -245,9 +245,17 @@ export const registerUser = async (req: Request, res: Response) => {
       },
     });
 
-    // 5. Send success response (excluding password)
+    // 5. Issue a JWT so the client can call /interests without logging in
+    const token = jwt.sign(
+      { userId: newUser.id, email: newUser.email, role: 'USER' },
+      process.env.JWT_SECRET || 'fallback_secret',
+      { expiresIn: '24h' }
+    );
+
+    // 6. Send success response (excluding password)
     return res.status(201).json({
       message: 'User registered successfully',
+      token,
       user: {
         id: newUser.id,
         email: newUser.email,
@@ -493,11 +501,43 @@ export const getCurrentUser = async (req: any, res: Response) => {
         suspendedUntil: user.suspendedUntil,
         suspensionReason: user.suspensionReason,
         notifications: user.notifications,
+        interests: user.interests,
         createdAt: user.createdAt
       });
     }
   } catch (error) {
     console.error('Error fetching current user:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// ── PUT /api/auth/interests ───────────────────────────────────────────────────
+// Save or update the current user's interest tags
+export const updateInterests = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+
+    const { interests } = req.body;
+    if (!Array.isArray(interests)) {
+      return res.status(400).json({ error: 'interests must be an array of strings' });
+    }
+
+    const VALID_TAGS = [
+      'academics', 'non-academics', 'social', 'entertainment', 'sports',
+      'arts & culture', 'music', 'travel', 'innovation', 'technology', 'funny'
+    ];
+    const cleaned = interests.filter((t: any) => typeof t === 'string' && VALID_TAGS.includes(t));
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { interests: cleaned },
+      select: { interests: true },
+    });
+
+    return res.status(200).json({ interests: updated.interests });
+  } catch (error) {
+    console.error('Error updating interests:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

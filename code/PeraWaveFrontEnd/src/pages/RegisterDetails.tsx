@@ -106,9 +106,9 @@ const RegisterDetails: React.FC = () => {
         return;
       }
 
-      // Success! Navigate to login or dashboard
-      // Registration successful
-      navigate("/login", { state: { message: "Account created successfully! Please log in." } });
+      // Registration successful — go to interests selection page
+      // Pass the JWT token so the page can save interests immediately
+      navigate("/select-interests", { state: { token: data.token } });
 
     } catch (err: any) {
       console.error("Failed to connect or parse response:", err);

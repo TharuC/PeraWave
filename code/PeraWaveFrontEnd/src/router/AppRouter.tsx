@@ -20,6 +20,7 @@ import Events from "../pages/Events";
 import CreateEvent from "../pages/CreateEvent";
 import ModEvents from "../pages/ModEvents";
 import EventDetail from "../pages/EventDetail";
+import SelectInterests from "../pages/SelectInterests";
 
 const AppRouter = () => {
   return (
@@ -31,6 +32,7 @@ const AppRouter = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register"       element={<RegisterEmail />} />
         <Route path="/register/details" element={<RegisterDetails />} />
+        <Route path="/select-interests" element={<SelectInterests />} />
         <Route path="/dashboard"      element={<UserDashboard />} />
         <Route path="/mods"           element={<ModLogin />} />
         <Route path="/mod-forgot-password" element={<ModForgotPassword />} />

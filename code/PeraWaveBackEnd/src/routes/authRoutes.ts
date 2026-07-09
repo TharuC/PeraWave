@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser, loginUser, modRegister, modLogin, getCurrentUser, getAllUsers, markNotificationsRead, getNotifications, sendOtp, verifyOtp, deleteMe, sendResetPasswordOtp, resetPassword, sendModResetPasswordOtp, modResetPassword, sendModRegisterOtp, getPublicProfile } from '../controllers/authController';
+import { registerUser, loginUser, modRegister, modLogin, getCurrentUser, getAllUsers, markNotificationsRead, getNotifications, sendOtp, verifyOtp, deleteMe, sendResetPasswordOtp, resetPassword, sendModResetPasswordOtp, modResetPassword, sendModRegisterOtp, getPublicProfile, updateInterests } from '../controllers/authController';
 import { verifyToken, requireModerator } from '../middlewares/authMiddleware';
 
 const router = Router();
@@ -54,5 +54,8 @@ router.get('/users', requireModerator, getAllUsers);
 
 // GET /api/auth/users/:id/profile (Authenticated users — public profile, no email/e-number)
 router.get('/users/:id/profile', verifyToken, getPublicProfile);
+
+// PUT /api/auth/interests (Authenticated users — save interest tags)
+router.put('/interests', verifyToken, updateInterests);
 
 export default router;

@@ -1,0 +1,330 @@
+/* ── Select Interests Page ───────────────────────────────────────────────── */
+.interests-page {
+  min-height: 100vh;
+  background: var(--bg-main, #f6f8fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.interests-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color, #d0d7de);
+  border-radius: 16px;
+  padding: 48px 52px;
+  max-width: 620px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.interests-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.interests-logo img {
+  height: 36px;
+}
+
+.interests-logo span {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary, #24292f);
+  letter-spacing: -0.5px;
+}
+
+.interests-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary, #24292f);
+  margin: 0 0 10px;
+  letter-spacing: -0.5px;
+}
+
+.interests-header p {
+  font-size: 15px;
+  color: var(--text-secondary, #57606a);
+  margin: 0 0 36px;
+  line-height: 1.6;
+}
+
+/* ── Tag Grid ─────────────────────────────────────────────────────────────── */
+.interests-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.interest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-color, #d0d7de);
+  background: #ffffff;
+  color: var(--text-secondary, #57606a);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.interest-chip:hover {
+  border-color: var(--accent-color, #0969da);
+  color: var(--accent-color, #0969da);
+  background: rgba(9, 105, 218, 0.05);
+  transform: translateY(-1px);
+}
+
+.interest-chip.selected {
+  background: var(--accent-color, #0969da);
+  border-color: var(--accent-color, #0969da);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(9, 105, 218, 0.3);
+}
+
+.interest-chip.selected:hover {
+  background: var(--accent-hover, #035cc5);
+  border-color: var(--accent-hover, #035cc5);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.interest-chip-emoji {
+  font-size: 16px;
+}
+
+/* ── Count Hint ──────────────────────────────────────────────────────────── */
+.interests-hint {
+  font-size: 13px;
+  color: var(--text-muted, #8c959f);
+  margin-bottom: 28px;
+}
+
+.interests-hint strong {
+  color: var(--accent-color, #0969da);
+}
+
+/* ── Actions ─────────────────────────────────────────────────────────────── */
+.interests-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.interests-finish-btn {
+  padding: 12px 32px;
+  background: var(--accent-color, #0969da);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s;
+}
+
+.interests-finish-btn:hover:not(:disabled) {
+  background: var(--accent-hover, #035cc5);
+  transform: translateY(-1px);
+}
+
+.interests-finish-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.interests-skip-btn {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-secondary, #57606a);
+  border: 1.5px solid var(--border-color, #d0d7de);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.interests-skip-btn:hover {
+  background: var(--bg-main, #f6f8fa);
+  color: var(--text-primary, #24292f);
+}
+
+/* ── Sidebar mini chips (used in Home sidebar) ───────────────────────────── */
+.sidebar-interest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.sidebar-interest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(9, 105, 218, 0.08);
+  border: 1px solid rgba(9, 105, 218, 0.18);
+  color: var(--accent-color, #0969da);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.sidebar-interest-chip.removable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sidebar-interest-chip.removable:hover {
+  background: rgba(207, 34, 46, 0.08);
+  border-color: rgba(207, 34, 46, 0.25);
+  color: var(--danger-color, #cf222e);
+}
+
+.sidebar-add-interest {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px dashed var(--border-color, #d0d7de);
+  color: var(--text-muted, #8c959f);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.sidebar-add-interest:hover {
+  border-color: var(--accent-color, #0969da);
+  color: var(--accent-color, #0969da);
+  background: rgba(9, 105, 218, 0.05);
+}
+
+/* ── Inline add-tag dropdown ─────────────────────────────────────────────── */
+.sidebar-tag-dropdown {
+  position: relative;
+  margin-top: 4px;
+}
+
+.sidebar-tag-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 200;
+  background: #ffffff;
+  border: 1px solid var(--border-color, #d0d7de);
+  border-radius: 10px;
+  padding: 6px;
+  width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: dropdownIn 0.15s ease;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sidebar-tag-option {
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary, #24292f);
+  cursor: pointer;
+  transition: background 0.12s;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+}
+
+.sidebar-tag-option:hover {
+  background: var(--bg-main, #f6f8fa);
+  color: var(--accent-color, #0969da);
+}
+
+/* ── Forum tag chips (on post cards and create post form) ────────────────── */
+.post-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(9, 105, 218, 0.08);
+  border: 1px solid rgba(9, 105, 218, 0.15);
+  color: var(--accent-color, #0969da);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.post-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+/* ── Create Post tag picker ───────────────────────────────────────────────── */
+.cp-tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cp-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-color, #d0d7de);
+  background: #ffffff;
+  color: var(--text-secondary, #57606a);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.cp-tag-chip:hover {
+  border-color: var(--accent-color, #0969da);
+  color: var(--accent-color, #0969da);
+  background: rgba(9, 105, 218, 0.05);
+}
+
+.cp-tag-chip.selected {
+  background: var(--accent-color, #0969da);
+  border-color: var(--accent-color, #0969da);
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .interests-card {
+    padding: 32px 24px;
+  }
+  .interests-actions {
+    flex-direction: column;
+  }
+}

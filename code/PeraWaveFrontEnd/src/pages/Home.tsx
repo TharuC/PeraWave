@@ -7,6 +7,7 @@ import '../styles/home.css';
 import userAvatarImg from '../assets/UserAvatar.png';
 import { API_URL } from '../config';
 import { getToken, clearToken } from '../utils/auth';
+import { ALL_TAGS } from './SelectInterests';
 
 // SVG icon helpers
 const IconGlobe = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'12px',height:'12px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>;
@@ -33,13 +34,47 @@ const Home: React.FC = () => {
         name: "",
         avatar: userAvatarImg,
         isSuspended: false,
-        suspensionReason: ""
+        suspensionReason: "",
+        interests: [] as string[]
     });
     const [notifications, setNotifications] = useState<any[]>([]);
     const [posts, setPosts] = useState<any[]>([]);
     const [postsLoading, setPostsLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<'all' | 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY' | 'SAVED'>('all');
-    const [sortBy, setSortBy] = useState<'date' | 'votes'>('date');
+    const [sortBy, setSortBy] = useState<'preferred' | 'date' | 'votes'>('preferred');
+    const [showTagDropdown, setShowTagDropdown] = useState(false);
+
+    const handleAddInterest = async (tagId: string) => {
+        const token = getToken();
+        if (!token) return;
+        const newInterests = [...user.interests, tagId];
+        // Optimistic update
+        setUser(prev => ({ ...prev, interests: newInterests }));
+        setShowTagDropdown(false);
+
+        // Update session storage
+        const cached = sessionStorage.getItem('cachedUser');
+        if (cached) {
+            try {
+                const c = JSON.parse(cached);
+                c.interests = newInterests;
+                sessionStorage.setItem('cachedUser', JSON.stringify(c));
+            } catch {}
+        }
+
+        try {
+            await fetch(`${API_URL}/api/auth/interests`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ interests: newInterests })
+            });
+        } catch (error) {
+            console.error('Error updating interests', error);
+        }
+    };
 
     useEffect(() => {
         const token = getToken();
@@ -50,7 +85,7 @@ const Home: React.FC = () => {
             try {
                 const c = JSON.parse(cached);
                 const isSuspended = c.suspendedUntil && new Date(c.suspendedUntil) > new Date();
-                setUser({ name: c.fullName || "", avatar: userAvatarImg, isSuspended, suspensionReason: c.suspensionReason || "" });
+                setUser({ name: c.fullName || "", avatar: userAvatarImg, isSuspended, suspensionReason: c.suspensionReason || "", interests: c.interests || [] });
             } catch {}
         }
 
@@ -67,7 +102,8 @@ const Home: React.FC = () => {
                         name: data.fullName,
                         avatar: userAvatarImg,
                         isSuspended,
-                        suspensionReason: data.suspensionReason || ""
+                        suspensionReason: data.suspensionReason || "",
+                        interests: data.interests || []
                     };
                     setUser(fresh);
                     // Update the cache so dashboard also gets fresh data
@@ -78,7 +114,8 @@ const Home: React.FC = () => {
                         registrationNumber: data.registrationNumber,
                         joinDate: data.createdAt,
                         suspendedUntil: data.suspendedUntil || null,
-                        suspensionReason: data.suspensionReason || ""
+                        suspensionReason: data.suspensionReason || "",
+                        interests: data.interests || []
                     }));
                 } else {
                     clearToken();
@@ -97,7 +134,8 @@ const Home: React.FC = () => {
                 name: loggedInUser.fullName || "User",
                 avatar: userAvatarImg,
                 isSuspended,
-                suspensionReason: loggedInUser.suspensionReason || ""
+                suspensionReason: loggedInUser.suspensionReason || "",
+                interests: loggedInUser.interests || []
             });
         } else {
             fetchUser();
@@ -161,11 +199,17 @@ const Home: React.FC = () => {
             return p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q);
         }
         return true;
-    }).slice().sort((a, b) =>
-        sortBy === 'votes'
-            ? b.upvotes - a.upvotes
-            : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    }).slice().sort((a, b) => {
+        if (sortBy === 'votes') {
+            return b.upvotes - a.upvotes;
+        } else if (sortBy === 'preferred') {
+            const aMatches = (a.tags || []).some((t: string) => user.interests.includes(t)) ? 1 : 0;
+            const bMatches = (b.tags || []).some((t: string) => user.interests.includes(t)) ? 1 : 0;
+            if (aMatches !== bMatches) return bMatches - aMatches;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
     const handleDeletePost = async (postId: number) => {
         if (!window.confirm('Are you sure you want to delete this post?')) return;
@@ -264,6 +308,45 @@ const Home: React.FC = () => {
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'13px',height:'13px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
                                     Events
                                 </button>
+                                
+                                <div style={{ marginTop: '16px' }}>
+                                    <div className="sidebar-title" style={{ fontSize: '11px', color: '#8c959f', marginBottom: '8px' }}>YOUR INTERESTS</div>
+                                    <div className="sidebar-interest-chips">
+                                        {user.interests.map(id => {
+                                            const tag = ALL_TAGS.find(t => t.id === id);
+                                            if (!tag) return null;
+                                            return (
+                                                <span key={id} className="sidebar-interest-chip">
+                                                    {tag.emoji} {tag.label}
+                                                </span>
+                                            );
+                                        })}
+                                        
+                                        {user.interests.length < ALL_TAGS.length && (
+                                            <div className="sidebar-tag-dropdown">
+                                                <button 
+                                                    className="sidebar-add-interest"
+                                                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                                                >
+                                                    + Add
+                                                </button>
+                                                {showTagDropdown && (
+                                                    <div className="sidebar-tag-dropdown-menu">
+                                                        {ALL_TAGS.filter(t => !user.interests.includes(t.id)).map(tag => (
+                                                            <button 
+                                                                key={tag.id}
+                                                                className="sidebar-tag-option"
+                                                                onClick={() => handleAddInterest(tag.id)}
+                                                            >
+                                                                {tag.emoji} {tag.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                         </aside>
@@ -311,7 +394,7 @@ const Home: React.FC = () => {
                                 {/* Sort toggle */}
                                 <div className="sort-chips">
                                     <span className="sort-label">Sort:</span>
-                                    {([{ value: 'date', label: 'Newest' }, { value: 'votes', label: 'Top Voted' }] as const).map(opt => (
+                                    {([{ value: 'preferred', label: 'Most Preferred' }, { value: 'date', label: 'Newest' }, { value: 'votes', label: 'Top Voted' }] as const).map(opt => (
                                         <button
                                             key={opt.value}
                                             onClick={() => setSortBy(opt.value)}
@@ -395,6 +478,19 @@ const Home: React.FC = () => {
                                                 </div>
 
                                                 <h2 className="post-title">{post.title}</h2>
+                                                {post.tags && post.tags.length > 0 && (
+                                                    <div className="post-tags-row">
+                                                        {post.tags.map((tagId: string) => {
+                                                            const tag = ALL_TAGS.find(t => t.id === tagId);
+                                                            if (!tag) return null;
+                                                            return (
+                                                                <span key={tagId} className="post-tag-chip">
+                                                                    {tag.emoji} {tag.label}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
                                                 <p className="post-content" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                     {post.content}
                                                 </p>
