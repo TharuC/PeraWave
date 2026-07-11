@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/mod-dashboard.css';
 import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
-import { clearToken } from '../utils/auth';
+import { getModToken, clearToken } from '../utils/auth';
 
 const TAB_TITLES: Record<string, string> = {
     overview: 'Overview Analytics',
@@ -49,9 +49,9 @@ const ModDashboard: React.FC = () => {
     const [suspendDuration, setSuspendDuration] = useState(1);
 
     const getToken = () => {
-        // Mod login without remember-me stores as sessionStorage["token"]
-        // Mod login with remember-me stores as localStorage["modToken"]
-        const token = sessionStorage.getItem('token') ?? localStorage.getItem('modToken');
+        // Uses getModToken() which checks sessionStorage["modToken"] first,
+        // then falls back to localStorage["modToken"] (remember-me sessions).
+        const token = getModToken();
         if (!token) { navigate('/mods'); return null; }
         return token;
     };
