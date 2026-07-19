@@ -8,15 +8,15 @@ import { API_URL } from '../config';
 import { getModToken as authGetToken, clearToken } from '../utils/auth';
 
 const FACULTIES = [
-  { code: 'eng', label: 'Engineering' },
-  { code: 'sci', label: 'Science' },
-  { code: 'arts', label: 'Arts' },
-  { code: 'med', label: 'Medicine' },
-  { code: 'mgt', label: 'Management' },
-  { code: 'agri', label: 'Agriculture' },
-  { code: 'dental', label: 'Dental' },
-  { code: 'ahs', label: 'Allied Health Sciences' },
-  { code: 'vet', label: 'Veterinary' },
+  { code: 'Engineering', label: 'Engineering' },
+  { code: 'Science', label: 'Science' },
+  { code: 'Arts', label: 'Arts' },
+  { code: 'Medicine', label: 'Medicine' },
+  { code: 'Management', label: 'Management' },
+  { code: 'Agriculture', label: 'Agriculture' },
+  { code: 'Dental', label: 'Dental' },
+  { code: 'Allied Health Sciences', label: 'Allied Health Sciences' },
+  { code: 'Veterinary', label: 'Veterinary' },
 ];
 
 const IconGlobe = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{width:'12px',height:'12px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>;
@@ -144,7 +144,7 @@ const ModHome: React.FC = () => {
 
   const filteredPosts = posts.filter(p => {
     if (visFilter !== 'all' && p.visibility !== visFilter) return false;
-    if (facultyFilter !== 'all' && p.faculty?.toLowerCase() !== facultyFilter) return false;
+    if (facultyFilter !== 'all' && p.faculty !== facultyFilter) return false;
     if (batchFilter.trim() && !p.batch?.toLowerCase().includes(batchFilter.trim().toLowerCase())) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -226,6 +226,7 @@ const ModHome: React.FC = () => {
                 {f.label}
               </button>
             ))}
+
           </div>
 
           <div className="sidebar-section">
@@ -351,23 +352,8 @@ const ModHome: React.FC = () => {
 
                     {/* Mod inline actions */}
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }} onClick={e => e.stopPropagation()}>
-                      {post.authorId && !post.isAnonymous && (
-                        <>
-                          <button
-                            onClick={e => openModAction('warn', post, e)}
-                            style={{ padding: '4px 10px', fontSize: '12px', fontWeight: 600, border: '1px solid #fde68a', background: '#fefce8', color: '#ca8a04', borderRadius: '6px', cursor: 'pointer' }}
-                          >
-                            Warn
-                          </button>
-                          <button
-                            onClick={e => openModAction('suspend', post, e)}
-                            style={{ padding: '4px 10px', fontSize: '12px', fontWeight: 600, border: '1px solid #e9d5ff', background: '#f3e8ff', color: '#9333ea', borderRadius: '6px', cursor: 'pointer' }}
-                          >
-                            Suspend
-                          </button>
-                        </>
-                      )}
-                      {post.isAnonymous && post.authorId && (
+                      {/* Show Warn/Suspend for any post where the author is identifiable (mod always knows) */}
+                      {post.authorId && (
                         <>
                           <button
                             onClick={e => openModAction('warn', post, e)}

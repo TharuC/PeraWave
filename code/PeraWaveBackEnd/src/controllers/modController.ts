@@ -84,8 +84,9 @@ export const getModerators = async (req: Request, res: Response) => {
   }
 };
 
-export const warnUser = async (req: Request, res: Response) => {
+export const warnUser = async (req: any, res: Response) => {
   const { targetUserId, reason } = body_warn(req.body);
+  const moderatorId: number | undefined = req.user?.userId;
   try {
     await prisma.$transaction([
       prisma.notification.create({
@@ -100,6 +101,7 @@ export const warnUser = async (req: Request, res: Response) => {
           targetUserId,
           actionType: 'WARN',
           reason,
+          ...(moderatorId ? { moderatorId } : {}),
         }
       })
     ]);
@@ -115,8 +117,9 @@ const body_warn = (body: any) => body as { targetUserId: number, reason: string 
 const body_suspend = (body: any) => body as { targetUserId: number, reason: string, durationDays: number };
 const body_delete = (body: any) => body as { targetUserId: number, reason: string };
 
-export const suspendUser = async (req: Request, res: Response) => {
+export const suspendUser = async (req: any, res: Response) => {
   const { targetUserId, reason, durationDays } = body_suspend(req.body);
+  const moderatorId: number | undefined = req.user?.userId;
   try {
     const suspendedUntil = new Date();
     suspendedUntil.setDate(suspendedUntil.getDate() + durationDays);
@@ -139,6 +142,7 @@ export const suspendUser = async (req: Request, res: Response) => {
           actionType: 'SUSPEND',
           reason,
           durationDays,
+          ...(moderatorId ? { moderatorId } : {}),
         }
       })
     ]);
@@ -150,8 +154,9 @@ export const suspendUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: any, res: Response) => {
   const { targetUserId, reason } = body_delete(req.body);
+  const moderatorId: number | undefined = req.user?.userId;
   try {
     await prisma.$transaction([
       prisma.user.update({
@@ -163,6 +168,7 @@ export const deleteUser = async (req: Request, res: Response) => {
           targetUserId,
           actionType: 'DELETE',
           reason,
+          ...(moderatorId ? { moderatorId } : {}),
         }
       })
     ]);

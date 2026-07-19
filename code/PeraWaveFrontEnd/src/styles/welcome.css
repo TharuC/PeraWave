@@ -114,11 +114,24 @@ body {
   min-height: calc(100vh - 60px);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 0 80px;
   position: relative;
   z-index: 1;
   overflow: hidden;
+  gap: 40px;
+}
+
+.hero-content {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.hero-features {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* Background image via pseudo-element */
@@ -253,11 +266,92 @@ body {
   box-shadow: 0 4px 12px rgba(27, 31, 36, 0.12);
 }
 
+/* ── FEATURES IN HERO ────────────────────────────────────────────── */
+.feature-glass-card {
+  width: 440px;
+  min-height: 280px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.dynamic-feature {
+  position: absolute;
+  top: 44px;
+  left: 52px;
+  right: 52px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+
+.dynamic-feature.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.feature-indicators {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.indicator.active {
+  background: #ffffff;
+}
+
+.feature-glass-card .feature-icon {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  box-shadow: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.feature-glass-card .feature-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.feature-glass-card .feature-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.feature-glass-card .feature-card-text {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* ── FOOTER ──────────────────────────────────────────────────────── */
 .welcome-page-container {
   position: relative;
-  min-height: 100vh;
-  padding-bottom: 50px; /* Space for the footer */
+  height: 100vh;
+  overflow: hidden;
   background: var(--bg-main);
 }
 
@@ -478,15 +572,28 @@ body {
   /* Hero full-width on mobile */
   .hero {
     padding: 20px;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-bottom: 100px; /* room for footer */
+    padding-bottom: 80px; /* room for footer */
+    gap: 20px;
   }
-  .glass-card {
+  .hero-content, .hero-features {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .glass-card, .feature-glass-card {
     width: 100%;
     max-width: 420px;
     padding: 28px 24px;
     box-sizing: border-box;
+    min-height: 240px;
+  }
+  .dynamic-feature {
+    top: 28px;
+    left: 24px;
+    right: 24px;
   }
   .glass-card h1 {
     font-size: 28px;
