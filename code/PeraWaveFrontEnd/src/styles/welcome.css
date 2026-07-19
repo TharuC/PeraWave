@@ -131,7 +131,22 @@ body {
 .hero-features {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.feature-tagline {
+  width: 440px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.1px;
 }
 
 /* Background image via pseudo-element */
@@ -267,53 +282,33 @@ body {
 }
 
 /* ── FEATURES IN HERO ────────────────────────────────────────────── */
-.solid-card {
-  background: #ffffff;
+.dark-card {
+  background: rgba(10, 16, 28, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
   transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease;
   overflow: hidden;
   position: relative;
   z-index: 1;
 }
 
-.solid-card.animate-slide {
+.dark-card.animate-slide {
   animation: slideDownFade 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.solid-card:hover {
-  transform: translateY(-6px) scale(1.015);
-  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.18);
+.dark-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.45);
 }
 
-.feature-solid-card {
+.feature-dark-card {
   width: 440px;
-  min-height: 380px;
+  min-height: 260px;
   display: flex;
   flex-direction: column;
-  padding: 36px 40px;
+  padding: 36px 40px 28px;
   box-sizing: border-box;
-}
-
-.feature-intro {
-  text-align: center;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 16px;
-}
-
-.feature-intro h3 {
-  margin: 0 0 8px 0;
-  color: var(--text-primary);
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.feature-intro p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.5;
 }
 
 .features-container {
@@ -351,47 +346,53 @@ body {
 }
 
 .indicator {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #d0d7de;
+  background: rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.indicator:hover {
+  transform: scale(1.3);
 }
 
 .indicator.active {
-  background: var(--accent-color);
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.2);
 }
 
-.feature-solid-card .feature-icon {
-  background: rgba(9, 105, 218, 0.1);
-  color: var(--accent-color);
-  box-shadow: none;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+.feature-dark-card .feature-icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.feature-solid-card .feature-icon svg {
-  width: 28px;
-  height: 28px;
+.feature-dark-card .feature-icon svg {
+  width: 26px;
+  height: 26px;
 }
 
-.feature-solid-card .feature-card-title {
-  font-size: 20px;
+.feature-dark-card .feature-card-title {
+  font-size: 19px;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 12px;
+  color: #ffffff;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.2px;
 }
 
-.feature-solid-card .feature-card-text {
-  font-size: 15px;
-  color: var(--text-secondary);
-  line-height: 1.6;
+.feature-dark-card .feature-card-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.65;
   margin: 0;
 }
 
@@ -630,13 +631,18 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
-  .glass-card, .feature-solid-card {
+  .glass-card, .feature-dark-card {
     width: 100%;
     max-width: 420px;
     padding: 28px 24px;
     box-sizing: border-box;
-    min-height: 240px;
+    min-height: 220px;
+  }
+  .feature-tagline {
+    width: 100%;
+    max-width: 420px;
   }
   .dynamic-feature {
     top: 0;

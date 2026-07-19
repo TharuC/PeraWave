@@ -91,19 +91,18 @@ const HeroSection: React.FC = () => {
       </div>
 
       <div className="hero-features">
+        <p className={`feature-tagline ${isLoaded ? "animate-slide" : ""}`} style={{ opacity: isLoaded ? 1 : 0 }}>
+          Built exclusively for the University of Peradeniya community to connect, share knowledge, and grow securely.
+        </p>
+
         <div
-          className={`solid-card feature-solid-card ${isLoaded ? "animate-slide" : ""}`}
+          className={`dark-card feature-dark-card ${isLoaded ? "animate-slide" : ""}`}
           style={{ opacity: isLoaded ? 1 : 0 }}
         >
-          <div className="feature-intro">
-            <h3>Why PeraWave?</h3>
-            <p>Built exclusively for the University of Peradeniya community to connect, share knowledge, and grow securely.</p>
-          </div>
-
           <div className="features-container">
             {FEATURES.map((feature, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`dynamic-feature ${index === activeFeature ? "active" : ""}`}
               >
                 <div className="feature-icon">{feature.icon}</div>
@@ -112,11 +111,11 @@ const HeroSection: React.FC = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="feature-indicators">
             {FEATURES.map((_, index) => (
-              <span 
-                key={index} 
+              <span
+                key={index}
                 className={`indicator ${index === activeFeature ? "active" : ""}`}
                 onClick={() => setActiveFeature(index)}
               />
