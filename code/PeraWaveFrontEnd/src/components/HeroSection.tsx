@@ -91,14 +91,16 @@ const HeroSection: React.FC = () => {
       </div>
 
       <div className="hero-features">
-        <p className={`feature-tagline ${isLoaded ? "animate-slide" : ""}`} style={{ opacity: isLoaded ? 1 : 0 }}>
-          Built exclusively for the University of Peradeniya community to connect, share knowledge, and grow securely.
-        </p>
-
         <div
           className={`dark-card feature-dark-card ${isLoaded ? "animate-slide" : ""}`}
           style={{ opacity: isLoaded ? 1 : 0 }}
         >
+          <p className="feature-tagline">
+            Built exclusively for the University of Peradeniya community to connect, share knowledge, and grow securely.
+          </p>
+
+          <hr className="feature-divider" />
+
           <div className="features-container">
             {FEATURES.map((feature, index) => (
               <div

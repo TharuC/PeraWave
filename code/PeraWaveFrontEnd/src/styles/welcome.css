@@ -131,22 +131,8 @@ body {
 .hero-features {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 20px;
-}
-
-.feature-tagline {
-  width: 440px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
-  text-align: center;
-  line-height: 1.6;
-  margin: 0;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
-  letter-spacing: 0.1px;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 /* Background image via pseudo-element */
@@ -179,15 +165,13 @@ body {
 .glass-card {
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(10, 16, 28, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   padding: 44px 52px;
   border-radius: var(--radius-lg);
   width: 420px;
   color: #ffffff;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
   transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease;
   overflow: hidden;
 }
@@ -196,36 +180,9 @@ body {
   animation: slideDownFade 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Liquid reflection glow */
-.glass-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 255, 255, 0.18),
-    transparent 40%
-  );
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
 .glass-card:hover {
-  transform: translateY(-6px) scale(1.015);
-  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.28);
-}
-
-.glass-card:hover::before {
-  opacity: 1;
-}
-
-/* Ensure text renders above the glow */
-.glass-card h1,
-.glass-card .tagline {
-  position: relative;
-  z-index: 1;
+  transform: translateY(-4px);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.45);
 }
 
 .glass-card h1 {
@@ -239,10 +196,11 @@ body {
 
 .tagline {
   font-size: 18px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.80);
   margin: 0;
   font-weight: 400;
   line-height: 1.5;
+}
 }
 
 /* Accent line under title */
@@ -304,11 +262,26 @@ body {
 
 .feature-dark-card {
   width: 440px;
-  min-height: 260px;
+  min-height: 340px;
   display: flex;
   flex-direction: column;
-  padding: 36px 40px 28px;
+  padding: 28px 36px 24px;
   box-sizing: border-box;
+}
+
+.feature-tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.70);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0 0 4px 0;
+  font-weight: 400;
+}
+
+.feature-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 16px 0 20px 0;
 }
 
 .features-container {
