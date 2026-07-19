@@ -291,6 +291,7 @@ body {
   position: relative;
   flex: 1;
   width: 100%;
+  min-height: 240px;
 }
 
 .dynamic-feature {
@@ -318,7 +319,7 @@ body {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: auto;
 }
 
 .indicator {
