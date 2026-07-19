@@ -165,7 +165,9 @@ body {
 .glass-card {
   position: relative;
   z-index: 1;
-  background: rgba(10, 16, 28, 0.72);
+  background: rgba(27, 31, 36, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.10);
   padding: 44px 52px;
   border-radius: var(--radius-lg);
@@ -240,7 +242,9 @@ body {
 
 /* ── FEATURES IN HERO ────────────────────────────────────────────── */
 .dark-card {
-  background: rgba(10, 16, 28, 0.72);
+  background: rgba(27, 31, 36, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
@@ -269,12 +273,12 @@ body {
 }
 
 .feature-tagline {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.70);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
   text-align: center;
   line-height: 1.6;
-  margin: 0 0 4px 0;
-  font-weight: 400;
+  margin: 0 0 6px 0;
+  font-weight: 500;
 }
 
 .feature-divider {
@@ -354,7 +358,7 @@ body {
 }
 
 .feature-dark-card .feature-card-title {
-  font-size: 19px;
+  font-size: 23px;
   font-weight: 700;
   color: #ffffff;
   margin: 0 0 10px 0;
@@ -362,8 +366,8 @@ body {
 }
 
 .feature-dark-card .feature-card-text {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.72);
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.65;
   margin: 0;
 }
