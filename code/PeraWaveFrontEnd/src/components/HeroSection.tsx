@@ -43,7 +43,6 @@ const FEATURES = [
 
 const HeroSection: React.FC = () => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const featureRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
 
