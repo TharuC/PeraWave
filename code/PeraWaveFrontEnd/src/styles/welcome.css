@@ -165,7 +165,7 @@ body {
 .glass-card {
   position: relative;
   z-index: 1;
-  background: rgba(27, 31, 36, 0.5);
+  background: rgba(90, 95, 100, 0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -242,7 +242,7 @@ body {
 
 /* ── FEATURES IN HERO ────────────────────────────────────────────── */
 .dark-card {
-  background: rgba(27, 31, 36, 0.5);
+  background: rgba(90, 95, 100, 0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -265,10 +265,10 @@ body {
 
 .feature-dark-card {
   width: 440px;
-  min-height: 340px;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
-  padding: 28px 36px 24px;
+  padding: 44px 52px;
   box-sizing: border-box;
 }
 
