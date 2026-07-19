@@ -176,15 +176,43 @@ body {
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
   transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease;
   overflow: hidden;
+  cursor: default;
 }
 
 .glass-card.animate-slide {
   animation: slideDownFade 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Liquid reflection glow */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.18),
+    transparent 40%
+  );
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
 .glass-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 28px 56px rgba(0, 0, 0, 0.45);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Ensure text renders above the glow */
+.glass-card h1,
+.glass-card .tagline {
+  position: relative;
+  z-index: 1;
 }
 
 .glass-card h1 {
@@ -252,6 +280,7 @@ body {
   overflow: hidden;
   position: relative;
   z-index: 1;
+  cursor: default;
 }
 
 .dark-card.animate-slide {
