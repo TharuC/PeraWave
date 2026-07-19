@@ -93,21 +93,26 @@ const HeroSection: React.FC = () => {
 
       <div className="hero-features">
         <div
-          className={`glass-card feature-glass-card ${isLoaded ? "animate-slide" : ""}`}
-          ref={featureRef}
-          onMouseMove={(e) => handleMouseMove(e, featureRef)}
+          className={`solid-card feature-solid-card ${isLoaded ? "animate-slide" : ""}`}
           style={{ opacity: isLoaded ? 1 : 0 }}
         >
-          {FEATURES.map((feature, index) => (
-            <div 
-              key={index} 
-              className={`dynamic-feature ${index === activeFeature ? "active" : ""}`}
-            >
-              <div className="feature-icon">{feature.icon}</div>
-              <h3 className="feature-card-title">{feature.title}</h3>
-              <p className="feature-card-text">{feature.text}</p>
-            </div>
-          ))}
+          <div className="feature-intro">
+            <h3>Why PeraWave?</h3>
+            <p>Built exclusively for the University of Peradeniya community to connect, share knowledge, and grow securely.</p>
+          </div>
+
+          <div className="features-container">
+            {FEATURES.map((feature, index) => (
+              <div 
+                key={index} 
+                className={`dynamic-feature ${index === activeFeature ? "active" : ""}`}
+              >
+                <div className="feature-icon">{feature.icon}</div>
+                <h3 className="feature-card-title">{feature.title}</h3>
+                <p className="feature-card-text">{feature.text}</p>
+              </div>
+            ))}
+          </div>
           
           <div className="feature-indicators">
             {FEATURES.map((_, index) => (

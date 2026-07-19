@@ -267,23 +267,74 @@ body {
 }
 
 /* ── FEATURES IN HERO ────────────────────────────────────────────── */
-.feature-glass-card {
-  width: 440px;
-  min-height: 280px;
+.solid-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease;
+  overflow: hidden;
   position: relative;
+  z-index: 1;
+}
+
+.solid-card.animate-slide {
+  animation: slideDownFade 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.solid-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.18);
+}
+
+.feature-solid-card {
+  width: 440px;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
+  padding: 36px 40px;
+  box-sizing: border-box;
+}
+
+.feature-intro {
+  text-align: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.feature-intro h3 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.feature-intro p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.features-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
 }
 
 .dynamic-feature {
   position: absolute;
-  top: 44px;
-  left: 52px;
-  right: 52px;
+  top: 0;
+  left: 0;
+  right: 0;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.6s ease, transform 0.6s ease;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .dynamic-feature.active {
@@ -293,31 +344,28 @@ body {
 }
 
 .feature-indicators {
-  position: absolute;
-  bottom: 24px;
-  left: 0;
-  width: 100%;
   display: flex;
   justify-content: center;
   gap: 8px;
+  margin-top: 20px;
 }
 
 .indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: #d0d7de;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .indicator.active {
-  background: #ffffff;
+  background: var(--accent-color);
 }
 
-.feature-glass-card .feature-icon {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+.feature-solid-card .feature-icon {
+  background: rgba(9, 105, 218, 0.1);
+  color: var(--accent-color);
   box-shadow: none;
   width: 56px;
   height: 56px;
@@ -325,24 +373,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.feature-glass-card .feature-icon svg {
+.feature-solid-card .feature-icon svg {
   width: 28px;
   height: 28px;
 }
 
-.feature-glass-card .feature-card-title {
+.feature-solid-card .feature-card-title {
   font-size: 20px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 12px;
 }
 
-.feature-glass-card .feature-card-text {
+.feature-solid-card .feature-card-text {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
@@ -583,7 +631,7 @@ body {
     display: flex;
     justify-content: center;
   }
-  .glass-card, .feature-glass-card {
+  .glass-card, .feature-solid-card {
     width: 100%;
     max-width: 420px;
     padding: 28px 24px;
@@ -591,9 +639,9 @@ body {
     min-height: 240px;
   }
   .dynamic-feature {
-    top: 28px;
-    left: 24px;
-    right: 24px;
+    top: 0;
+    left: 0;
+    right: 0;
   }
   .glass-card h1 {
     font-size: 28px;
