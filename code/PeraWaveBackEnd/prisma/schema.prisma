@@ -27,6 +27,7 @@ model User {
   reports            Report[]
   savedPosts         SavedPost[]
   events             Event[]
+  wikiArticles       WikiArticle[]
   interests          String[]  @default([])
 }
 
@@ -152,4 +153,20 @@ model Event {
   organizer     User     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// ─── Wiki Articles ───────────────────────────────────────────────────────────
+
+model WikiArticle {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  location    String?  // Optional physical location on campus
+  imageUrls   String[] @default([])  // Array of Cloudinary URLs
+  status      String   @default("PENDING")  // 'PENDING' | 'APPROVED' | 'REJECTED'
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+  modNote     String?  // Moderator's internal note
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

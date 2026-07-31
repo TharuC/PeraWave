@@ -21,6 +21,9 @@ import CreateEvent from "../pages/CreateEvent";
 import ModEvents from "../pages/ModEvents";
 import EventDetail from "../pages/EventDetail";
 import SelectInterests from "../pages/SelectInterests";
+import WikiList from "../pages/WikiList";
+import WikiArticleDetail from "../pages/WikiArticleDetail";
+import CreateWikiArticle from "../pages/CreateWikiArticle";
 
 const AppRouter = () => {
   return (
@@ -50,6 +53,10 @@ const AppRouter = () => {
         <Route path="/events/:id"      element={<EventDetail />} />
         <Route path="/create-event"    element={<CreateEvent />} />
         <Route path="/mod-events"      element={<ModEvents />} />
+        {/* Wiki routes */}
+        <Route path="/wiki"             element={<WikiList />} />
+        <Route path="/wiki/:id"         element={<WikiArticleDetail />} />
+        <Route path="/create-wiki"      element={<CreateWikiArticle />} />
       </Routes>
     </BrowserRouter>
   );

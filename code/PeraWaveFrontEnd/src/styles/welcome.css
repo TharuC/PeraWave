@@ -403,6 +403,7 @@ body {
 }
 
 /* ── FOOTER ──────────────────────────────────────────────────────── */
+/* The hero wrapper is exactly one viewport tall; wiki section sits below it */
 .welcome-page-container {
   position: relative;
   height: 100vh;

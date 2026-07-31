@@ -1,15 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/mod-dashboard.css';
+import '../styles/wiki.css';
 import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
 import { getModToken, clearToken } from '../utils/auth';
 
+const API_URL_CONST = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+// ── Wiki Mod Card ─────────────────────────────────────────────────────────────
+interface WikiModCardProps {
+    article: any;
+    token: string | null;
+    onAction: () => void;
+}
+
+const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction }) => {
+    const [loading, setLoading] = React.useState(false);
+    const [modNote, setModNote] = React.useState('');
+
+    const updateStatus = async (status: 'APPROVED' | 'REJECTED') => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL_CONST}/api/wiki/${article.id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ status, modNote }),
+            });
+            if (res.ok) onAction();
+            else alert('Failed to update status.');
+        } catch { alert('Network error.'); }
+        finally { setLoading(false); }
+    };
+
+    return (
+        <div className="wiki-mod-card">
+            {article.imageUrls && article.imageUrls.length > 0 ? (
+                <img src={article.imageUrls[0]} alt={article.title} className="wiki-mod-card-img" />
+            ) : (
+                <div className="wiki-mod-card-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                    </svg>
+                </div>
+            )}
+            <div className="wiki-mod-card-info">
+                <p className="wiki-mod-card-title">{article.title}</p>
+                <p className="wiki-mod-card-author">
+                    by {article.author?.fullName || 'Unknown'} · {article.author?.faculty || ''} ·{' '}
+                    {new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {article.location && <> · 📍 {article.location}</>}
+                </p>
+                <p className="wiki-mod-card-excerpt">{article.content}</p>
+                <input
+                    type="text"
+                    placeholder="Optional note to author (optional)"
+                    value={modNote}
+                    onChange={e => setModNote(e.target.value)}
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: '7px', border: '1px solid #334155', background: '#0f172a', color: '#94a3b8', fontSize: '12px', marginBottom: '10px', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                />
+                <div className="wiki-mod-card-actions">
+                    <button className="wiki-mod-approve-btn" disabled={loading} onClick={() => updateStatus('APPROVED')}>✓ Approve</button>
+                    <button className="wiki-mod-reject-btn" disabled={loading} onClick={() => updateStatus('REJECTED')}>✕ Reject</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ── TAB TITLES ──────────────────────────────────────────────────────────────
 const TAB_TITLES: Record<string, string> = {
     overview: 'Overview Analytics',
     users: 'User Management',
     moderators: 'Moderator Team',
     forum: 'Forum Posts',
+    wiki: 'Wiki Moderation',
     audit: 'Audit Logs',
 };
 
@@ -41,6 +107,10 @@ const ModDashboard: React.FC = () => {
     // --- Audit Logs ---
     const [auditLogs, setAuditLogs] = useState<any[]>([]);
     const [auditLoading, setAuditLoading] = useState(false);
+
+    // --- Wiki Articles ---
+    const [pendingWikiArticles, setPendingWikiArticles] = useState<any[]>([]);
+    const [wikiLoading, setWikiLoading] = useState(false);
 
     // --- Modal State ---
     const [showModal, setShowModal] = useState<'warn' | 'suspend' | 'delete' | null>(null);
@@ -99,10 +169,17 @@ const ModDashboard: React.FC = () => {
             if (auditRes.ok) setAuditLogs(await auditRes.json());
             setAuditLoading(false);
 
+            // 6. Pending wiki articles
+            setWikiLoading(true);
+            const wikiRes = await fetch(`${API_URL}/api/wiki/pending`, { headers });
+            if (wikiRes.ok) setPendingWikiArticles(await wikiRes.json());
+            setWikiLoading(false);
+
         } catch (err) {
             console.error('Failed to load dashboard data', err);
             setPostsLoading(false);
             setAuditLoading(false);
+            setWikiLoading(false);
         }
     };
 
@@ -231,6 +308,12 @@ const ModDashboard: React.FC = () => {
                     style={{ width: '100%', padding: '10px 14px', marginBottom: '10px', background: 'linear-gradient(90deg, #10b981, #059669)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                     Manage Events
+                </button>
+                <button
+                    onClick={() => { setActiveTab('wiki'); }}
+                    style={{ width: '100%', padding: '10px 14px', marginBottom: '10px', background: 'linear-gradient(90deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                    📖 Wiki Articles {pendingWikiArticles.length > 0 && <span style={{ background: '#ef4444', borderRadius: '999px', padding: '1px 7px', fontSize: '11px' }}>{pendingWikiArticles.length}</span>}
                 </button>
 
 
@@ -527,6 +610,36 @@ const ModDashboard: React.FC = () => {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* ─── Wiki Moderation ─── */}
+                {activeTab === 'wiki' && (
+                    <div className="mod-section">
+                        <h2>Wiki Moderation <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 400 }}>({pendingWikiArticles.length} pending)</span></h2>
+                        <p style={{ color: '#64748b', marginBottom: '20px' }}>Review and approve or reject articles submitted to Pera Wiki.</p>
+
+                        {wikiLoading ? (
+                            <p style={{ color: '#64748b' }}>Loading wiki articles…</p>
+                        ) : pendingWikiArticles.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '60px 24px', color: '#64748b' }}>
+                                <div style={{ fontSize: '40px', marginBottom: '12px' }}>📖</div>
+                                <p>No pending wiki articles. All caught up!</p>
+                            </div>
+                        ) : (
+                            <div className="wiki-mod-grid">
+                                {pendingWikiArticles.map((article: any) => (
+                                    <WikiModCard
+                                        key={article.id}
+                                        article={article}
+                                        token={getToken()}
+                                        onAction={() => {
+                                            setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                        }}
+                                    />
+                                ))}
                             </div>
                         )}
                     </div>
