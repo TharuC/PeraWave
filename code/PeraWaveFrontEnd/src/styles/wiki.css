@@ -912,3 +912,155 @@
   .wiki-welcome-grid { grid-template-columns: 1fr; }
   .wiki-welcome-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* ── Welcome page wiki outer wrapper ─────────────────────────────────────── */
+/* This makes the section ALWAYS visible below the hero */
+.wiki-welcome-outer {
+  background: #f6f8fa;
+  border-top: 1px solid #e8ecf0;
+}
+
+/* ── Wiki badge inside Welcome header ────────────────────────────────────── */
+.wiki-welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(9,105,218,0.1), rgba(9,105,218,0.18));
+  color: #0969da;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(9,105,218,0.18);
+  margin-bottom: 12px;
+}
+
+.wiki-welcome-header-left h2 {
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #24292f 0%, #0969da 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.wiki-welcome-header-left p {
+  font-size: 15px;
+  color: #57606a;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Empty state for Welcome wiki section ────────────────────────────────── */
+.wiki-welcome-empty {
+  text-align: center;
+  padding: 60px 24px;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.wiki-welcome-empty-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, rgba(9,105,218,0.1), rgba(9,105,218,0.2));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: #0969da;
+}
+
+.wiki-welcome-empty-icon svg { width: 36px; height: 36px; }
+
+.wiki-welcome-empty h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #24292f;
+  margin: 0 0 10px;
+}
+
+.wiki-welcome-empty p {
+  font-size: 15px;
+  color: #57606a;
+  max-width: 500px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+}
+
+.wiki-welcome-empty-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.wiki-welcome-cta-btn {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #0969da, #1a56db);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(9,105,218,0.3);
+}
+
+.wiki-welcome-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(9,105,218,0.35);
+}
+
+.wiki-welcome-cta-btn-outline {
+  padding: 12px 28px;
+  background: transparent;
+  color: #0969da;
+  border: 2px solid #0969da;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.wiki-welcome-cta-btn-outline:hover {
+  background: #0969da;
+  color: #fff;
+}
+
+/* ── Welcome scroll footer ────────────────────────────────────────────────── */
+.welcome-scroll-footer {
+  background: rgba(27, 31, 36, 0.93);
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 18px 24px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+
+.welcome-scroll-footer a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.welcome-scroll-footer a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* ── Responsive additions ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wiki-welcome-header-left h2 { font-size: 24px; }
+  .wiki-welcome-empty { padding: 40px 20px; }
+}
