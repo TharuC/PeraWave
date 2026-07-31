@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { API_URL } from '../config';
@@ -9,6 +9,13 @@ const MAX_IMAGES = 5;
 
 const CreateWikiArticle: React.FC = () => {
   const navigate = useNavigate();
+
+  // ── Auth guard: redirect to login immediately if not logged in ──────────────
+  useEffect(() => {
+    if (!getToken()) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   const [form, setForm] = useState({ title: '', content: '', location: '' });
   const [images, setImages] = useState<File[]>([]);

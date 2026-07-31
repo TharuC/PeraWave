@@ -135,8 +135,8 @@ const Welcome: React.FC = () => {
               </div>
               <h3>Be the First to Contribute!</h3>
               <p>
-                No articles yet. Know an interesting place or piece of history from the
-                University of Peradeniya? Log in and write the first Pera Wiki article!
+                No articles yet. This section will showcase historical and important places
+                within the University of Peradeniya, documented by our community.
               </p>
               <div className="wiki-welcome-empty-actions">
                 <button
@@ -145,13 +145,6 @@ const Welcome: React.FC = () => {
                   id="wiki-browse-btn"
                 >
                   Browse Wiki
-                </button>
-                <button
-                  className="wiki-welcome-cta-btn-outline"
-                  onClick={() => navigate('/login')}
-                  id="wiki-login-write-btn"
-                >
-                  Log in &amp; Write
                 </button>
               </div>
             </div>
