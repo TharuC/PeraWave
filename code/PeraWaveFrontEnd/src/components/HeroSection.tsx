@@ -126,6 +126,36 @@ const HeroSection: React.FC = () => {
         </div>
       </div>
 
+      {/* Scroll Down Indicator */}
+      <div 
+        className="scroll-indicator"
+        style={{
+          position: 'absolute',
+          bottom: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: 'rgba(255, 255, 255, 0.9)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '6px',
+          cursor: 'pointer',
+          zIndex: 20,
+          animation: 'bounce 2s infinite'
+        }}
+        onClick={() => {
+          const wikiSection = document.querySelector('.wiki-welcome-outer');
+          if (wikiSection) {
+            wikiSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>Discover</span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </div>
+
     </div>
   );
 };
