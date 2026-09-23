@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
-import Footer from "../components/Footer";
 import "../styles/welcome.css";
 import "../styles/wiki.css";
 
@@ -42,7 +41,6 @@ const Welcome: React.FC = () => {
       <div className="welcome-page-container">
         <Navbar />
         <HeroSection />
-        <Footer />
       </div>
 
       {/* ── Pera Wiki preview section — ALWAYS VISIBLE ─────────────── */}

@@ -212,7 +212,7 @@ const UserDashboard: React.FC = () => {
             gap: '14px',
             marginBottom: '8px'
           }}>
-            <span style={{ fontSize: '24px', flexShrink: 0 }}>🚫</span>
+            <div style={{ flexShrink: 0, color: '#dc2626' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 24, height: 24 }}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg></div>
             <div>
               <p style={{ margin: 0, fontWeight: 700, color: '#991b1b', fontSize: '15px' }}>
                 Account Suspended until {new Date(userData!.suspendedUntil!).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
@@ -320,7 +320,7 @@ const UserDashboard: React.FC = () => {
             </div>
           ) : wikiArticles.length === 0 ? (
             <div style={{ background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', padding: '32px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', marginBottom: '10px' }}>📖</div>
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'center' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 32, height: 32, color: '#94a3b8' }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
               <p style={{ margin: '0 0 6px', fontWeight: 600, color: '#0f172a', fontSize: '15px' }}>No articles yet</p>
               <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '13px' }}>Document a place or landmark of the University of Peradeniya.</p>
               <button
@@ -352,7 +352,7 @@ const UserDashboard: React.FC = () => {
                     {article.imageUrls.length > 0 ? (
                       <img src={article.imageUrls[0]} alt={article.title} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
                     ) : (
-                      <div style={{ width: '64px', height: '64px', background: '#f1f5f9', borderRadius: '8px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '24px' }}>📄</div>
+                      <div style={{ width: '64px', height: '64px', background: '#f1f5f9', borderRadius: '8px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 24, height: 24 }}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg></div>
                     )}
 
                     {/* Info */}
@@ -370,14 +370,21 @@ const UserDashboard: React.FC = () => {
                       </p>
                       {article.status === 'REJECTED' && article.modNote && (
                         <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '6px 10px', marginTop: '6px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                          <span style={{ fontSize: '13px', flexShrink: 0 }}>💬</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14, flexShrink: 0, marginTop: '2px' }}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
                           <p style={{ margin: 0, color: '#991b1b', fontSize: '12px', lineHeight: '1.5' }}>
                             <strong>Moderator note:</strong> {article.modNote}
                           </p>
                         </div>
                       )}
-                      <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: '12px' }}>
-                        Submitted {date}{article.location ? ` · 📍 ${article.location}` : ''}
+                      <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                        Submitted {date}
+                        {article.location && (
+                          <>
+                            <span style={{ margin: '0 2px' }}>·</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 12, height: 12 }}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                            {article.location}
+                          </>
+                        )}
                       </p>
                     </div>
 

@@ -50,7 +50,7 @@ const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction }) =
                 <p className="wiki-mod-card-author">
                     by {article.author?.fullName || 'Unknown'} · {article.author?.faculty || ''} ·{' '}
                     {new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                    {article.location && <> · 📍 {article.location}</>}
+                    {article.location && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}> · <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg> {article.location}</span>}
                 </p>
                 <p className="wiki-mod-card-excerpt">{article.content}</p>
                 <input
@@ -313,7 +313,7 @@ const ModDashboard: React.FC = () => {
                     onClick={() => { setActiveTab('wiki'); }}
                     style={{ width: '100%', padding: '10px 14px', marginBottom: '10px', background: 'linear-gradient(90deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
-                    📖 Wiki Articles {pendingWikiArticles.length > 0 && <span style={{ background: '#ef4444', borderRadius: '999px', padding: '1px 7px', fontSize: '11px' }}>{pendingWikiArticles.length}</span>}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 16, height: 16 }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg> Wiki Articles</span> {pendingWikiArticles.length > 0 && <span style={{ background: '#ef4444', borderRadius: '999px', padding: '1px 7px', fontSize: '11px' }}>{pendingWikiArticles.length}</span>}
                 </button>
 
 
@@ -570,8 +570,8 @@ const ModDashboard: React.FC = () => {
                                                     {post.isAnonymous ? (
                                                         <span>
                                                             <span style={{ color: '#94a3b8', marginRight: '6px' }}>Anonymous</span>
-                                                            <span style={{ background: '#fef9c3', color: '#854d0e', fontSize: '11px', padding: '2px 8px', borderRadius: '999px', fontWeight: 700, border: '1px solid #fde68a' }}>
-                                                                🔑 {post.realName}
+                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fef9c3', color: '#854d0e', fontSize: '11px', padding: '2px 8px', borderRadius: '999px', fontWeight: 700, border: '1px solid #fde68a' }}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 12, height: 12 }}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" /></svg> {post.realName}
                                                             </span>
                                                             <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '3px' }}>{post.realEmail}</div>
                                                         </span>
@@ -625,7 +625,7 @@ const ModDashboard: React.FC = () => {
                             <p style={{ color: '#64748b' }}>Loading wiki articles…</p>
                         ) : pendingWikiArticles.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '60px 24px', color: '#64748b' }}>
-                                <div style={{ fontSize: '40px', marginBottom: '12px' }}>📖</div>
+                                <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 40, height: 40, color: '#94a3b8' }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
                                 <p>No pending wiki articles. All caught up!</p>
                             </div>
                         ) : (

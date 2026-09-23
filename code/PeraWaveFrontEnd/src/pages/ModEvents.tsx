@@ -194,9 +194,9 @@ const ModEvents: React.FC = () => {
                   <p className="mes-event-desc">{ev.description}</p>
 
                   <div className="mes-event-meta">
-                    <span>📅 {formatDate(ev.eventDate)} · {ev.eventTime}</span>
-                    <span>📍 {ev.location}</span>
-                    {ev.link && <a href={ev.link} target="_blank" rel="noopener noreferrer" className="mes-link" onClick={e => e.stopPropagation()}>🔗 More info</a>}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg> {formatDate(ev.eventDate)} · {ev.eventTime}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg> {ev.location}</span>
+                    {ev.link && <a href={ev.link} target="_blank" rel="noopener noreferrer" className="mes-link" onClick={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg> More info</a>}
                   </div>
 
                   <div className="mes-organizer">

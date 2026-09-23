@@ -215,19 +215,19 @@ const ModRegister: React.FC = () => {
                     <div style={{ fontSize: "13px", color: "#64748b", marginTop: "-10px", display: "flex", flexDirection: "column", gap: "6px", background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
                         <div style={{ fontWeight: 600, marginBottom: "4px", color: "#475569" }}>Password Standards:</div>
                         <div style={{ color: hasLength ? "#16a34a" : "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-                            {hasLength ? "✅" : "○"} At least 8 characters
+                            {hasLength ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><circle cx="12" cy="12" r="9" /></svg>} At least 8 characters
                         </div>
                         <div style={{ color: hasUpper ? "#16a34a" : "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-                            {hasUpper ? "✅" : "○"} One uppercase letter
+                            {hasUpper ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><circle cx="12" cy="12" r="9" /></svg>} One uppercase letter
                         </div>
                         <div style={{ color: hasLower ? "#16a34a" : "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-                            {hasLower ? "✅" : "○"} One lowercase letter
+                            {hasLower ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><circle cx="12" cy="12" r="9" /></svg>} One lowercase letter
                         </div>
                         <div style={{ color: hasNumber ? "#16a34a" : "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-                            {hasNumber ? "✅" : "○"} One number
+                            {hasNumber ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><circle cx="12" cy="12" r="9" /></svg>} One number
                         </div>
                         <div style={{ color: hasSpecial ? "#16a34a" : "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-                            {hasSpecial ? "✅" : "○"} One special character (!@#$%^&*)
+                            {hasSpecial ? <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><circle cx="12" cy="12" r="9" /></svg>} One special character (!@#$%^&*)
                         </div>
                     </div>
 
