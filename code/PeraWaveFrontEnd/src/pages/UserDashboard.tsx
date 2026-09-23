@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../styles/dashboard.css";
+import "../styles/wiki.css";
 import userAvatar from "../assets/UserAvatar.png";
 import { API_URL } from "../config";
 import { getToken, clearToken } from "../utils/auth";
@@ -28,6 +29,20 @@ const UserDashboard: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+
+  // Wiki submissions
+  type WikiArticle = {
+    id: number;
+    title: string;
+    content: string;
+    location?: string;
+    imageUrls: string[];
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    modNote?: string | null;
+    createdAt: string;
+  };
+  const [wikiArticles, setWikiArticles] = useState<WikiArticle[]>([]);
+  const [wikiLoading, setWikiLoading] = useState(true);
 
   // Always fetch fresh data from backend on mount
   useEffect(() => {
@@ -86,6 +101,14 @@ const UserDashboard: React.FC = () => {
         }
       })
       .catch((err) => console.error("Error fetching notifications", err));
+
+    // 3. Fetch user's own wiki submissions
+    fetch(`${API_URL}/api/wiki/my-articles`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((articles) => { setWikiArticles(articles); setWikiLoading(false); })
+      .catch(() => setWikiLoading(false));
   }, [navigate]);
 
   const handleLogout = () => { navigate("/"); };
@@ -274,6 +297,98 @@ const UserDashboard: React.FC = () => {
             </div>
 
           </div>
+        </div>
+
+        {/* My Wiki Submissions Section */}
+        <div className="info-section" style={{ marginTop: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 className="info-section-title" style={{ margin: 0 }}>My Wiki Submissions</h3>
+            <button
+              onClick={() => navigate('/create-wiki')}
+              style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #0969da, #1a56db)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+              Write Article
+            </button>
+          </div>
+
+          {wikiLoading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[1, 2].map(i => (
+                <div key={i} style={{ ...skeletonStyle, height: '70px', borderRadius: '10px', width: '100%', display: 'block' }} />
+              ))}
+            </div>
+          ) : wikiArticles.length === 0 ? (
+            <div style={{ background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', padding: '32px', textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', marginBottom: '10px' }}>📖</div>
+              <p style={{ margin: '0 0 6px', fontWeight: 600, color: '#0f172a', fontSize: '15px' }}>No articles yet</p>
+              <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '13px' }}>Document a place or landmark of the University of Peradeniya.</p>
+              <button
+                onClick={() => navigate('/create-wiki')}
+                style={{ padding: '9px 20px', background: 'linear-gradient(135deg, #0969da, #1a56db)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+              >
+                Write your first article
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {wikiArticles.map(article => {
+                const statusMap = {
+                  PENDING:  { label: 'Pending Review', bg: '#fefce8', color: '#854d0e', border: '#fde68a' },
+                  APPROVED: { label: 'Approved',       bg: '#f0fdf4', color: '#166534', border: '#86efac' },
+                  REJECTED: { label: 'Rejected',       bg: '#fef2f2', color: '#991b1b', border: '#fca5a5' },
+                };
+                const s = statusMap[article.status];
+                const excerpt = article.content.length > 120 ? article.content.slice(0, 120) + '…' : article.content;
+                const date = new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+                return (
+                  <div
+                    key={article.id}
+                    style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px 18px', display: 'flex', gap: '14px', alignItems: 'flex-start', transition: 'box-shadow 0.2s', cursor: article.status === 'APPROVED' ? 'pointer' : 'default' }}
+                    onClick={() => article.status === 'APPROVED' && navigate(`/wiki/${article.id}`)}
+                  >
+                    {/* Thumbnail */}
+                    {article.imageUrls.length > 0 ? (
+                      <img src={article.imageUrls[0]} alt={article.title} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: '64px', height: '64px', background: '#f1f5f9', borderRadius: '8px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '24px' }}>📄</div>
+                    )}
+
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {article.title}
+                        </span>
+                        <span style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}`, fontSize: '11px', fontWeight: 700, padding: '2px 10px', borderRadius: '999px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                          {s.label}
+                        </span>
+                      </div>
+                      <p style={{ margin: '0 0 4px', color: '#475569', fontSize: '13px', lineHeight: '1.5', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                        {excerpt}
+                      </p>
+                      {article.status === 'REJECTED' && article.modNote && (
+                        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', padding: '6px 10px', marginTop: '6px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                          <span style={{ fontSize: '13px', flexShrink: 0 }}>💬</span>
+                          <p style={{ margin: 0, color: '#991b1b', fontSize: '12px', lineHeight: '1.5' }}>
+                            <strong>Moderator note:</strong> {article.modNote}
+                          </p>
+                        </div>
+                      )}
+                      <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: '12px' }}>
+                        Submitted {date}{article.location ? ` · 📍 ${article.location}` : ''}
+                      </p>
+                    </div>
+
+                    {article.status === 'APPROVED' && (
+                      <div style={{ color: '#0969da', fontSize: '18px', flexShrink: 0, paddingTop: '2px' }}>→</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Delete Account Section */}

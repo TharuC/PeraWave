@@ -9,6 +9,7 @@ import {
   getPendingArticles,
   updateArticleStatus,
   deleteArticle,
+  getMyArticles,
 } from '../controllers/wikiController';
 import { requireModerator, requireUser } from '../middlewares/authMiddleware';
 
@@ -37,6 +38,7 @@ router.get('/pending', requireModerator, getPendingArticles);
 router.patch('/:id/status', requireModerator, updateArticleStatus);
 
 // ── Authenticated user endpoints ────────────────────────────────────────────────
+router.get('/my-articles', requireUser, getMyArticles);
 router.post('/', requireUser, upload.array('images', 5), createWikiArticle);
 router.delete('/:id', requireUser, deleteArticle);
 

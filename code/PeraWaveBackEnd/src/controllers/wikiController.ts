@@ -14,6 +14,32 @@ const uploadToCloudinary = async (filePath: string): Promise<string> => {
   return result.secure_url;
 };
 
+// ── GET /api/wiki/my-articles ──────────────────────────────────────────────────
+// Returns all articles submitted by the currently authenticated user (all statuses)
+export const getMyArticles = async (req: AuthRequest, res: Response) => {
+  try {
+    const authorId = req.user?.userId;
+    const articles = await prisma.wikiArticle.findMany({
+      where: { authorId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        location: true,
+        imageUrls: true,
+        status: true,
+        modNote: true,
+        createdAt: true,
+      },
+    });
+    return res.json(articles);
+  } catch (err) {
+    console.error('getMyArticles error:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
 // ── POST /api/wiki ──────────────────────────────────────────────────────────────
 // Authenticated users submit a new wiki article (starts as PENDING)
 export const createWikiArticle = async (req: AuthRequest, res: Response) => {
