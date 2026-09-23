@@ -49,3 +49,17 @@ export const requireModerator = (req: AuthRequest, res: Response, next: NextFunc
     }
   });
 };
+
+/**
+ * Middleware that only allows authenticated regular users (role === 'USER').
+ * Blocks unauthenticated requests and moderator / admin accounts.
+ */
+export const requireUser = (req: AuthRequest, res: Response, next: NextFunction) => {
+  verifyToken(req, res, () => {
+    if (req.user && req.user.role === 'USER') {
+      next();
+    } else {
+      return res.status(403).json({ error: 'Access denied. Only registered users can perform this action.' });
+    }
+  });
+};

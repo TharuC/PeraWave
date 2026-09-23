@@ -10,7 +10,7 @@ import {
   updateArticleStatus,
   deleteArticle,
 } from '../controllers/wikiController';
-import { verifyToken, requireModerator } from '../middlewares/authMiddleware';
+import { requireModerator, requireUser } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -37,8 +37,8 @@ router.get('/pending', requireModerator, getPendingArticles);
 router.patch('/:id/status', requireModerator, updateArticleStatus);
 
 // ── Authenticated user endpoints ────────────────────────────────────────────────
-router.post('/', verifyToken, upload.array('images', 5), createWikiArticle);
-router.delete('/:id', verifyToken, deleteArticle);
+router.post('/', requireUser, upload.array('images', 5), createWikiArticle);
+router.delete('/:id', requireUser, deleteArticle);
 
 // ── Parameterised public routes (must come after named sub-routes) ───────────────
 router.get('/:id', getArticleById);
