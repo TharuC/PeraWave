@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: ./Code/PeraWaveFrontEnd
+        working-directory: ./code/PeraWaveFrontEnd
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -21,9 +21,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: ./code/PeraWaveFrontEnd/package-lock.json
 
       - name: Install Frontend Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run Frontend Tests
         run: npm run test
@@ -50,7 +52,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./Code/PeraWaveBackEnd
+        working-directory: ./code/PeraWaveBackEnd
 
     steps:
       - name: Checkout Repository
@@ -60,9 +62,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: ./code/PeraWaveBackEnd/package-lock.json
 
       - name: Install Backend Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Setup Test Environment Variables
         run: |
