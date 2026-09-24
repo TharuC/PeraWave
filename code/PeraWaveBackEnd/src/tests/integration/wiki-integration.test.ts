@@ -1,41 +1,39 @@
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import app from '../../server';
 import prisma from '../../config/db';
 
 describe('Wiki API - Integration Test', () => {
-  let testUser: any;
+  let testUser: { id: number };
+
+  // Use a unique ID per run so parallel / repeated runs never clash
+  const testId = randomUUID();
+  const testEmail = `test_integration_${testId}@perawave.com`;
+  const testRegistrationNumber = `TEST-${testId}`;
 
   beforeAll(async () => {
-    // 1. Clean up existing test data
-    await prisma.wikiArticle.deleteMany({
-      where: { author: { email: 'test_integration@perawave.com' } }
-    });
-    await prisma.user.deleteMany({ where: { email: 'test_integration@perawave.com' } });
-
-    // 2. Create a test user
+    // Create a fresh test user with unique identifiers
     testUser = await prisma.user.create({
       data: {
-        email: 'test_integration@perawave.com',
+        email: testEmail,
         password: 'dummy_hash',
         fullName: 'Integration Tester',
-        registrationNumber: 'E/20/001',
+        registrationNumber: testRegistrationNumber,
         faculty: 'Engineering',
-      }
+      },
     });
   });
 
   afterAll(async () => {
-    // Clean up
-    await prisma.wikiArticle.deleteMany({
-      where: { author: { email: 'test_integration@perawave.com' } }
-    });
-    await prisma.user.deleteMany({ where: { email: 'test_integration@perawave.com' } });
+    // Clean up only the rows this test run created
+    await prisma.wikiArticle.deleteMany({ where: { authorId: testUser.id } });
+    await prisma.user.delete({ where: { id: testUser.id } });
     await prisma.$disconnect();
   });
 
   it('should successfully write to and read from the real test database schema', async () => {
-    // 1. Manually insert a test article into the REAL test database
+    // 1. Insert a real article into the test database
     await prisma.wikiArticle.create({
       data: {
         title: 'Integration Test Article',
@@ -44,17 +42,20 @@ describe('Wiki API - Integration Test', () => {
         imageUrls: [],
         authorId: testUser.id,
         status: 'APPROVED',
-      }
+      },
     });
 
-    // 2. Make an actual API request to fetch it
+    // 2. Make a real HTTP request to the live API
     const response = await request(app).get('/api/wiki/recent');
-    
-    // 3. Verify it fetched the real data from the test DB
+
+    // 3. Verify the real data was fetched correctly
     expect(response.status).toBe(200);
     expect(response.body.length).toBeGreaterThanOrEqual(1);
-    
-    const fetchedArticle = response.body.find((a: any) => a.title === 'Integration Test Article');
+
+    const fetchedArticle = response.body.find(
+      (article: any) => article.title === 'Integration Test Article',
+    );
+
     expect(fetchedArticle).toBeDefined();
     expect(fetchedArticle.location).toBe('Test Location');
   });
