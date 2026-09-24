@@ -1,0 +1,82 @@
+name: PeraWave CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  frontend-tests:
+    name: Frontend Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Code/PeraWaveFrontEnd
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './Code/PeraWaveFrontEnd/package-lock.json'
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: Run Frontend Tests
+        run: npm run test
+
+  backend-tests:
+    name: Backend Unit & Integration Tests
+    runs-on: ubuntu-latest
+    
+    # We spin up a temporary PostgreSQL database container just for this GitHub Action!
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+    defaults:
+      run:
+        working-directory: ./Code/PeraWaveBackEnd
+        
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './Code/PeraWaveBackEnd/package-lock.json'
+      
+      - name: Install Backend Dependencies
+        run: npm ci
+      
+      - name: Setup Environment Variables
+        run: |
+          # Create a .env.test file on the fly that points to the temporary Postgres container
+          echo 'DATABASE_URL="postgresql://postgres:password@localhost:5432/test_db?schema=test"' > .env.test
+          echo 'JWT_SECRET="PeraWaveSuperSecretKey2026"' >> .env.test
+          echo 'PORT=8080' >> .env.test
+      
+      - name: Run Backend Unit Tests (Mocks)
+        run: npm run test
+        
+      - name: Run Backend Integration Tests (Real DB)
+        run: npm run test:integration
