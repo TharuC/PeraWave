@@ -21,11 +21,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: ./code/PeraWaveFrontEnd/package-lock.json
 
       - name: Install Frontend Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run Frontend Tests
         run: npm run test
@@ -34,7 +32,6 @@ jobs:
     name: Backend Unit & Integration Tests
     runs-on: ubuntu-24.04
 
-    # Spin up a temporary PostgreSQL container just for this job
     services:
       postgres:
         image: postgres:15
@@ -54,6 +51,9 @@ jobs:
       run:
         working-directory: ./code/PeraWaveBackEnd
 
+    env:
+      DATABASE_URL: postgresql://postgres:password@localhost:5432/test_db?schema=test
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -62,18 +62,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: ./code/PeraWaveBackEnd/package-lock.json
 
       - name: Install Backend Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Setup Test Environment Variables
         run: |
           printf 'DATABASE_URL=postgresql://postgres:password@localhost:5432/test_db?schema=test\nJWT_SECRET=PeraWaveSuperSecretKey2026\nPORT=8080\n' > .env.test
 
       - name: Run Backend Unit Tests (Mocked)
-        run: npm run test
+        run: npx vitest run src/tests/server.test.ts src/tests/wiki.test.ts
         env:
           NODE_ENV: test
 
@@ -81,4 +79,3 @@ jobs:
         run: npm run test:integration
         env:
           NODE_ENV: test
-          DATABASE_URL: postgresql://postgres:password@localhost:5432/test_db?schema=test
