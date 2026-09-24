@@ -153,6 +153,13 @@ const Home: React.FC = () => {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
+    // Strip HTML tags for plain-text preview in the feed
+    const stripHtml = (html: string) => {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+    };
+
     const queryParams = new URLSearchParams(location.search);
     const searchFilter = queryParams.get('search') || '';
 
@@ -447,7 +454,7 @@ const Home: React.FC = () => {
                                                     </div>
                                                 )}
                                                 <p className="post-content" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                    {post.content}
+                                                    {stripHtml(post.content)}
                                                 </p>
 
                                                 <div className="post-actions">
