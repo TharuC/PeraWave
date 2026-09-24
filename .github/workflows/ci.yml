@@ -9,7 +9,7 @@ on:
 jobs:
   frontend-tests:
     name: Frontend Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ./Code/PeraWaveFrontEnd
@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install Frontend Dependencies
         run: npm install
@@ -30,7 +30,7 @@ jobs:
 
   backend-tests:
     name: Backend Unit & Integration Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Spin up a temporary PostgreSQL container just for this job
     services:
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install Backend Dependencies
         run: npm install
@@ -77,4 +77,3 @@ jobs:
 
       - name: Run Backend Integration Tests (Real DB)
         run: npm run test:integration
-
