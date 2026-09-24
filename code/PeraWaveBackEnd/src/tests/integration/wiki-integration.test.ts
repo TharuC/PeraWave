@@ -26,9 +26,11 @@ describe('Wiki API - Integration Test', () => {
   });
 
   afterAll(async () => {
-    // Clean up only the rows this test run created
-    await prisma.wikiArticle.deleteMany({ where: { authorId: testUser.id } });
-    await prisma.user.delete({ where: { id: testUser.id } });
+    // Guard: if beforeAll failed, testUser is undefined
+    if (testUser) {
+      await prisma.wikiArticle.deleteMany({ where: { authorId: testUser.id } });
+      await prisma.user.delete({ where: { id: testUser.id } });
+    }
     await prisma.$disconnect();
   });
 
