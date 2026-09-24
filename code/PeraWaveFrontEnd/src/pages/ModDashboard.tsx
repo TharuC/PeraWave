@@ -7,15 +7,175 @@ import { API_URL } from '../config';
 import { getModToken, clearToken } from '../utils/auth';
 
 
+// ── Wiki Article Preview Modal ────────────────────────────────────────────────────
+const WikiArticlePreviewModal: React.FC<{ article: any; onClose: () => void }> = ({ article, onClose }) => {
+    const [activeImg, setActiveImg] = React.useState(0);
+    React.useEffect(() => { setActiveImg(0); }, [article]);
+
+    // Close on Escape key
+    React.useEffect(() => {
+        const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [onClose]);
+
+    const statusColors: Record<string, { bg: string; color: string; label: string }> = {
+        APPROVED: { bg: '#dcfce7', color: '#15803d', label: 'Approved' },
+        PENDING:  { bg: '#fef3c7', color: '#92400e', label: 'Pending Review' },
+        REJECTED: { bg: '#fee2e2', color: '#dc2626', label: 'Rejected' },
+    };
+    const sc = statusColors[article.status] || { bg: '#f1f5f9', color: '#64748b', label: article.status };
+
+    return (
+        // Backdrop
+        <div
+            onClick={onClose}
+            style={{
+                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+                zIndex: 3000, display: 'flex', justifyContent: 'flex-end',
+                animation: 'fadeIn 0.2s ease',
+            }}
+        >
+            {/* Drawer panel */}
+            <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                    width: '560px', maxWidth: '95vw', height: '100%',
+                    background: '#0f172a', overflowY: 'auto',
+                    display: 'flex', flexDirection: 'column',
+                    boxShadow: '-8px 0 40px rgba(0,0,0,0.4)',
+                    animation: 'slideInRight 0.25s ease',
+                }}
+            >
+                {/* Header */}
+                <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '20px 24px', borderBottom: '1px solid #1e293b',
+                    background: '#0f172a', position: 'sticky', top: 0, zIndex: 10,
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ background: sc.bg, color: sc.color, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px' }}>
+                            {sc.label}
+                        </span>
+                        <span style={{ color: '#64748b', fontSize: '12px' }}>Article #{article.id}</span>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
+                        title="Close (Esc)"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 20, height: 20 }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Image carousel */}
+                {article.imageUrls && article.imageUrls.length > 0 && (
+                    <div style={{ position: 'relative', background: '#020817' }}>
+                        <img
+                            src={article.imageUrls[activeImg]}
+                            alt={article.title}
+                            style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', display: 'block' }}
+                        />
+                        {article.imageUrls.length > 1 && (
+                            <>
+                                {/* Prev */}
+                                {activeImg > 0 && (
+                                    <button onClick={() => setActiveImg(i => i - 1)} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{ width: 16, height: 16 }}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                                    </button>
+                                )}
+                                {/* Next */}
+                                {activeImg < article.imageUrls.length - 1 && (
+                                    <button onClick={() => setActiveImg(i => i + 1)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" style={{ width: 16, height: 16 }}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                                    </button>
+                                )}
+                                {/* Dots */}
+                                <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '6px' }}>
+                                    {article.imageUrls.map((_: any, i: number) => (
+                                        <button key={i} onClick={() => setActiveImg(i)} style={{ width: 8, height: 8, borderRadius: '50%', border: 'none', background: i === activeImg ? '#fff' : 'rgba(255,255,255,0.4)', cursor: 'pointer', padding: 0 }} />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                        <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '11px', padding: '3px 8px', borderRadius: '999px' }}>
+                            {activeImg + 1} / {article.imageUrls.length}
+                        </div>
+                    </div>
+                )}
+
+                {/* Body */}
+                <div style={{ padding: '24px', flex: 1 }}>
+                    {/* Location */}
+                    {article.location && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#1e293b', color: '#94a3b8', fontSize: '12px', padding: '4px 10px', borderRadius: '999px', marginBottom: '14px' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 12, height: 12 }}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                            {article.location}
+                        </div>
+                    )}
+
+                    {/* Title */}
+                    <h2 style={{ color: '#f1f5f9', fontSize: '22px', fontWeight: 800, margin: '0 0 12px', lineHeight: 1.3 }}>{article.title}</h2>
+
+                    {/* Author row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #1e293b' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>
+                            {(article.author?.fullName || 'U')[0].toUpperCase()}
+                        </div>
+                        <div>
+                            <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '13px' }}>{article.author?.fullName || 'Unknown'}</div>
+                            <div style={{ color: '#64748b', fontSize: '11px' }}>
+                                {article.author?.email || ''}
+                                {article.author?.faculty ? ` · ${article.author.faculty}` : ''}
+                            </div>
+                        </div>
+                        <div style={{ marginLeft: 'auto', color: '#64748b', fontSize: '11px' }}>
+                            {new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ color: '#cbd5e1', fontSize: '14px', lineHeight: '1.8', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {article.content}
+                    </div>
+
+                    {/* Mod note if present */}
+                    {article.modNote && (
+                        <div style={{ marginTop: '24px', background: '#1e293b', borderLeft: '3px solid #f59e0b', borderRadius: '0 8px 8px 0', padding: '12px 16px' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '11px', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Moderator Note</p>
+                            <p style={{ margin: 0, color: '#94a3b8', fontSize: '13px', lineHeight: 1.6 }}>{article.modNote}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <style>{`
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to   { transform: translateX(0);    opacity: 1; }
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to   { opacity: 1; }
+                }
+            `}</style>
+        </div>
+    );
+};
+
+
 // ── Wiki Mod Card ─────────────────────────────────────────────────────────────
 interface WikiModCardProps {
     article: any;
     token: string | null;
     onAction: () => void;
     onDelete: () => void;
+    onView: () => void;
 }
 
-const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction, onDelete }) => {
+const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction, onDelete, onView }) => {
     const [loading, setLoading] = React.useState(false);
     const [modNote, setModNote] = React.useState('');
 
@@ -76,6 +236,15 @@ const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction, onD
                     style={{ width: '100%', padding: '7px 10px', borderRadius: '7px', border: '1px solid #334155', background: '#0f172a', color: '#94a3b8', fontSize: '12px', marginBottom: '10px', boxSizing: 'border-box', fontFamily: 'inherit' }}
                 />
                 <div className="wiki-mod-card-actions">
+                    <button
+                        disabled={loading}
+                        onClick={onView}
+                        style={{ padding: '7px 14px', background: 'transparent', border: '1px solid #6366f1', color: '#818cf8', borderRadius: '7px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#6366f1'; e.currentTarget.style.color = '#fff'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#818cf8'; }}
+                    >
+                        👁 View
+                    </button>
                     <button className="wiki-mod-approve-btn" disabled={loading} onClick={() => updateStatus('APPROVED')}>✓ Approve</button>
                     <button className="wiki-mod-reject-btn" disabled={loading} onClick={() => updateStatus('REJECTED')}>✕ Reject</button>
                     <button
@@ -137,6 +306,7 @@ const ModDashboard: React.FC = () => {
     const [allWikiArticles, setAllWikiArticles] = useState<any[]>([]);
     const [wikiLoading, setWikiLoading] = useState(false);
     const [wikiSubTab, setWikiSubTab] = useState<'pending' | 'all'>('pending');
+    const [previewArticle, setPreviewArticle] = useState<any | null>(null);
 
     // --- Modal State ---
     const [showModal, setShowModal] = useState<'warn' | 'suspend' | 'delete' | null>(null);
@@ -683,6 +853,7 @@ const ModDashboard: React.FC = () => {
                                             key={article.id}
                                             article={article}
                                             token={getToken()}
+                                            onView={() => setPreviewArticle(article)}
                                             onAction={() => {
                                                 setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
                                                 setAllWikiArticles(prev => prev.map(a => a.id === article.id ? { ...a, status: 'APPROVED' } : a));
@@ -739,26 +910,35 @@ const ModDashboard: React.FC = () => {
                                                             {new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                                                         </td>
                                                         <td style={{ textAlign: 'center' }}>
-                                                            <button
-                                                                className="mod-action-btn danger"
-                                                                onClick={async () => {
-                                                                    const token = getToken();
-                                                                    if (!token) return;
-                                                                    if (!window.confirm(`Delete "${article.title}" permanently?`)) return;
-                                                                    const res = await fetch(`${API_URL}/api/wiki/mod/${article.id}`, {
-                                                                        method: 'DELETE',
-                                                                        headers: { Authorization: `Bearer ${token}` },
-                                                                    });
-                                                                    if (res.ok) {
-                                                                        setAllWikiArticles(prev => prev.filter(a => a.id !== article.id));
-                                                                        setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
-                                                                    } else {
-                                                                        alert('Failed to delete article.');
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Delete
-                                                            </button>
+                                                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                                                                <button
+                                                                    className="mod-action-btn"
+                                                                    onClick={() => setPreviewArticle(article)}
+                                                                    style={{ background: 'transparent', border: '1px solid #6366f1', color: '#818cf8' }}
+                                                                >
+                                                                    View
+                                                                </button>
+                                                                <button
+                                                                    className="mod-action-btn danger"
+                                                                    onClick={async () => {
+                                                                        const token = getToken();
+                                                                        if (!token) return;
+                                                                        if (!window.confirm(`Delete "${article.title}" permanently?`)) return;
+                                                                        const res = await fetch(`${API_URL}/api/wiki/mod/${article.id}`, {
+                                                                            method: 'DELETE',
+                                                                            headers: { Authorization: `Bearer ${token}` },
+                                                                        });
+                                                                        if (res.ok) {
+                                                                            setAllWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                                                            setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                                                        } else {
+                                                                            alert('Failed to delete article.');
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 );
@@ -861,6 +1041,12 @@ const ModDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            {/* Wiki Article Preview Modal */}
+            {previewArticle && (
+                <WikiArticlePreviewModal
+                    article={previewArticle}
+                    onClose={() => setPreviewArticle(null)}
+                />
             )}
         </div>
     );
