@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/forum.css';
 import '../styles/home.css';
-// import logo from '../assets/PeraWaveLogo.png';
+import userAvatarImg from '../assets/UserAvatar.png';
 import { API_URL } from '../config';
 import { getToken, clearToken } from '../utils/auth';
 import { ALL_TAGS } from './SelectInterests';
@@ -13,13 +13,198 @@ type Visibility = 'UNIVERSITY_WIDE' | 'FACULTY_ONLY' | 'BATCH_ONLY';
 const IconGlobe = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'24px',height:'24px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>;
 const IconBuilding = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'24px',height:'24px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" /></svg>;
 const IconAcademic = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width:'24px',height:'24px'}}><path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" /></svg>;
-import userAvatarImg from '../assets/UserAvatar.png';
 
 const VISIBILITY_OPTIONS: { value: Visibility; label: string; icon: () => React.ReactElement; desc: string }[] = [
   { value: 'UNIVERSITY_WIDE', label: 'University-Wide', icon: IconGlobe, desc: 'Visible to all users' },
   { value: 'FACULTY_ONLY', label: 'Faculty-Only', icon: IconBuilding, desc: 'Visible to your faculty' },
   { value: 'BATCH_ONLY', label: 'Batch-Only', icon: IconAcademic, desc: 'Visible to your batch' },
 ];
+
+// ── Rich Text Editor ──────────────────────────────────────────────────────────
+interface RichEditorProps {
+  value: string;
+  onChange: (html: string) => void;
+  placeholder?: string;
+}
+
+const RichEditor: React.FC<RichEditorProps> = ({ value, onChange, placeholder }) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [focused, setFocused] = useState(false);
+  const [activeFormats, setActiveFormats] = useState<Record<string, boolean>>({});
+  const lastSavedRange = useRef<Range | null>(null);
+
+  // Sync external value on mount only
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value;
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      lastSavedRange.current = sel.getRangeAt(0).cloneRange();
+    }
+  };
+
+  const restoreSelection = () => {
+    const sel = window.getSelection();
+    if (sel && lastSavedRange.current) {
+      sel.removeAllRanges();
+      sel.addRange(lastSavedRange.current);
+    }
+  };
+
+  const updateActiveFormats = useCallback(() => {
+    setActiveFormats({
+      bold: document.queryCommandState('bold'),
+      italic: document.queryCommandState('italic'),
+      underline: document.queryCommandState('underline'),
+      strikeThrough: document.queryCommandState('strikeThrough'),
+      insertUnorderedList: document.queryCommandState('insertUnorderedList'),
+      insertOrderedList: document.queryCommandState('insertOrderedList'),
+    });
+  }, []);
+
+  const exec = (command: string, value?: string) => {
+    restoreSelection();
+    editorRef.current?.focus();
+    document.execCommand(command, false, value);
+    onChange(editorRef.current?.innerHTML ?? '');
+    updateActiveFormats();
+  };
+
+  const handleInput = () => {
+    onChange(editorRef.current?.innerHTML ?? '');
+    updateActiveFormats();
+  };
+
+  const handleKeyUp = () => {
+    updateActiveFormats();
+    saveSelection();
+  };
+
+  const handleMouseUp = () => {
+    updateActiveFormats();
+    saveSelection();
+  };
+
+  const handleToolbarMouseDown = (e: React.MouseEvent) => {
+    // Prevent losing focus/selection when clicking toolbar buttons
+    e.preventDefault();
+  };
+
+  const insertLink = () => {
+    const url = window.prompt('Enter URL:', 'https://');
+    if (url) exec('createLink', url);
+  };
+
+  const isEmpty = !value || value === '<br>' || value === '';
+
+  return (
+    <div className={`rte-wrapper${focused ? ' focused' : ''}`}>
+      {/* Toolbar */}
+      <div className="rte-toolbar" onMouseDown={handleToolbarMouseDown}>
+        {/* Text style */}
+        <div className="rte-group">
+          <button type="button" className={`rte-btn${activeFormats.bold ? ' active' : ''}`} onClick={() => exec('bold')} title="Bold (Ctrl+B)">
+            <strong>B</strong>
+          </button>
+          <button type="button" className={`rte-btn${activeFormats.italic ? ' active' : ''}`} onClick={() => exec('italic')} title="Italic (Ctrl+I)">
+            <em>I</em>
+          </button>
+          <button type="button" className={`rte-btn${activeFormats.underline ? ' active' : ''}`} onClick={() => exec('underline')} title="Underline (Ctrl+U)">
+            <span style={{ textDecoration: 'underline' }}>U</span>
+          </button>
+          <button type="button" className={`rte-btn${activeFormats.strikeThrough ? ' active' : ''}`} onClick={() => exec('strikeThrough')} title="Strikethrough">
+            <span style={{ textDecoration: 'line-through' }}>S</span>
+          </button>
+        </div>
+
+        <div className="rte-divider" />
+
+        {/* Headings */}
+        <div className="rte-group">
+          <button type="button" className="rte-btn rte-btn-text" onClick={() => exec('formatBlock', 'H2')} title="Heading 2">
+            H2
+          </button>
+          <button type="button" className="rte-btn rte-btn-text" onClick={() => exec('formatBlock', 'H3')} title="Heading 3">
+            H3
+          </button>
+          <button type="button" className="rte-btn rte-btn-text" onClick={() => exec('formatBlock', 'P')} title="Normal Text">
+            ¶
+          </button>
+        </div>
+
+        <div className="rte-divider" />
+
+        {/* Lists */}
+        <div className="rte-group">
+          <button type="button" className={`rte-btn${activeFormats.insertUnorderedList ? ' active' : ''}`} onClick={() => exec('insertUnorderedList')} title="Bullet List">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M3 5a1 1 0 100-2 1 1 0 000 2zm0 6a1 1 0 100-2 1 1 0 000 2zm0 6a1 1 0 100-2 1 1 0 000 2zM7 4h10a1 1 0 010 2H7a1 1 0 010-2zm0 6h10a1 1 0 010 2H7a1 1 0 010-2zm0 6h10a1 1 0 010 2H7a1 1 0 010-2z" clipRule="evenodd"/></svg>
+          </button>
+          <button type="button" className={`rte-btn${activeFormats.insertOrderedList ? ' active' : ''}`} onClick={() => exec('insertOrderedList')} title="Numbered List">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M4 4a1 1 0 011-1h.5a.5.5 0 010 1H5v.5h.5a.5.5 0 010 1H5V6h1a1 1 0 010 2H4a1 1 0 010-2h.001V4H4zm0 6a1 1 0 011-1h.5a.5.5 0 010 1H5l.5 1H5a1 1 0 010 2H4a1 1 0 010-2h.5L4.5 10H4zm3-6h10a1 1 0 010 2H7a1 1 0 010-2zm0 6h10a1 1 0 010 2H7a1 1 0 010-2zm0 6h10a1 1 0 010 2H7a1 1 0 010-2z" clipRule="evenodd"/></svg>
+          </button>
+        </div>
+
+        <div className="rte-divider" />
+
+        {/* Alignment */}
+        <div className="rte-group">
+          <button type="button" className="rte-btn" onClick={() => exec('justifyLeft')} title="Align Left">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M2 4h16v2H2V4zm0 4h10v2H2V8zm0 4h16v2H2v-2zm0 4h10v2H2v-2z" clipRule="evenodd"/></svg>
+          </button>
+          <button type="button" className="rte-btn" onClick={() => exec('justifyCenter')} title="Align Center">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M2 4h16v2H2V4zm3 4h10v2H5V8zm-3 4h16v2H2v-2zm3 4h10v2H5v-2z" clipRule="evenodd"/></svg>
+          </button>
+          <button type="button" className="rte-btn" onClick={() => exec('justifyRight')} title="Align Right">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M2 4h16v2H2V4zm6 4h10v2H8V8zm-6 4h16v2H2v-2zm6 4h10v2H8v-2z" clipRule="evenodd"/></svg>
+          </button>
+        </div>
+
+        <div className="rte-divider" />
+
+        {/* Block quote + link + clear */}
+        <div className="rte-group">
+          <button type="button" className="rte-btn" onClick={() => exec('formatBlock', 'BLOCKQUOTE')} title="Block Quote">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M6.5 3C4.01 3 2 5.01 2 7.5c0 1.61.8 3.03 2.02 3.88A3.5 3.5 0 008 14.5V17h1V7.5A4.5 4.5 0 006.5 3zM13.5 3C11.01 3 9 5.01 9 7.5c0 1.61.8 3.03 2.02 3.88A3.5 3.5 0 0015 14.5V17h1V7.5A4.5 4.5 0 0013.5 3z"/></svg>
+          </button>
+          <button type="button" className="rte-btn" onClick={insertLink} title="Insert Link">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd"/></svg>
+          </button>
+          <button type="button" className="rte-btn rte-btn-danger" onClick={() => exec('removeFormat')} title="Clear Formatting">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fillRule="evenodd" d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v4a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4-4a1 1 0 010-1.414l4.001-3.828zM15 6H8.828l-3.5 3.5 3.5 3.5H15V6z" clipRule="evenodd"/></svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Editable area */}
+      <div
+        ref={editorRef}
+        id="post-content"
+        className="rte-body"
+        contentEditable
+        suppressContentEditableWarning
+        onInput={handleInput}
+        onKeyUp={handleKeyUp}
+        onMouseUp={handleMouseUp}
+        onFocus={() => setFocused(true)}
+        onBlur={() => { setFocused(false); saveSelection(); }}
+        data-placeholder={placeholder}
+        aria-label="Post content"
+        style={{ minHeight: '200px' }}
+      />
+
+      {/* Placeholder overlay */}
+      {isEmpty && !focused && (
+        <div className="rte-placeholder">{placeholder}</div>
+      )}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
@@ -29,12 +214,12 @@ const CreatePost: React.FC = () => {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [user, setUser] = useState<any>(null);
 
   const toggleTag = (id: string) => {
     setSelectedTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
   };
-  const [error, setError] = useState('');
-  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const token = getToken();
@@ -61,8 +246,9 @@ const CreatePost: React.FC = () => {
     e.preventDefault();
     setError('');
 
+    const plainText = content.replace(/<[^>]*>/g, '').trim();
     if (!title.trim()) { setError('Please enter a title for your post.'); return; }
-    if (!content.trim()) { setError('Please enter some content for your post.'); return; }
+    if (!plainText) { setError('Please enter some content for your post.'); return; }
 
     const token = getToken();
     if (!token) { navigate('/login'); return; }
@@ -127,16 +313,13 @@ const CreatePost: React.FC = () => {
               />
             </div>
 
-            {/* Content */}
+            {/* Rich Text Content */}
             <div className="cp-field">
-              <label className="cp-label" htmlFor="post-content">Content</label>
-              <textarea
-                id="post-content"
-                className="cp-textarea"
-                placeholder="Describe your topic in detail. Be respectful and constructive."
+              <label className="cp-label">Content</label>
+              <RichEditor
                 value={content}
-                onChange={e => setContent(e.target.value)}
-                rows={7}
+                onChange={setContent}
+                placeholder="Describe your topic in detail. Be respectful and constructive."
               />
             </div>
 

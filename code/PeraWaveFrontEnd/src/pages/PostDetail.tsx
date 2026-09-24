@@ -263,7 +263,7 @@ const PostDetail: React.FC = () => {
               </div>
             </div>
 
-          <p className="pd-content">{post.content}</p>
+          <div className="pd-content" dangerouslySetInnerHTML={{ __html: post.content }} />
 
           {/* Actions */}
           <div className="pd-actions">
