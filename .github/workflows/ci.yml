@@ -45,7 +45,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d test_db"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -70,9 +70,11 @@ jobs:
 
       - name: Setup Test Environment Variables
         run: |
-          echo 'DATABASE_URL="postgresql://postgres:password@localhost:5432/test_db?schema=test"' > .env.test
-          echo 'JWT_SECRET="PeraWaveSuperSecretKey2026"' >> .env.test
-          echo 'PORT=8080' >> .env.test
+          cat > .env.test <<'EOF'
+          DATABASE_URL=postgresql://postgres:password@localhost:5432/test_db?schema=test
+          JWT_SECRET=PeraWaveSuperSecretKey2026
+          PORT=8080
+          EOF
 
       - name: Run Backend Unit Tests (Mocked)
         run: npm run test
@@ -81,3 +83,6 @@ jobs:
 
       - name: Run Backend Integration Tests (Real DB)
         run: npm run test:integration
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/test_db?schema=test
