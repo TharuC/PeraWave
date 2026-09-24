@@ -1041,6 +1041,8 @@ const ModDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
             {/* Wiki Article Preview Modal */}
             {previewArticle && (
                 <WikiArticlePreviewModal
