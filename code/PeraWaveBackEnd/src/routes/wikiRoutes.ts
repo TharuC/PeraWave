@@ -7,6 +7,7 @@ import {
   getRecentArticles,
   getArticleById,
   getPendingArticles,
+  getAllArticlesForMod,
   updateArticleStatus,
   deleteArticle,
   getMyArticles,
@@ -34,13 +35,15 @@ router.get('/', getApprovedArticles);
 router.get('/recent', getRecentArticles);
 
 // ── Moderator-only endpoints ────────────────────────────────────────────────────
+router.get('/all', requireModerator, getAllArticlesForMod); // All articles (any status)
 router.get('/pending', requireModerator, getPendingArticles);
 router.patch('/:id/status', requireModerator, updateArticleStatus);
+router.delete('/mod/:id', requireModerator, deleteArticle);  // Moderator delete any article
 
 // ── Authenticated user endpoints ────────────────────────────────────────────────
 router.get('/my-articles', requireUser, getMyArticles);
 router.post('/', requireUser, upload.array('images', 5), createWikiArticle);
-router.delete('/:id', requireUser, deleteArticle);
+router.delete('/:id', requireUser, deleteArticle);           // Author self-delete
 
 // ── Parameterised public routes (must come after named sub-routes) ───────────────
 router.get('/:id', getArticleById);

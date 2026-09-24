@@ -167,6 +167,24 @@ export const getPendingArticles = async (_req: Request, res: Response) => {
   }
 };
 
+// ── GET /api/wiki/all  (moderators only) ──────────────────────────────────────
+// Returns ALL articles regardless of status for the moderator dashboard
+export const getAllArticlesForMod = async (_req: Request, res: Response) => {
+  try {
+    const articles = await prisma.wikiArticle.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: { select: { id: true, fullName: true, email: true, faculty: true } },
+      },
+    });
+    return res.json(articles);
+  } catch (err) {
+    console.error('getAllArticlesForMod error:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+
 // ── PATCH /api/wiki/:id/status  (moderators only) ─────────────────────────────
 export const updateArticleStatus = async (req: AuthRequest, res: Response) => {
   try {

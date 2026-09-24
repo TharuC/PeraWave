@@ -6,16 +6,16 @@ import adminAvatar from '../assets/AdminAvatar.png';
 import { API_URL } from '../config';
 import { getModToken, clearToken } from '../utils/auth';
 
-const API_URL_CONST = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // ── Wiki Mod Card ─────────────────────────────────────────────────────────────
 interface WikiModCardProps {
     article: any;
     token: string | null;
     onAction: () => void;
+    onDelete: () => void;
 }
 
-const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction }) => {
+const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction, onDelete }) => {
     const [loading, setLoading] = React.useState(false);
     const [modNote, setModNote] = React.useState('');
 
@@ -23,13 +23,28 @@ const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction }) =
         if (!token) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL_CONST}/api/wiki/${article.id}/status`, {
+            const res = await fetch(`${API_URL}/api/wiki/${article.id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ status, modNote }),
             });
             if (res.ok) onAction();
             else alert('Failed to update status.');
+        } catch { alert('Network error.'); }
+        finally { setLoading(false); }
+    };
+
+    const deleteArticle = async () => {
+        if (!token) return;
+        if (!window.confirm(`Delete "${article.title}" permanently? This cannot be undone.`)) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/api/wiki/mod/${article.id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) onDelete();
+            else alert('Failed to delete article.');
         } catch { alert('Network error.'); }
         finally { setLoading(false); }
     };
@@ -63,6 +78,15 @@ const WikiModCard: React.FC<WikiModCardProps> = ({ article, token, onAction }) =
                 <div className="wiki-mod-card-actions">
                     <button className="wiki-mod-approve-btn" disabled={loading} onClick={() => updateStatus('APPROVED')}>✓ Approve</button>
                     <button className="wiki-mod-reject-btn" disabled={loading} onClick={() => updateStatus('REJECTED')}>✕ Reject</button>
+                    <button
+                        disabled={loading}
+                        onClick={deleteArticle}
+                        style={{ padding: '7px 14px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '7px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ef4444'; }}
+                    >
+                        🗑 Delete
+                    </button>
                 </div>
             </div>
         </div>
@@ -110,7 +134,9 @@ const ModDashboard: React.FC = () => {
 
     // --- Wiki Articles ---
     const [pendingWikiArticles, setPendingWikiArticles] = useState<any[]>([]);
+    const [allWikiArticles, setAllWikiArticles] = useState<any[]>([]);
     const [wikiLoading, setWikiLoading] = useState(false);
+    const [wikiSubTab, setWikiSubTab] = useState<'pending' | 'all'>('pending');
 
     // --- Modal State ---
     const [showModal, setShowModal] = useState<'warn' | 'suspend' | 'delete' | null>(null);
@@ -173,6 +199,10 @@ const ModDashboard: React.FC = () => {
             setWikiLoading(true);
             const wikiRes = await fetch(`${API_URL}/api/wiki/pending`, { headers });
             if (wikiRes.ok) setPendingWikiArticles(await wikiRes.json());
+
+            // 7. All wiki articles for moderator management
+            const allWikiRes = await fetch(`${API_URL}/api/wiki/all`, { headers });
+            if (allWikiRes.ok) setAllWikiArticles(await allWikiRes.json());
             setWikiLoading(false);
 
         } catch (err) {
@@ -618,29 +648,125 @@ const ModDashboard: React.FC = () => {
                 {/* ─── Wiki Moderation ─── */}
                 {activeTab === 'wiki' && (
                     <div className="mod-section">
-                        <h2>Wiki Moderation <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 400 }}>({pendingWikiArticles.length} pending)</span></h2>
-                        <p style={{ color: '#64748b', marginBottom: '20px' }}>Review and approve or reject articles submitted to Pera Wiki.</p>
+                        <h2>Wiki Moderation</h2>
+
+                        {/* Sub-tabs */}
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', borderBottom: '2px solid #1e293b', paddingBottom: '0' }}>
+                            <button
+                                onClick={() => setWikiSubTab('pending')}
+                                style={{ padding: '8px 20px', background: 'none', border: 'none', borderBottom: wikiSubTab === 'pending' ? '2px solid #8b5cf6' : '2px solid transparent', color: wikiSubTab === 'pending' ? '#a78bfa' : '#64748b', fontWeight: 700, fontSize: '14px', cursor: 'pointer', marginBottom: '-2px', transition: 'all 0.15s' }}
+                            >
+                                Pending Review
+                                {pendingWikiArticles.length > 0 && <span style={{ marginLeft: '8px', background: '#ef4444', color: '#fff', borderRadius: '999px', padding: '1px 8px', fontSize: '11px' }}>{pendingWikiArticles.length}</span>}
+                            </button>
+                            <button
+                                onClick={() => setWikiSubTab('all')}
+                                style={{ padding: '8px 20px', background: 'none', border: 'none', borderBottom: wikiSubTab === 'all' ? '2px solid #8b5cf6' : '2px solid transparent', color: wikiSubTab === 'all' ? '#a78bfa' : '#64748b', fontWeight: 700, fontSize: '14px', cursor: 'pointer', marginBottom: '-2px', transition: 'all 0.15s' }}
+                            >
+                                All Articles
+                                <span style={{ marginLeft: '8px', background: '#334155', color: '#94a3b8', borderRadius: '999px', padding: '1px 8px', fontSize: '11px' }}>{allWikiArticles.length}</span>
+                            </button>
+                        </div>
 
                         {wikiLoading ? (
                             <p style={{ color: '#64748b' }}>Loading wiki articles…</p>
-                        ) : pendingWikiArticles.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '60px 24px', color: '#64748b' }}>
-                                <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 40, height: 40, color: '#94a3b8' }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
-                                <p>No pending wiki articles. All caught up!</p>
-                            </div>
+                        ) : wikiSubTab === 'pending' ? (
+                            pendingWikiArticles.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '60px 24px', color: '#64748b' }}>
+                                    <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 40, height: 40, color: '#94a3b8' }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
+                                    <p>No pending wiki articles. All caught up!</p>
+                                </div>
+                            ) : (
+                                <div className="wiki-mod-grid">
+                                    {pendingWikiArticles.map((article: any) => (
+                                        <WikiModCard
+                                            key={article.id}
+                                            article={article}
+                                            token={getToken()}
+                                            onAction={() => {
+                                                setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                                setAllWikiArticles(prev => prev.map(a => a.id === article.id ? { ...a, status: 'APPROVED' } : a));
+                                            }}
+                                            onDelete={() => {
+                                                setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                                setAllWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )
                         ) : (
-                            <div className="wiki-mod-grid">
-                                {pendingWikiArticles.map((article: any) => (
-                                    <WikiModCard
-                                        key={article.id}
-                                        article={article}
-                                        token={getToken()}
-                                        onAction={() => {
-                                            setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
-                                        }}
-                                    />
-                                ))}
-                            </div>
+                            /* All Articles table */
+                            allWikiArticles.length === 0 ? (
+                                <p style={{ color: '#64748b' }}>No wiki articles yet.</p>
+                            ) : (
+                                <div className="mod-table-container">
+                                    <table className="mod-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Title</th>
+                                                <th>Author</th>
+                                                <th>Location</th>
+                                                <th>Status</th>
+                                                <th>Submitted</th>
+                                                <th style={{ textAlign: 'center' }}>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {allWikiArticles.map((article: any) => {
+                                                const statusColors: Record<string, { bg: string; color: string }> = {
+                                                    APPROVED: { bg: '#dcfce7', color: '#15803d' },
+                                                    PENDING:  { bg: '#fef3c7', color: '#92400e' },
+                                                    REJECTED: { bg: '#fee2e2', color: '#dc2626' },
+                                                };
+                                                const sc = statusColors[article.status] || { bg: '#f1f5f9', color: '#64748b' };
+                                                return (
+                                                    <tr key={article.id}>
+                                                        <td>{article.id}</td>
+                                                        <td style={{ maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>{article.title}</td>
+                                                        <td>
+                                                            <div>{article.author?.fullName || '—'}</div>
+                                                            <div style={{ fontSize: '11px', color: '#64748b' }}>{article.author?.email || ''}</div>
+                                                        </td>
+                                                        <td style={{ color: '#94a3b8', fontSize: '13px' }}>{article.location || '—'}</td>
+                                                        <td>
+                                                            <span style={{ background: sc.bg, color: sc.color, fontWeight: 700, fontSize: '11px', padding: '2px 10px', borderRadius: '999px' }}>
+                                                                {article.status}
+                                                            </span>
+                                                        </td>
+                                                        <td style={{ color: '#64748b', fontSize: '13px' }}>
+                                                            {new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                        </td>
+                                                        <td style={{ textAlign: 'center' }}>
+                                                            <button
+                                                                className="mod-action-btn danger"
+                                                                onClick={async () => {
+                                                                    const token = getToken();
+                                                                    if (!token) return;
+                                                                    if (!window.confirm(`Delete "${article.title}" permanently?`)) return;
+                                                                    const res = await fetch(`${API_URL}/api/wiki/mod/${article.id}`, {
+                                                                        method: 'DELETE',
+                                                                        headers: { Authorization: `Bearer ${token}` },
+                                                                    });
+                                                                    if (res.ok) {
+                                                                        setAllWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                                                        setPendingWikiArticles(prev => prev.filter(a => a.id !== article.id));
+                                                                    } else {
+                                                                        alert('Failed to delete article.');
+                                                                    }
+                                                                }}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )
                         )}
                     </div>
                 )}
