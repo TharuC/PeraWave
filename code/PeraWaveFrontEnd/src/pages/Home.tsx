@@ -153,13 +153,6 @@ const Home: React.FC = () => {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
-    // Strip HTML tags for plain-text preview in the feed (preserving line breaks)
-    const stripHtml = (html: string) => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n');
-        return (tmp.textContent || tmp.innerText || '').trim();
-    };
-
     const queryParams = new URLSearchParams(location.search);
     const searchFilter = queryParams.get('search') || '';
 
@@ -453,8 +446,8 @@ const Home: React.FC = () => {
                                                         })}
                                                     </div>
                                                 )}
-                                                <p className="post-content" style={{ whiteSpace: 'pre-line', overflow: 'hidden' }}>
-                                                    {stripHtml(post.content)}
+                                                <p className="post-content" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    {post.content}
                                                 </p>
 
                                                 <div className="post-actions">
