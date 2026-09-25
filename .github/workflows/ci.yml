@@ -71,11 +71,14 @@ jobs:
           printf 'DATABASE_URL=postgresql://postgres:password@localhost:5432/test_db?schema=public\nJWT_SECRET=PeraWaveSuperSecretKey2026\nPORT=8080\n' > .env.test
 
       - name: Run Backend Unit Tests (Mocked)
-        run: npx vitest run src/tests/server.test.ts src/tests/wiki.test.ts
+        run: npx vitest run
         env:
           NODE_ENV: test
 
+      - name: Reset Test Database Schema
+        run: npx prisma db push --force-reset --accept-data-loss
+
       - name: Run Backend Integration Tests (Real DB)
-        run: npm run test:integration
+        run: npx vitest run --config vitest.integration.config.mts
         env:
           NODE_ENV: test

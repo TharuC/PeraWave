@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "test:integration": "dotenv -e .env.test -- npx prisma db push --force-reset --accept-data-loss && dotenv -e .env.test -- vitest run src/tests/integration",
+    "test:integration": "dotenv -e .env.test -- npx prisma db push --force-reset --accept-data-loss && dotenv -e .env.test -- vitest run --config vitest.integration.config.mts",
     "coverage": "vitest run --coverage",
     "build": "tsc",
     "start": "npx prisma migrate deploy && node dist/src/server.js",
