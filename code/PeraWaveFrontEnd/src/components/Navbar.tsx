@@ -30,6 +30,20 @@ const Navbar: React.FC<NavbarProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
+  let displayName = userName;
+  let displayAvatar = userAvatar;
+
+  if (isLoggedIn && (!displayName || !displayAvatar)) {
+    const cached = sessionStorage.getItem('cachedUser');
+    if (cached) {
+      try {
+        const c = JSON.parse(cached);
+        if (!displayName) displayName = c.fullName || "";
+        if (!displayAvatar) displayAvatar = c.avatar || userAvatarDefault;
+      } catch {}
+    }
+  }
+
   const getNotifIcon = (type: string) => {
     if (type === "WARNING") return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#eab308" style={{width:'18px',height:'18px',flexShrink:0}}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>;
     if (type === "SUSPENSION") return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#ef4444" style={{width:'18px',height:'18px',flexShrink:0}}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>;
@@ -164,8 +178,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", userSelect: "none" }}
                   onClick={() => { if (userRole !== 'MODERATOR') setIsDropdownOpen(!isDropdownOpen); setIsNotifOpen(false); }}
               >
-                <img src={userAvatar || userAvatarDefault} alt="User" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flexShrink: 0 }} />
-                <span className="navbar-username" style={{ fontWeight: 600, color: "#1e293b", fontSize: "15px" }}>{userName || "User"}</span>
+                <img src={displayAvatar || userAvatarDefault} alt="User" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flexShrink: 0 }} />
+                <span className="navbar-username" style={{ fontWeight: 600, color: "#1e293b", fontSize: "15px" }}>{displayName || "User"}</span>
                 {userRole !== 'MODERATOR' && (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: "14px", height: "14px", color: "#64748b" }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
