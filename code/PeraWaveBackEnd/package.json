@@ -8,7 +8,7 @@
     "test:integration": "dotenv -e .env.test -- npx prisma db push --force-reset --accept-data-loss && dotenv -e .env.test -- vitest run --config vitest.integration.config.mts",
     "coverage": "vitest run --coverage",
     "build": "tsc",
-    "start": "npx prisma migrate deploy && node dist/src/server.js",
+    "start": "tsc && npx prisma migrate deploy && node dist/src/server.js",
     "postinstall": "prisma generate",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
