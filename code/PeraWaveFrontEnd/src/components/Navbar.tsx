@@ -95,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = ({
           style={{ background: 'none', border: 'none', color: '#1e293b', fontWeight: 600, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', padding: 0 }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 16, height: 16, color: '#3b82f6' }}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-          Pera Wiki
+          <span className="navbar-wiki-text">Pera Wiki</span>
         </button>
 
         {isLoggedIn ? (
@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   position: 'absolute', top: '120%', right: 0,
                   background: 'white', borderRadius: '12px',
                   boxShadow: '0 8px 32px rgba(0,0,0,0.15)', border: '1px solid #e2e8f0',
-                  width: '320px', zIndex: 2000, overflow: 'hidden'
+                  width: 'min(320px, 90vw)', zIndex: 2000, overflow: 'hidden'
                 }}>
                   <div style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Notifications</span>

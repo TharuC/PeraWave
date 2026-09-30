@@ -279,7 +279,54 @@
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
-@media (max-width: 520px) {
-  .ce-card { padding: 24px 16px; }
-  .ce-row { grid-template-columns: 1fr; }
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .create-event-container {
+    padding: 48px 20px 48px;
+    max-width: 560px;
+  }
+  .ce-card {
+    padding: 28px;
+  }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  .create-event-container {
+    padding: 24px 16px 40px;
+    max-width: 100%;
+  }
+  .ce-card {
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+  .ce-title {
+    font-size: 22px;
+  }
+  .ce-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .ce-submit-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+  .ce-success-card {
+    padding: 32px 20px;
+  }
+}
+
+/* Small Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .ce-card { padding: 20px 14px; }
+  .ce-title { font-size: 20px; }
+  .ce-input {
+    padding: 10px 12px;
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+  .ce-submit-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
 }

@@ -894,24 +894,66 @@
 .wiki-mod-reject-btn:hover { opacity: 0.85; }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .wiki-page-header h1 { font-size: 32px; }
-  .wiki-container { padding: 40px 16px 60px; }
-  .wiki-detail-body { padding: 24px; }
-  .wiki-create-card { padding: 24px 20px; }
-  .wiki-welcome-section { padding: 60px 20px; }
-  .wiki-welcome-grid { grid-template-columns: 1fr 1fr; }
-  .wiki-actions-bar { flex-direction: column; align-items: stretch; }
-  .wiki-search-input { max-width: 100%; }
-  .wiki-detail-title { font-size: 26px; }
-  .wiki-mod-card { flex-direction: column; }
-  .wiki-mod-card-img, .wiki-mod-card-placeholder { width: 100%; height: 160px; }
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .wiki-container {
+    padding: 48px 20px 60px;
+  }
+  .wiki-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .wiki-detail-container {
+    padding: 48px 20px 60px;
+  }
+  .wiki-detail-body {
+    padding: 28px;
+  }
+  .wiki-welcome-section {
+    padding: 60px 24px;
+  }
 }
 
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  .wiki-page-header h1 { font-size: 32px; }
+  .wiki-container { padding: 32px 16px 48px; }
+  .wiki-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .wiki-detail-container { padding: 24px 16px 40px; }
+  .wiki-detail-body { padding: 20px 16px; }
+  .wiki-detail-title { font-size: 24px; }
+  .wiki-create-card { padding: 24px 16px; }
+  .wiki-create-container { padding: 24px 16px 40px; }
+  .wiki-welcome-section { padding: 40px 16px; }
+  .wiki-welcome-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .wiki-welcome-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .wiki-welcome-header-left h2 { font-size: 24px; }
+  .wiki-actions-bar { flex-direction: column; align-items: stretch; }
+  .wiki-search-input { max-width: 100%; }
+  .wiki-mod-card { flex-direction: column; }
+  .wiki-mod-card-img, .wiki-mod-card-placeholder { width: 100%; height: 160px; }
+  .wiki-card-body { padding: 16px; }
+  .wiki-card-title { font-size: 16px; }
+}
+
+/* Small Mobile (≤ 480px) */
 @media (max-width: 480px) {
+  .wiki-page-header h1 { font-size: 26px; }
   .wiki-welcome-grid { grid-template-columns: 1fr; }
   .wiki-welcome-header { flex-direction: column; align-items: flex-start; }
+  .wiki-success-card { padding: 32px 20px; }
+  .wiki-success-card h2 { font-size: 20px; }
+  .wiki-create-title-h1 { font-size: 22px; }
+  .wiki-submit-btn { padding: 12px; font-size: 14px; }
 }
+
 
 /* ── Welcome page wiki outer wrapper ─────────────────────────────────────── */
 /* This makes the section ALWAYS visible below the hero */

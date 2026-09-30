@@ -596,6 +596,12 @@
   .cp-anon-row {
     padding: 14px 16px;
   }
+
+  .cp-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
   
   /* Post Detail Card */
   .pd-card {
@@ -627,6 +633,42 @@
   .pd-comment-submit {
     width: 100%;
     padding: 12px;
+  }
+}
+
+/* Small Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .forum-layout {
+    padding: 12px 10px 24px;
+  }
+  .cp-card-header {
+    padding: 16px 14px 12px;
+  }
+  .cp-card-body {
+    padding: 14px 14px 20px;
+    gap: 16px;
+  }
+  .cp-card-header h1 {
+    font-size: 16px;
+  }
+  .cp-cancel-btn,
+  .cp-submit-btn {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+  .pd-title {
+    font-size: 18px;
+  }
+  .pd-comments-section {
+    padding: 16px 12px;
+  }
+  .rte-toolbar {
+    padding: 6px 8px;
+    gap: 1px;
+  }
+  .rte-btn {
+    min-width: 26px;
+    height: 26px;
   }
 }
 

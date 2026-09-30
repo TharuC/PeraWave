@@ -3,23 +3,52 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  /* Fix iOS 100vh issue */
+  height: -webkit-fill-available;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   width: 100%;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent horizontal overflow on mobile */
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
   margin: 0;
   padding: 0;
+  /* Contain overflow */
+  overflow-x: hidden;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Global image responsiveness */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent text overflow in any container */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Touch-friendly tap target minimum */
+button, [role="button"] {
+  touch-action: manipulation;
 }

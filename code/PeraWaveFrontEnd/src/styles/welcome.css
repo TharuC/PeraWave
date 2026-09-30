@@ -65,6 +65,8 @@ body {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Search bar wrapper — flex by default, hidden on mobile via media query */
@@ -107,6 +109,20 @@ body {
 
 .login-btn:hover {
   background: var(--accent-hover);
+}
+
+/* Pera Wiki button label — hidden on very small mobile */
+.navbar-wiki-text {
+  /* shown by default */
+}
+
+@media (max-width: 480px) {
+  .navbar-wiki-text {
+    display: none;
+  }
+  .nav-buttons {
+    gap: 6px;
+  }
 }
 
 /* ── HERO ─────────────────────────────────────────────────────────── */
@@ -586,10 +602,22 @@ body {
   }
   .hero {
     padding: 0 40px;
+    gap: 24px;
   }
   .glass-card {
-    width: 360px;
-    padding: 36px 40px;
+    width: 340px;
+    padding: 32px 36px;
+  }
+  .feature-dark-card {
+    width: 380px;
+    min-height: 340px;
+    padding: 32px 36px;
+  }
+  .features-title {
+    font-size: 34px;
+  }
+  .features-subtitle {
+    font-size: 16px;
   }
 }
 
@@ -618,21 +646,22 @@ body {
   }
   /* Shrink auth buttons */
   .create-btn {
-    font-size: 13px;
-    padding: 6px 12px;
+    font-size: 12px;
+    padding: 5px 10px;
   }
   .login-btn {
-    font-size: 13px;
-    padding: 6px 14px;
+    font-size: 12px;
+    padding: 5px 12px;
   }
   /* Hero full-width on mobile */
   .hero {
-    padding: 20px;
+    padding: 20px 16px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding-bottom: 80px; /* room for footer */
     gap: 20px;
+    min-height: calc(100vh - 56px);
   }
   .hero-content, .hero-features {
     width: 100%;
@@ -642,14 +671,17 @@ body {
   }
   .glass-card, .feature-dark-card {
     width: 100%;
-    max-width: 420px;
-    padding: 28px 24px;
+    max-width: 100%;
+    padding: 28px 20px;
     box-sizing: border-box;
-    min-height: 220px;
+    min-height: auto;
+  }
+  .feature-dark-card {
+    min-height: 280px;
   }
   .feature-tagline {
     width: 100%;
-    max-width: 420px;
+    max-width: 100%;
   }
   .dynamic-feature {
     top: 0;
@@ -657,16 +689,28 @@ body {
     right: 0;
   }
   .glass-card h1 {
-    font-size: 28px;
+    font-size: 26px;
   }
   .tagline {
-    font-size: 15px;
+    font-size: 14px;
   }
   .help-btn {
     bottom: 16px;
     right: 16px;
     padding: 8px 18px;
     font-size: 13px;
+  }
+  .features-section {
+    padding: 48px 16px;
+  }
+  .features-title {
+    font-size: 28px;
+  }
+  .features-subtitle {
+    font-size: 15px;
+  }
+  .features-header {
+    margin-bottom: 36px;
   }
   .footer-content {
     grid-template-columns: 1fr;
@@ -677,6 +721,28 @@ body {
   .footer-content p:last-child {
     grid-column: 1;
     text-align: center;
+  }
+}
+
+/* Small Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .glass-card h1 {
+    font-size: 22px;
+  }
+  .tagline {
+    font-size: 13px;
+  }
+  .glass-card, .feature-dark-card {
+    padding: 20px 16px;
+  }
+  .feature-dark-card .feature-card-title {
+    font-size: 18px;
+  }
+  .feature-dark-card .feature-card-text {
+    font-size: 14px;
+  }
+  .create-btn {
+    display: none; /* hide register btn, keep only login */
   }
 }
 
