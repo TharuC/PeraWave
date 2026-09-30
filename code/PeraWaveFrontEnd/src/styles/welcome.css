@@ -65,8 +65,6 @@ body {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  min-width: 0;
-  overflow: hidden;
 }
 
 /* Search bar wrapper — flex by default, hidden on mobile via media query */

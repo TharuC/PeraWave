@@ -89,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
       )}
 
-      <div className="nav-buttons" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+      <div className="nav-buttons">
         <button 
           onClick={() => navigate(userRole === 'MODERATOR' || userRole === 'SUPER_ADMIN' ? '/mod-dashboard' : '/wiki')} 
           style={{ background: 'none', border: 'none', color: '#1e293b', fontWeight: 600, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', padding: 0 }}

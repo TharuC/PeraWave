@@ -205,8 +205,7 @@ const ModHome: React.FC = () => {
             <div className="sidebar-title">Visibility</div>
             {[{ v: 'all', label: 'All Posts', Icon: IconHome }, { v: 'UNIVERSITY_WIDE', label: 'University-Wide', Icon: IconGlobe }, { v: 'FACULTY_ONLY', label: 'Faculty-Only', Icon: IconBuilding }, { v: 'BATCH_ONLY', label: 'Batch-Only', Icon: IconAcademic }].map(({ v, label, Icon }) => (
               <button key={v} onClick={() => setVisFilter(v)}
-                className={`sidebar-link${visFilter === v ? ' active' : ''}`}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '7px' }}>
+                className={`sidebar-link${visFilter === v ? ' active' : ''}`}>
                 <Icon />{label}
               </button>
             ))}
@@ -215,14 +214,12 @@ const ModHome: React.FC = () => {
           <div className="sidebar-section">
             <div className="sidebar-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><IconBuilding /> Faculty</div>
             <button onClick={() => setFacultyFilter('all')}
-              className={`sidebar-link${facultyFilter === 'all' ? ' active' : ''}`}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontFamily: 'Inter, sans-serif' }}>
+              className={`sidebar-link${facultyFilter === 'all' ? ' active' : ''}`}>
               All Faculties
             </button>
             {FACULTIES.map(f => (
               <button key={f.code} onClick={() => setFacultyFilter(f.code)}
-                className={`sidebar-link${facultyFilter === f.code ? ' active' : ''}`}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontFamily: 'Inter, sans-serif' }}>
+                className={`sidebar-link${facultyFilter === f.code ? ' active' : ''}`}>
                 {f.label}
               </button>
             ))}
