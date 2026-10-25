@@ -790,7 +790,7 @@ const ModDashboard: React.FC = () => {
                                                     <td>{user.email}</td>
                                                     <td style={{ textTransform: 'uppercase', fontSize: '12px', color: '#64748b' }}>{user.faculty || '—'}</td>
                                                     <td style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
-                                                        {extractBatch(user.registrationNumber, user.email) ? `E/${extractBatch(user.registrationNumber, user.email)}` : '—'}
+                                                        {extractBatch(user.registrationNumber, user.email) || '—'}
                                                     </td>
                                                     <td>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                                                     <td>
