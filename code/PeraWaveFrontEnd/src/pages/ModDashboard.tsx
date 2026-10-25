@@ -472,11 +472,19 @@ const ModDashboard: React.FC = () => {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
-    // Extract batch year from registrationNumber e.g. "E/23/060" or "E23060" -> "23"
-    const extractBatch = (regNo: string | null | undefined): string => {
-        if (!regNo) return '';
-        const match = regNo.match(/[Ee][\/_-]?(\d{2})[\/_-]?\d+/);
-        return match ? match[1] : '';
+    // Extract batch year from registrationNumber e.g. "E/23/060" -> "23"
+    // Falls back to email e.g. "e23300@eng.pdn.ac.lk" or "d24061@dental.pdn.ac.lk" -> "23" / "24"
+    const extractBatch = (regNo: string | null | undefined, email?: string | null): string => {
+        if (regNo) {
+            const match = regNo.match(/[Ee][\/_-]?(\d{2})[\/_-]?\d+/);
+            if (match) return match[1];
+        }
+        if (email) {
+            // Matches leading letter(s) then 2-digit year then more digits before @
+            const match = email.match(/^[a-zA-Z]+(\d{2})\d+@/);
+            if (match) return match[1];
+        }
+        return '';
     };
 
     return (
@@ -659,12 +667,12 @@ const ModDashboard: React.FC = () => {
                     const faculties = Array.from(new Set(users.map((u: any) => u.faculty).filter(Boolean))).sort() as string[];
                     // Derive unique batches by parsing registrationNumber
                     const batches = Array.from(
-                        new Set(users.map((u: any) => extractBatch(u.registrationNumber)).filter(Boolean))
+                        new Set(users.map((u: any) => extractBatch(u.registrationNumber, u.email)).filter(Boolean))
                     ).sort() as string[];
 
                     const filteredUsers = users.filter((u: any) => {
                         const matchFaculty = !filterFaculty || u.faculty === filterFaculty;
-                        const matchBatch   = !filterBatch   || extractBatch(u.registrationNumber) === filterBatch;
+                        const matchBatch   = !filterBatch   || extractBatch(u.registrationNumber, u.email) === filterBatch;
                         return matchFaculty && matchBatch;
                     });
 
@@ -782,7 +790,7 @@ const ModDashboard: React.FC = () => {
                                                     <td>{user.email}</td>
                                                     <td style={{ textTransform: 'uppercase', fontSize: '12px', color: '#64748b' }}>{user.faculty || '—'}</td>
                                                     <td style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
-                                                        {extractBatch(user.registrationNumber) ? `E/${extractBatch(user.registrationNumber)}` : '—'}
+                                                        {extractBatch(user.registrationNumber, user.email) ? `E/${extractBatch(user.registrationNumber, user.email)}` : '—'}
                                                     </td>
                                                     <td>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                                                     <td>
