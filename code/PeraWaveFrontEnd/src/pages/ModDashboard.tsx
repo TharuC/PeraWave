@@ -308,6 +308,10 @@ const ModDashboard: React.FC = () => {
     const [wikiSubTab, setWikiSubTab] = useState<'pending' | 'all'>('pending');
     const [previewArticle, setPreviewArticle] = useState<any | null>(null);
 
+    // --- User Filters ---
+    const [filterFaculty, setFilterFaculty] = useState('');
+    const [filterBatch, setFilterBatch] = useState('');
+
     // --- Modal State ---
     const [showModal, setShowModal] = useState<'warn' | 'suspend' | 'delete' | null>(null);
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -643,56 +647,156 @@ const ModDashboard: React.FC = () => {
                 )}
 
                 {/* ─── Users ─── */}
-                {activeTab === 'users' && (
-                    <div className="mod-section">
-                        <h2>User Management <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 400 }}>({users.length} active users)</span></h2>
-                        <div className="mod-table-container">
-                            <table className="mod-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>University Email</th>
-                                        <th>Faculty</th>
-                                        <th>Joined</th>
-                                        <th>Status</th>
-                                        <th className="text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {users.length === 0 ? (
-                                        <tr><td colSpan={6} style={{ textAlign: 'center', color: '#64748b', padding: '30px' }}>No users found.</td></tr>
-                                    ) : users.map(user => {
-                                        const isSuspended = user.suspendedUntil && new Date(user.suspendedUntil) > new Date();
-                                        const status = isSuspended ? 'Suspended' : 'Active';
-                                        return (
-                                            <tr key={user.id}>
-                                                <td>{user.fullName || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unknown</span>}</td>
-                                                <td>{user.email}</td>
-                                                <td style={{ textTransform: 'uppercase', fontSize: '12px', color: '#64748b' }}>{user.faculty || '—'}</td>
-                                                <td>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-                                                <td>
-                                                    <span className={`mod-status status-${status.toLowerCase()}`}>{status}</span>
-                                                    {isSuspended && (
-                                                        <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '3px' }}>
-                                                            Until {new Date(user.suspendedUntil).toLocaleDateString()}
+                {activeTab === 'users' && (() => {
+                    // Derive unique faculties and batches from user data
+                    const faculties = Array.from(new Set(users.map((u: any) => u.faculty).filter(Boolean))).sort() as string[];
+                    const batches   = Array.from(new Set(users.map((u: any) => u.batch  ).filter(Boolean))).sort() as string[];
+
+                    const filteredUsers = users.filter((u: any) => {
+                        const matchFaculty = !filterFaculty || u.faculty === filterFaculty;
+                        const matchBatch   = !filterBatch   || String(u.batch) === filterBatch;
+                        return matchFaculty && matchBatch;
+                    });
+
+                    const selectStyle: React.CSSProperties = {
+                        padding: '8px 12px',
+                        background: '#1e293b',
+                        color: '#cbd5e1',
+                        border: '1px solid #334155',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        minWidth: '180px',
+                    };
+
+                    return (
+                        <div className="mod-section">
+                            <h2>
+                                User Management{' '}
+                                <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 400 }}>
+                                    ({filteredUsers.length} of {users.length} users)
+                                </span>
+                            </h2>
+
+                            {/* ── Filter Bar ── */}
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap' }}>
+                                {/* Faculty filter */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Faculty</label>
+                                    <select
+                                        id="filter-faculty"
+                                        value={filterFaculty}
+                                        onChange={e => { setFilterFaculty(e.target.value); setFilterBatch(''); }}
+                                        style={selectStyle}
+                                    >
+                                        <option value="">All Faculties</option>
+                                        {faculties.map(f => (
+                                            <option key={f} value={f}>{f}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Batch filter */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Batch</label>
+                                    <select
+                                        id="filter-batch"
+                                        value={filterBatch}
+                                        onChange={e => setFilterBatch(e.target.value)}
+                                        style={selectStyle}
+                                        disabled={batches.length === 0}
+                                    >
+                                        <option value="">All Batches</option>
+                                        {batches.map(b => (
+                                            <option key={b} value={String(b)}>{b}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Clear filters */}
+                                {(filterFaculty || filterBatch) && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <label style={{ fontSize: '11px', color: 'transparent', userSelect: 'none' }}>.</label>
+                                        <button
+                                            onClick={() => { setFilterFaculty(''); setFilterBatch(''); }}
+                                            style={{ padding: '8px 14px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ef4444'; }}
+                                        >
+                                            ✕ Clear Filters
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Active filter badges */}
+                                <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                                    {filterFaculty && (
+                                        <span style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '12px', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>
+                                            📚 {filterFaculty}
+                                        </span>
+                                    )}
+                                    {filterBatch && (
+                                        <span style={{ background: '#1e3a2f', color: '#34d399', fontSize: '12px', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>
+                                            🎓 Batch {filterBatch}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* ── Table ── */}
+                            <div className="mod-table-container">
+                                <table className="mod-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>University Email</th>
+                                            <th>Faculty</th>
+                                            <th>Batch</th>
+                                            <th>Joined</th>
+                                            <th>Status</th>
+                                            <th className="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredUsers.length === 0 ? (
+                                            <tr><td colSpan={7} style={{ textAlign: 'center', color: '#64748b', padding: '30px' }}>
+                                                {users.length === 0 ? 'No users found.' : 'No users match the selected filters.'}
+                                            </td></tr>
+                                        ) : filteredUsers.map((user: any) => {
+                                            const isSuspended = user.suspendedUntil && new Date(user.suspendedUntil) > new Date();
+                                            const status = isSuspended ? 'Suspended' : 'Active';
+                                            return (
+                                                <tr key={user.id}>
+                                                    <td>{user.fullName || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unknown</span>}</td>
+                                                    <td>{user.email}</td>
+                                                    <td style={{ textTransform: 'uppercase', fontSize: '12px', color: '#64748b' }}>{user.faculty || '—'}</td>
+                                                    <td style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>{user.batch ? `E${user.batch}` : '—'}</td>
+                                                    <td>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                                                    <td>
+                                                        <span className={`mod-status status-${status.toLowerCase()}`}>{status}</span>
+                                                        {isSuspended && (
+                                                            <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '3px' }}>
+                                                                Until {new Date(user.suspendedUntil).toLocaleDateString()}
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="text-center">
+                                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                            <button className="mod-action-btn" onClick={() => openModal('warn', user)}>Warn</button>
+                                                            {!isSuspended && <button className="mod-action-btn danger" onClick={() => openModal('suspend', user)}>Suspend</button>}
+                                                            <button className="mod-action-btn danger" onClick={() => openModal('delete', user)}>Delete</button>
                                                         </div>
-                                                    )}
-                                                </td>
-                                                <td className="text-center">
-                                                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                                                        <button className="mod-action-btn" onClick={() => openModal('warn', user)}>Warn</button>
-                                                        {!isSuspended && <button className="mod-action-btn danger" onClick={() => openModal('suspend', user)}>Suspend</button>}
-                                                        <button className="mod-action-btn danger" onClick={() => openModal('delete', user)}>Delete</button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
 
                 {/* ─── Moderators ─── */}
                 {activeTab === 'moderators' && (
