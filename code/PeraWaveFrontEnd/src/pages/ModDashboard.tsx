@@ -472,6 +472,13 @@ const ModDashboard: React.FC = () => {
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
+    // Extract batch year from registrationNumber e.g. "E/23/060" or "E23060" -> "23"
+    const extractBatch = (regNo: string | null | undefined): string => {
+        if (!regNo) return '';
+        const match = regNo.match(/[Ee][\/_-]?(\d{2})[\/_-]?\d+/);
+        return match ? match[1] : '';
+    };
+
     return (
         <div className="mod-dashboard-page">
             {/* Sidebar */}
@@ -648,13 +655,16 @@ const ModDashboard: React.FC = () => {
 
                 {/* ─── Users ─── */}
                 {activeTab === 'users' && (() => {
-                    // Derive unique faculties and batches from user data
+                    // Derive unique faculties from user data
                     const faculties = Array.from(new Set(users.map((u: any) => u.faculty).filter(Boolean))).sort() as string[];
-                    const batches   = Array.from(new Set(users.map((u: any) => u.batch  ).filter(Boolean))).sort() as string[];
+                    // Derive unique batches by parsing registrationNumber
+                    const batches = Array.from(
+                        new Set(users.map((u: any) => extractBatch(u.registrationNumber)).filter(Boolean))
+                    ).sort() as string[];
 
                     const filteredUsers = users.filter((u: any) => {
                         const matchFaculty = !filterFaculty || u.faculty === filterFaculty;
-                        const matchBatch   = !filterBatch   || String(u.batch) === filterBatch;
+                        const matchBatch   = !filterBatch   || extractBatch(u.registrationNumber) === filterBatch;
                         return matchFaculty && matchBatch;
                     });
 
@@ -733,12 +743,12 @@ const ModDashboard: React.FC = () => {
                                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                                     {filterFaculty && (
                                         <span style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '12px', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>
-                                            📚 {filterFaculty}
+                                            {filterFaculty}
                                         </span>
                                     )}
                                     {filterBatch && (
                                         <span style={{ background: '#1e3a2f', color: '#34d399', fontSize: '12px', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>
-                                            🎓 Batch {filterBatch}
+                                            Batch {filterBatch}
                                         </span>
                                     )}
                                 </div>
@@ -771,7 +781,9 @@ const ModDashboard: React.FC = () => {
                                                     <td>{user.fullName || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unknown</span>}</td>
                                                     <td>{user.email}</td>
                                                     <td style={{ textTransform: 'uppercase', fontSize: '12px', color: '#64748b' }}>{user.faculty || '—'}</td>
-                                                    <td style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>{user.batch ? `E${user.batch}` : '—'}</td>
+                                                    <td style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
+                                                        {extractBatch(user.registrationNumber) ? `E/${extractBatch(user.registrationNumber)}` : '—'}
+                                                    </td>
                                                     <td>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                                                     <td>
                                                         <span className={`mod-status status-${status.toLowerCase()}`}>{status}</span>
